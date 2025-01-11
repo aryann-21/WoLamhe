@@ -19,8 +19,8 @@ const App = () => {
             <img src={mainPhoto} alt="Your Photo" className="object-cover h-full w-full" />
           </div>
           <div className="w-1/2 flex flex-col justify-center items-start bg-[#D3B495] text-[#2E2210] p-8">
-            <h1 className="text-6xl font-bold mb-4 tracking-wider leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>Heyy...</h1>
-            <p className="text-xl max-w-md tracking-wide leading-relaxed" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <h1 className="text-6xl font-bold mb-12 tracking-wider leading-tight">Heyy...</h1>
+            <p className="text-xl max-w-md tracking-wide leading-relaxed font-semibold">
               Realize the power of print and let your memories shine! From personalized polaroids to stunning postcards, trendy strips, sleek square prints, and epic wall posters—every format tells your story in style. Transform moments into timeless treasures, because your memories deserve more than just a screen!
             </p>
           </div>

@@ -1,14 +1,14 @@
 import React from 'react';
-import headerPhoto from '../assets/header.png'; // Ensure this path is correct
-import profileIcon from '../assets/profile.png'; // Ensure this path is correct
+import { Link } from 'react-router-dom';
+import headerPhoto from '../assets/header.png';
+import profileIcon from '../assets/profile.png';
 
 const Header = () => {
   return (
     <header>
       {/* Top Strip with Photo */}
-        
       <div className="bg-[#2E2210] text-[#EDE8E0] flex justify-center items-center">
-        <img src={headerPhoto} className='w-40'/>
+        <img src={headerPhoto} className="w-40" alt="Header" />
       </div>
 
       {/* Navbar */}
@@ -16,15 +16,18 @@ const Header = () => {
         <div className="container mx-auto flex justify-between items-center text-lg font-semibold px-20">
           <nav className="flex-1">
             <ul className="flex justify-start space-x-24">
-              <li><a href="#" className="hover:underline">Home</a></li>
-              <li><a href="#" className="hover:underline">Polaroids</a></li>
-              <li><a href="#" className="hover:underline">Postcards</a></li>
-              <li><a href="#" className="hover:underline">Wall Posters</a></li>
-              <li><a href="#" className="hover:underline">Strips</a></li>
-              <li><a href="#" className="hover:underline">Square Prints</a></li>
+              <li><Link to="/" className="hover:underline">Home</Link></li>
+              <li><Link to="/polaroids" className="hover:underline">Polaroids</Link></li>
+              <li><Link to="/postcards" className="hover:underline">Postcards</Link></li>
+              <li><Link to="/wallposters" className="hover:underline">Wall Posters</Link></li>
+              <li><Link to="/strips" className="hover:underline">Strips</Link></li>
+              <li><Link to="/squareprints" className="hover:underline">Square Prints</Link></li>
             </ul>
           </nav>
-          <img src={profileIcon} className='w-6'/>
+          {/* Profile Icon Link */}
+          <Link to="/login">
+            <img src={profileIcon} className="w-6 cursor-pointer" alt="Profile Icon" />
+          </Link>
         </div>
       </div>
     </header>

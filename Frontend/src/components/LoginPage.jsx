@@ -1,35 +1,43 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   return (
-    <div className="bg-[#faf5f0] min-h-screen flex items-center justify-center">
+    <div className="bg-[#faf5f0] min-h-screen flex items-center justify-center p-4">
       {/* Outer Container */}
-      <div className="flex bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-4/5 max-w-5xl h-96">
+      <div className="flex bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-full max-w-4xl h-auto my-8">
         {/* Left Section */}
-        <div className="w-1/2 bg-[#e4ccb4] p-6 flex flex-col items-center justify-center text-center">
-          {/* Wo Lamhe Logo */}
-          <img 
-            src="/src/assets/footer.png" // Replace with the actual path to your Wo Lamhe logo image
-            alt="Wo Lamhe Logo"
-            className="h-16 mb-4"
-          />
-
-          <h2 className="text-2xl font-bold mb-4 text-black">Log In</h2>
+        <div className="w-1/2 bg-[#e4ccb4] p-6 flex flex-col items-center justify-start text-center pt-20">
+          <h2 className="text-4xl font-extrabold mb-8 text-black">Log In</h2>
           <form className="w-full max-w-sm">
             {/* Input: Email/Username */}
-            <div className="mb-3">
+            <div className="mb-5 relative">
+              <span className="absolute left-3 top-2">
+                <img
+                  src="/src/assets/email.png" // Replace with actual path
+                  alt="Email Icon"
+                  className="h-5 w-5"
+                />
+              </span>
               <input
                 type="text"
-                placeholder="Email or Username"
-                className="w-full p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
+                placeholder="Email"
+                className="w-full pl-10 p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
               />
             </div>
             {/* Input: Password */}
-            <div className="mb-5">
+            <div className="mb-8 relative">
+              <span className="absolute left-3 top-2">
+                <img
+                  src="/src/assets/password.png" // Replace with actual path
+                  alt="Password Icon"
+                  className="h-5 w-5"
+                />
+              </span>
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
+                className="w-full pl-10 p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
               />
             </div>
             {/* Submit Button */}
@@ -40,12 +48,17 @@ const LoginPage = () => {
               Log In
             </button>
           </form>
+          <p className="mt-8 text-sm text-gray-700">
+            Not already a user?{" "}
+            <Link to="/signup" className="text-[#2E2210] font-semibold underline">
+              Sign Up
+            </Link>
+          </p>
         </div>
-
         {/* Right Section */}
         <div className="w-1/2">
           <img
-            src="/src/assets/login.jpg" // Replace with your login background image path
+            src="/src/assets/login.jpg" // Replace with actual path
             alt="Photographer"
             className="w-full h-full object-cover"
           />

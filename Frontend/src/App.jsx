@@ -9,6 +9,7 @@ import SquarePrints from './components/SquarePrints';
 import PhotoStrips from './components/PhotoStrips';
 import LoginPage from './components/LoginPage';
 import mainPhoto from './assets/main.jpg';
+import SignUpPage from './components/SignUpPage';
 
 const App = () => {
   return (
@@ -58,6 +59,7 @@ const App = () => {
         <Route path="/wallposters" element={<WallPosters />} />
         <Route path="/strips" element={<PhotoStrips />} />
         <Route path="/squareprints" element={<SquarePrints />} />
+        <Route path="/signup" element={<SignUpPage />} />
       </Routes>
       <Footer />
     </div>

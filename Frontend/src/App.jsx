@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Routes, Route } from "react-router-dom";
-import { UserProvider } from "./context/UserContext"; // Import UserProvider to wrap the app
+import { UserProvider } from "./context/UserContext"; 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Polaroids from "./components/Polaroids";
@@ -13,17 +13,27 @@ import mainPhoto from "./assets/main.jpg";
 import SignUpPage from "./components/SignUpPage";
 
 const App = () => {
+  const polaroidsRef = useRef(null);
+  const postcardsRef = useRef(null);
+  const wallPostersRef = useRef(null);
+  const squarePrintsRef = useRef(null);
+  const photoStripsRef = useRef(null);
+
   return (
-    <UserProvider> {/* Wrap the app with UserProvider to make user data available globally */}
+    <UserProvider>
       <div>
-        <Header />
+        <Header
+          polaroidsRef={polaroidsRef}
+          postcardsRef={postcardsRef}
+          wallPostersRef={wallPostersRef}
+          squarePrintsRef={squarePrintsRef}
+          photoStripsRef={photoStripsRef}
+        />
         <Routes>
-          {/* Home Page */}
           <Route
             path="/"
             element={
               <main className="bg-gray-100">
-                {/* Hero Section */}
                 <section className="h-screen flex">
                   <div className="w-1/2">
                     <img src={mainPhoto} alt="Main" className="object-cover h-full w-full" />
@@ -38,23 +48,22 @@ const App = () => {
 
                 {/* Sections Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2">
-                  <PostCards />
-                  <Polaroids />
+                  <PostCards ref={postcardsRef} />
+                  <Polaroids ref={polaroidsRef} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
                   <div className="col-span-1">
-                    <WallPosters />
+                    <WallPosters ref={wallPostersRef} />
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-2">
-                    <SquarePrints />
-                    <PhotoStrips />
+                    <SquarePrints ref={squarePrintsRef} />
+                    <PhotoStrips ref={photoStripsRef} />
                   </div>
                 </div>
               </main>
             }
           />
 
-          {/* Individual Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/polaroids" element={<Polaroids />} />
           <Route path="/postcards" element={<PostCards />} />
@@ -65,7 +74,7 @@ const App = () => {
         </Routes>
         <Footer />
       </div>
-    </UserProvider> // Closing the UserProvider to wrap the whole app
+    </UserProvider>
   );
 };
 

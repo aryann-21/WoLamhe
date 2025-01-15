@@ -1,16 +1,24 @@
 // src/context/UserContext.jsx
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 // Create the UserContext
 const UserContext = createContext();
 
 // Create the UserProvider component to wrap your app and provide context values
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Initialize with no user
+  // Check if there's any user data in localStorage on component mount
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
-  // Set the user info in context
+  const [user, setUser] = useState(storedUser || null); // Initialize with stored user data or null
+
+  // Set the user info in context and store in localStorage
   const setUserInfo = (userInfo) => {
     setUser(userInfo);
+    if (userInfo) {
+      localStorage.setItem("user", JSON.stringify(userInfo)); // Store user data in localStorage
+    } else {
+      localStorage.removeItem("user"); // Remove user data from localStorage if logging out
+    }
   };
 
   return (

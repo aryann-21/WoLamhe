@@ -2,8 +2,20 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import headerPhoto from '../assets/header.png';
 import profileIcon from '../assets/profile.png';
+import { useUser } from '../context/UserContext'; // Import the useUser hook
 
 const Header = () => {
+  const { user, setUser } = useUser(); // Get user data and setUser function from context
+
+  // Log out handler
+  const handleLogout = () => {
+    // Clear user data from context
+    setUser(null);
+
+    // Optionally, clear token from local storage
+    localStorage.removeItem("token");
+  };
+
   return (
     <header>
       {/* Top Strip with Photo */}
@@ -24,10 +36,22 @@ const Header = () => {
               <li><Link to="/squareprints" className="hover:underline">Square Prints</Link></li>
             </ul>
           </nav>
-          {/* Profile Icon Link */}
-          <Link to="/login">
-            <img src={profileIcon} className="w-6 cursor-pointer" alt="Profile Icon" />
-          </Link>
+          {/* Profile or User Name */}
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <span className="text-[#2E2210]">{user.name}</span>
+              <button
+                onClick={handleLogout}
+                className="text-red-600 hover:underline"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link to="/login">
+              <img src={profileIcon} className="w-6 cursor-pointer" alt="Profile Icon" />
+            </Link>
+          )}
         </div>
       </div>
     </header>

@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer>
       {/* Upper Strip */}
-      <div className="bg-[#2E2210] text-[#EDE8E0] text-center">
+      <div className="bg-[#2E2210] text-[#EDE8E0] flex justify-center items-center">
         <img src={dilSe} className="w-72 mx-auto -my-6" />
       </div>
 

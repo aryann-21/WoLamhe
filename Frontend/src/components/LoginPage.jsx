@@ -3,20 +3,20 @@ import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   return (
-    <div className="bg-[#faf5f0] min-h-screen flex items-center justify-center p-4">
+    <div className="bg-[#faf5f0] flex justify-center p-4">
       {/* Outer Container */}
-      <div className="flex bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-full max-w-4xl h-auto my-8">
+      <div className="flex bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-full max-w-4xl h-auto">
         {/* Left Section */}
         <div className="w-1/2 bg-[#e4ccb4] p-6 flex flex-col items-center justify-start text-center pt-20">
           <h2 className="text-4xl font-extrabold mb-8 text-black">Log In</h2>
           <form className="w-full max-w-sm">
             {/* Input: Email/Username */}
             <div className="mb-5 relative">
-              <span className="absolute left-3 top-2">
+              <span className="absolute left-2 top-2">
                 <img
                   src="/src/assets/email.png" // Replace with actual path
                   alt="Email Icon"
-                  className="h-5 w-5"
+                  className="w-6"
                 />
               </span>
               <input
@@ -27,11 +27,11 @@ const LoginPage = () => {
             </div>
             {/* Input: Password */}
             <div className="mb-8 relative">
-              <span className="absolute left-3 top-2">
+              <span className="absolute left-[11px] top-2">
                 <img
                   src="/src/assets/password.png" // Replace with actual path
                   alt="Password Icon"
-                  className="h-5 w-5"
+                  className="w-5"
                 />
               </span>
               <input
@@ -43,7 +43,7 @@ const LoginPage = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="bg-[#2E2210] text-white px-6 py-2 rounded-full w-full hover:bg-[#65350f] transition duration-300"
+              className="bg-[#65350f] text-white px-6 py-2 rounded-full w-full hover:bg-[#875223] transition duration-150"
             >
               Log In
             </button>

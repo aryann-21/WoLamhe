@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -11,17 +11,17 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="bg-[#faf5f0] min-h-screen flex items-center justify-center p-4">
+    <div className="bg-[#faf5f0] flex justify-center p-4">
       {/* Outer Container */}
-      <div className="flex bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-full max-w-4xl h-auto my-8">
+      <div className="flex bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-full max-w-4xl h-auto">
         {/* Left Section */}
         <div className="w-1/2 bg-[#e4ccb4] p-6 flex flex-col items-center justify-start text-center pt-12">
           <h2 className="text-4xl font-extrabold mb-6 text-black">Sign Up</h2>
           <form onSubmit={handleSignUp} className="w-full max-w-sm">
             {/* Input: Name */}
             <div className="mb-3 relative">
-              <span className="absolute left-3 top-2">
-                <img src="/src/assets/user.png" alt="User Icon" className="h-5 w-5" />
+              <span className="absolute left-3 top-[11px]">
+                <img src="/src/assets/user.png" alt="User Icon" className="w-4" />
               </span>
               <input
                 type="text"
@@ -31,8 +31,8 @@ const SignUpPage = () => {
             </div>
             {/* Input: Email */}
             <div className="mb-3 relative">
-              <span className="absolute left-3 top-2">
-                <img src="/src/assets/email.png" alt="Email Icon" className="h-5 w-5" />
+              <span className="absolute left-2 top-2">
+                <img src="/src/assets/email.png" alt="Email Icon" className="w-6" />
               </span>
               <input
                 type="email"
@@ -42,8 +42,8 @@ const SignUpPage = () => {
             </div>
             {/* Input: Phone */}
             <div className="mb-3 relative">
-              <span className="absolute left-3 top-2">
-                <img src="/src/assets/phone.png" alt="Phone Icon" className="h-5 w-5" />
+              <span className="absolute left-3 top-[12px]">
+                <img src="/src/assets/phone.png" alt="Phone Icon" className="w-4" />
               </span>
               <input
                 type="tel"
@@ -53,8 +53,8 @@ const SignUpPage = () => {
             </div>
             {/* Input: Password */}
             <div className="mb-3 relative">
-              <span className="absolute left-3 top-2">
-                <img src="/src/assets/password.png" alt="Password Icon" className="h-5 w-5" />
+              <span className="absolute left-[10px] top-[8px]">
+                <img src="/src/assets/password.png" alt="Password Icon" className="w-5" />
               </span>
               <input
                 type="password"
@@ -64,8 +64,8 @@ const SignUpPage = () => {
             </div>
             {/* Input: Confirm Password */}
             <div className="mb-5 relative">
-              <span className="absolute left-3 top-2">
-                <img src="/src/assets/confirm.png" alt="Confirm Password Icon" className="h-5 w-5" />
+              <span className="absolute left-[9px] top-[10px]">
+                <img src="/src/assets/confirm.png" alt="Confirm Password Icon" className="w-6" />
               </span>
               <input
                 type="password"
@@ -76,11 +76,17 @@ const SignUpPage = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="bg-[#2E2210] text-white px-6 py-2 rounded-full w-full hover:bg-[#65350f] transition duration-300"
+              className="bg-[#65350f] text-white px-6 py-2 rounded-full w-full hover:bg-[#875223] transition duration-300"
             >
               Sign Up
             </button>
           </form>
+          <p className="mt-8 text-sm text-gray-700">
+            Already have an account?{" "}
+            <Link to="/login" className="text-[#2E2210] font-semibold underline">
+              Log In
+            </Link>
+          </p>
         </div>
         {/* Right Section */}
         <div className="w-1/2">

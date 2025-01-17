@@ -11,6 +11,8 @@ import PhotoStrips from "./components/PhotoStrips";
 import LoginPage from "./components/LoginPage";
 import mainPhoto from "./assets/main.jpg";
 import SignUpPage from "./components/SignUpPage";
+import Presets from "./components/Presets";
+import UploadPage from "./components/UploadPage";
 
 const App = () => {
   const polaroidsRef = useRef(null);
@@ -71,6 +73,8 @@ const App = () => {
           <Route path="/strips" element={<PhotoStrips />} />
           <Route path="/squareprints" element={<SquarePrints />} />
           <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/presets" element={<Presets />} />
+          <Route path="/upload" element={<UploadPage />} />
         </Routes>
         <Footer />
       </div>

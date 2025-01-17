@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import headerPhoto from "../assets/header.png";
 import profileIcon from "../assets/profile.png";
 import { useUser } from "../context/UserContext";
@@ -12,11 +12,14 @@ const Header = ({
   photoStripsRef,
 }) => {
   const { user, setUser } = useUser();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Log out handler
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("user"); // Clear user from localStorage on logout
+    navigate("/", { replace: true });
   };
 
   // Scroll to section handler
@@ -24,7 +27,8 @@ const Header = ({
     if (ref.current) {
       const offset = -110; // Adjust the scroll position by 10px above the section
       window.scrollTo({
-        top: ref.current.getBoundingClientRect().top + window.pageYOffset + offset,
+        top:
+          ref.current.getBoundingClientRect().top + window.pageYOffset + offset,
         behavior: "smooth",
       });
     }
@@ -32,10 +36,25 @@ const Header = ({
 
   // Scroll to the top of the page
   const scrollToTop = () => {
+    navigate("/", { replace: true });
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
+  };
+
+  // Handle scroll to section and redirection
+  const handleSectionClick = (ref) => {
+    if (location.pathname === "/") {
+      // If we are on the home page, scroll directly to the section
+      scrollToSection(ref);
+    } else {
+      // If we are on another route, navigate to home and then scroll to the section
+      navigate("/", { replace: true });
+      setTimeout(() => {
+        scrollToSection(ref);
+      }, 350); // Delay to allow navigation to happen first
+    }
   };
 
   return (
@@ -47,7 +66,7 @@ const Header = ({
 
       {/* Navbar */}
       <div className="bg-[#ebe1d2] text-[#2E2210] py-3">
-        <div className="container mx-auto flex justify-between items-center text-lg font-semibold px-20">
+        <div className="container mx-auto flex justify-between items-center text-lg font-semibold px-10">
           <nav className="flex-1">
             <ul className="flex justify-start space-x-24">
               <li>
@@ -56,44 +75,76 @@ const Header = ({
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollToSection(polaroidsRef)} className="hover:underline">
-                  Polaroids
-                </button>
-              </li>
-              <li>
-                <button onClick={() => scrollToSection(postcardsRef)} className="hover:underline">
+                <button
+                  onClick={() => handleSectionClick(postcardsRef)}
+                  className="hover:underline"
+                >
                   Postcards
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollToSection(wallPostersRef)} className="hover:underline">
+                <button
+                  onClick={() => handleSectionClick(polaroidsRef)}
+                  className="hover:underline"
+                >
+                  Polaroids
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => handleSectionClick(wallPostersRef)}
+                  className="hover:underline"
+                >
                   Wall Posters
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollToSection(photoStripsRef)} className="hover:underline">
-                  Strips
+                <button
+                  onClick={() => handleSectionClick(squarePrintsRef)}
+                  className="hover:underline"
+                >
+                  Square Prints
                 </button>
               </li>
               <li>
-                <button onClick={() => scrollToSection(squarePrintsRef)} className="hover:underline">
-                  Square Prints
+                <button
+                  onClick={() => handleSectionClick(photoStripsRef)}
+                  className="hover:underline"
+                >
+                  Photo Strips
                 </button>
               </li>
             </ul>
           </nav>
           {/* Profile or User Name */}
           {user ? (
-            <div className="flex items-center space-x-4">
-              <span className="text-[#2E2210]">{user.name}</span>
-              <button onClick={handleLogout} className="text-red-600 hover:underline">
+            <div className="flex items-center space-x-8">
+              <div className="lefty flex items-center justify-start space-x-2">
+                <img
+                  src={profileIcon}
+                  className="w-5 cursor-pointer"
+                  alt="Profile Icon"
+                />
+                <span className="text-[#2E2210]">{user.name}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="bg-red-700 text-[16px] text-white py-1 px-3 rounded-lg hover:bg-red-800"
+              >
                 Logout
               </button>
             </div>
           ) : (
+            <div>
             <Link to="/login">
-              <img src={profileIcon} className="w-6 cursor-pointer" alt="Profile Icon" />
+              {/* <img src={profileIcon} className="w-6 cursor-pointer" alt="Profile Icon" /> */}
+              <span className="text-green-700 hover:underline">Login</span> /{" "}
+              {/* <span className="text-blue-700 hover:underline">SignUp</span> */}
             </Link>
+            <Link to="/signup">
+              <span className="text-blue-700 hover:underline">SignUp</span>
+            </Link>
+            </div>
           )}
         </div>
       </div>

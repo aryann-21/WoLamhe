@@ -1,11 +1,17 @@
 import React, { forwardRef, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import wall from "../assets/wall.jpg";
 import cameraPhoto from "../assets/camera.png";
 
 const WallPosters = (props, ref) => {
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate(); // Initialize navigate
 
   const categories = Array.from({ length: 12 }, (_, i) => `Category ${i + 1}`);
+
+  const handleClick = () => {
+    navigate("/upload"); // Navigate to the Presets page when clicked
+  };
 
   return (
     <div
@@ -15,8 +21,14 @@ const WallPosters = (props, ref) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Title */}
-      <div className="absolute top-0 left-0 z-10 p-4">
-        <h3 className="text-6xl">Wall Posters</h3>
+      <div className="absolute top-0 right-0 z-10 p-4">
+        <h3
+          className={`text-6xl text-[#2E2210] transition-opacity duration-700 ${
+            isHovered ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          Wall Posters
+        </h3>
       </div>
 
       {/* Background Image */}
@@ -37,7 +49,8 @@ const WallPosters = (props, ref) => {
           <img
             src={cameraPhoto}
             alt="Upload"
-            className="w-24 h-24 object-cover mb-8 border-2 p-3 rounded-lg border-gray-300"
+            className="w-24 h-24 object-cover mb-8 border-2 p-3 rounded-lg border-gray-300 cursor-pointer"
+            onClick={handleClick} // Add onClick handler
           />
           <p className="text-center text-xl font-semibold">
             Upload your own photos
@@ -49,7 +62,9 @@ const WallPosters = (props, ref) => {
 
         {/* Right Section */}
         <div className="w-1/2 flex flex-col justify-center p-6">
-          <h3 className="text-2xl font-bold mb-4 text-center z-40">Categories</h3>
+          <h3 className="text-2xl font-bold mb-4 text-center z-40">
+            Wall Posters
+          </h3>
           <ul className="grid grid-cols-2 gap-4">
             {categories.map((category, index) => (
               <li key={index} className="text-center">

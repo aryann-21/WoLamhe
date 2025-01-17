@@ -1,11 +1,17 @@
 import React, { forwardRef, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import Square from "../assets/square.jpg";
 import cameraPhoto from "../assets/camera.png";
 
 const SquarePrints = (props, ref) => {
   const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate(); // Initialize navigate
 
   const categories = Array.from({ length: 12 }, (_, i) => `Category ${i + 1}`);
+
+  const handleClick = () => {
+    navigate("/upload"); // Navigate to the Presets page when clicked
+  };
 
   return (
     <div
@@ -22,8 +28,14 @@ const SquarePrints = (props, ref) => {
       />
 
       {/* Title */}
-      <div className="absolute bottom-0 left-0 z-10 p-4">
-        <h3 className="text-3xl">Square Prints</h3>
+      <div className="absolute bottom-0 right-0 z-10 p-4">
+        <h3
+          className={`text-3xl text-[#2E2210] transition-opacity duration-700 ${
+            isHovered ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          Square Prints
+        </h3>
       </div>
 
       {/* Hover Overlay */}
@@ -37,7 +49,8 @@ const SquarePrints = (props, ref) => {
           <img
             src={cameraPhoto}
             alt="Upload"
-            className="w-20 h-20 object-cover mb-6 border-2 p-2 rounded-lg border-gray-300"
+            className="w-20 h-20 object-cover mb-6 border-2 p-2 rounded-lg border-gray-300 cursor-pointer"
+            onClick={handleClick} // Add onClick handler
           />
           <p className="text-center text-lg font-semibold">
             Upload your own photos
@@ -49,7 +62,9 @@ const SquarePrints = (props, ref) => {
 
         {/* Bottom Section */}
         <div className="w-full flex flex-col justify-center p-4">
-          <h3 className="text-xl font-bold mb-3 text-center z-40">Categories</h3>
+          <h3 className="text-xl font-bold mb-3 text-center z-40">
+            Square Prints
+          </h3>
           <ul className="grid grid-cols-3 gap-3">
             {categories.map((category, index) => (
               <li key={index} className="text-center z-50">

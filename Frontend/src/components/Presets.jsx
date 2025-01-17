@@ -4,7 +4,7 @@ const HomePage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const images = [
-    "/src/assets/order.jpg", // Replace with actual image paths
+    "/src/assets/orders.jpg", // Replace with actual image paths
     "/src/assets/Polaroids.jpg",
     "/src/assets/square.jpg",
     "/src/assets/strips.jpg",
@@ -22,7 +22,7 @@ const HomePage = () => {
   };
 
   return (
-    <main className="bg-[#FDF6F0] min-h-screen py-16">
+    <main className="bg-[#FDF6F0] min-h-screen py-16 mt-[108px]">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Left Section: Image with Thumbnails */}

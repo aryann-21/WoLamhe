@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const HomePage = () => {
+const UploadPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [customText, setCustomText] = useState("");
   const [addedText, setAddedText] = useState({});
@@ -204,4 +204,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default UploadPage;

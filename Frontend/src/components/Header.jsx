@@ -138,11 +138,11 @@ const Header = ({
             <div>
             <Link to="/login">
               {/* <img src={profileIcon} className="w-6 cursor-pointer" alt="Profile Icon" /> */}
-              <span className="text-green-700 hover:underline">Login</span> /{" "}
+              <span className="text-green-950 hover:underline">Login</span> /{" "}
               {/* <span className="text-blue-700 hover:underline">SignUp</span> */}
             </Link>
             <Link to="/signup">
-              <span className="text-blue-700 hover:underline">SignUp</span>
+              <span className="text-blue-950 hover:underline">SignUp</span>
             </Link>
             </div>
           )}

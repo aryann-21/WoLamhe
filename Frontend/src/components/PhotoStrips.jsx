@@ -7,8 +7,6 @@ const PhotoStrips = (props, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate(); // Initialize navigate
 
-  const categories = Array.from({ length: 12 }, (_, i) => `Category ${i + 1}`);
-
   const handleClick = () => {
     navigate("/upload"); // Navigate to the Presets page when clicked
   };
@@ -40,12 +38,19 @@ const PhotoStrips = (props, ref) => {
 
       {/* Hover Overlay */}
       <div
-        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col text-white text-sm transition-all duration-700 ease-in-out ${
+        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white text-sm transition-all duration-700 ease-in-out ${
           isHovered ? "opacity-100" : "opacity-0"
         }`}
       >
         {/* Top Section */}
         <div className="w-full flex flex-col items-center justify-center p-4">
+          <h3 className="text-xl font-bold mb-3 text-center z-40">
+            Photo Strips
+          </h3>
+
+          {/* Divider Line */}
+          <div className="h-px bg-white w-3/4 self-center my-8" />
+
           <img
             src={cameraPhoto}
             alt="Upload"
@@ -55,23 +60,6 @@ const PhotoStrips = (props, ref) => {
           <p className="text-center text-lg font-semibold">
             Upload your own photos
           </p>
-        </div>
-
-        {/* Divider Line */}
-        <div className="h-px bg-white w-3/4 self-center my-4" />
-
-        {/* Bottom Section */}
-        <div className="w-full flex flex-col justify-center p-4">
-          <h3 className="text-xl font-bold mb-3 text-center z-40">
-            Photo Strips
-          </h3>
-          <ul className="grid grid-cols-3 gap-3">
-            {categories.map((category, index) => (
-              <li key={index} className="text-center z-40">
-                {category}
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </div>

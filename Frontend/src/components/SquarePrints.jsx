@@ -7,8 +7,6 @@ const SquarePrints = (props, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate(); // Initialize navigate
 
-  const categories = Array.from({ length: 12 }, (_, i) => `Category ${i + 1}`);
-
   const handleClick = () => {
     navigate("/upload"); // Navigate to the Presets page when clicked
   };
@@ -24,11 +22,11 @@ const SquarePrints = (props, ref) => {
       <img
         src={Square}
         alt="Square Prints"
-        className="absolute top-0 right-0 w-[80%] h-[80%] object-cover"
+        className="absolute bottom-0 right-0 w-[80%] h-[80%] object-cover"
       />
 
       {/* Title */}
-      <div className="absolute bottom-0 right-0 z-10 p-4">
+      <div className="absolute top-0 right-0 z-10 p-4">
         <h3
           className={`text-3xl text-[#2E2210] transition-opacity duration-700 ${
             isHovered ? "opacity-0" : "opacity-100"
@@ -40,12 +38,19 @@ const SquarePrints = (props, ref) => {
 
       {/* Hover Overlay */}
       <div
-        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col text-white text-sm transition-all duration-700 ease-in-out ${
+        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white text-sm transition-all duration-700 ease-in-out ${
           isHovered ? "opacity-100" : "opacity-0"
         }`}
       >
         {/* Top Section */}
         <div className="w-full flex flex-col items-center justify-center p-4">
+          <h3 className="text-xl font-bold mb-3 text-center z-40">
+            Square Prints
+          </h3>
+
+          {/* Divider Line */}
+          <div className="h-px bg-white w-3/4 self-center my-8" />
+
           <img
             src={cameraPhoto}
             alt="Upload"
@@ -55,23 +60,6 @@ const SquarePrints = (props, ref) => {
           <p className="text-center text-lg font-semibold">
             Upload your own photos
           </p>
-        </div>
-
-        {/* Divider Line */}
-        <div className="h-px bg-white w-3/4 self-center my-4" />
-
-        {/* Bottom Section */}
-        <div className="w-full flex flex-col justify-center p-4">
-          <h3 className="text-xl font-bold mb-3 text-center z-40">
-            Square Prints
-          </h3>
-          <ul className="grid grid-cols-3 gap-3">
-            {categories.map((category, index) => (
-              <li key={index} className="text-center z-50">
-                {category}
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </div>

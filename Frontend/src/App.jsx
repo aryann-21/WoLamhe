@@ -11,7 +11,7 @@ import PhotoStrips from "./components/PhotoStrips";
 import LoginPage from "./components/LoginPage";
 import mainPhoto from "./assets/main.jpg";
 import SignUpPage from "./components/SignUpPage";
-import Presets from "./components/Presets";
+import Presets from "./components/Presets"; // Import PresetsPage
 import UploadPage from "./components/UploadPage";
 
 const App = () => {
@@ -73,7 +73,8 @@ const App = () => {
           <Route path="/strips" element={<PhotoStrips />} />
           <Route path="/squareprints" element={<SquarePrints />} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/presets" element={<Presets />} />
+          {/* Modify the /presets route to handle categories */}
+          <Route path="/presets/:category" element={<Presets />} />
           <Route path="/upload" element={<UploadPage />} />
         </Routes>
         <Footer />

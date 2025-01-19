@@ -7,10 +7,13 @@ const WallPosters = (props, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate(); // Initialize navigate
 
-  const categories = Array.from({ length: 12 }, (_, i) => `Category ${i + 1}`);
+  const categories = ["General", "VanGogh", "Blue", "Yellow", "Red", "Green"];
 
-  const handleClick = () => {
-    navigate("/upload"); // Navigate to the Presets page when clicked
+  const handleCategoryClick = (category) => {
+    console.log("Category clicked:", category); // Log category on click
+    navigate(`/presets/${category.toLowerCase()}`, {
+      state: { fromPage: "Wall Posters", category: category }, // Passing both state and category
+    });
   };
 
   return (
@@ -21,7 +24,7 @@ const WallPosters = (props, ref) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Title */}
-      <div className="absolute top-0 right-0 z-10 p-4">
+      <div className="absolute right-0 top-0 z-10 p-4">
         <h3
           className={`text-6xl text-[#2E2210] transition-opacity duration-700 ${
             isHovered ? "opacity-0" : "opacity-100"
@@ -35,7 +38,7 @@ const WallPosters = (props, ref) => {
       <img
         src={wall}
         alt="Wall Posters"
-        className="absolute bottom-0 right-0 w-[80%] h-[70%] object-cover"
+        className="absolute bottom-0 left-0 w-[80%] h-[70%] object-cover"
       />
 
       {/* Hover Overlay */}
@@ -50,7 +53,7 @@ const WallPosters = (props, ref) => {
             src={cameraPhoto}
             alt="Upload"
             className="w-24 h-24 object-cover mb-8 border-2 p-3 rounded-lg border-gray-300 cursor-pointer"
-            onClick={handleClick} // Add onClick handler
+            onClick={() => navigate("/upload")} // Navigate to upload page
           />
           <p className="text-center text-xl font-semibold">
             Upload your own photos
@@ -62,12 +65,16 @@ const WallPosters = (props, ref) => {
 
         {/* Right Section */}
         <div className="w-1/2 flex flex-col justify-center p-6">
-          <h3 className="text-2xl font-bold mb-4 text-center z-40">
+          <h3 className="text-2xl font-bold mb-12 text-center z-40">
             Wall Posters
           </h3>
           <ul className="grid grid-cols-2 gap-4">
             {categories.map((category, index) => (
-              <li key={index} className="text-center">
+              <li
+                key={index}
+                className="text-center z-40 cursor-pointer hover:bg-slate-300 hover:bg-opacity-20"
+                onClick={() => handleCategoryClick(category)} // Handle category click
+              >
                 {category}
               </li>
             ))}

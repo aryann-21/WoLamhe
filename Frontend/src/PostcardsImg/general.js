@@ -1,16 +1,16 @@
 const general = [
-  "https://imgur.com/PbRLbhr.jpg",
-  "https://imgur.com/WO2HoMp.jpg",
-  "https://imgur.com/o7yylJc.jpg",
-  "https://imgur.com/ycRjDNk.jpg",
-  "https://imgur.com/SoHwzUH.jpg",
-  "https://imgur.com/fnoITWZ.jpg",
-  "https://imgur.com/Dz3RdiP.jpg",
-  "https://imgur.com/mL8xiyu.jpg",
-  "https://imgur.com/may2Es7.jpg",
-  "https://imgur.com/R24jBsY.jpg",
-  "https://imgur.com/IzvUxwR.jpg",
-  "https://imgur.com/fWuuTJv.jpg",
+  "https://imgur.com/RW8EYvq.jpg",
+  "https://imgur.com/jxAsJUC.jpg",
+  "https://imgur.com/vTmmJAe.jpg",
+  "https://imgur.com/tbS0moy.jpg",
+  "https://imgur.com/vUQy89O.jpg",
+  "https://imgur.com/ERi5IJn.jpg",
+  "https://imgur.com/zOvWnAi.jpg",
+  "https://imgur.com/HjXl8FI.jpg",
+  "https://imgur.com/TAH78bT.jpg",
+  "https://imgur.com/PvZfbt3.jpg",
+  "https://imgur.com/Yb4iVDs.jpg",
+  "https://imgur.com/34AjrYN.jpg",
 ];
 
 export default general;

@@ -7,7 +7,7 @@ const PostCards = (props, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
-  const categories = ['general', 'vangogh', 'blue', 'yellow', 'red', 'green'];
+  const categories = ['General', 'VanGogh', 'Blue', 'Yellow', 'Red', 'Green'];
 
   const handleCategoryClick = (category) => {
     console.log("Category clicked:", category);  // Log category on click
@@ -56,7 +56,7 @@ const PostCards = (props, ref) => {
             {categories.map((category, index) => (
               <li
                 key={index}
-                className="text-center z-40 cursor-pointer"
+                className="text-center z-40 cursor-pointer hover:bg-slate-300 hover:bg-opacity-20"
                 onClick={() => handleCategoryClick(category)}
               >
                 {category}

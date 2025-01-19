@@ -7,11 +7,13 @@ const PostCards = (props, ref) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
-  const categories = ['General', 'VanGogh', 'Blue', 'Yellow', 'Red', 'Green'];
+  const categories = ["General", "VanGogh", "Blue", "Yellow", "Red", "Green"];
 
   const handleCategoryClick = (category) => {
-    console.log("Category clicked:", category);  // Log category on click
-    navigate(`/presets/${category.toLowerCase()}`);
+    console.log("Category clicked:", category); // Log category on click
+    navigate(`/presets/${category.toLowerCase()}`, {
+      state: { fromPage: "Postcards", category: category }, // Passing both state and category
+    });
   };
 
   return (
@@ -23,7 +25,9 @@ const PostCards = (props, ref) => {
     >
       <div className="absolute right-0 top-0 z-10 p-4">
         <h3
-          className={`text-6xl text-[#2E2210] transition-opacity duration-700 ${isHovered ? "opacity-0" : "opacity-100"}`}
+          className={`text-6xl text-[#2E2210] transition-opacity duration-700 ${
+            isHovered ? "opacity-0" : "opacity-100"
+          }`}
         >
           Postcards
         </h3>
@@ -36,7 +40,9 @@ const PostCards = (props, ref) => {
       />
 
       <div
-        className={`absolute inset-0 bg-black bg-opacity-70 flex text-white text-lg transition-all duration-700 ease-in-out ${isHovered ? "opacity-100" : "opacity-0"}`}
+        className={`absolute inset-0 bg-black bg-opacity-70 flex text-white text-lg transition-all duration-700 ease-in-out ${
+          isHovered ? "opacity-100" : "opacity-0"
+        }`}
       >
         <div className="w-1/2 flex flex-col items-center justify-center p-6">
           <img
@@ -45,13 +51,17 @@ const PostCards = (props, ref) => {
             className="w-24 h-24 object-cover mb-8 border-2 p-3 rounded-lg border-gray-300 cursor-pointer"
             onClick={() => navigate("/upload")}
           />
-          <p className="text-center text-xl font-semibold">Upload your own photos</p>
+          <p className="text-center text-xl font-semibold">
+            Upload your own photos
+          </p>
         </div>
 
         <div className="w-px bg-white self-center h-3/4 mx-4" />
 
         <div className="w-1/2 flex flex-col justify-center p-6">
-          <h3 className="text-2xl font-bold mb-12 text-center z-40">Postcards</h3>
+          <h3 className="text-2xl font-bold mb-12 text-center z-40">
+            Postcards
+          </h3>
           <ul className="grid grid-cols-2 gap-4">
             {categories.map((category, index) => (
               <li

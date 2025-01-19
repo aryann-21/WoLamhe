@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // Import useParams for route parameters
+import { useParams, useLocation } from "react-router-dom"; // Import useLocation to access the passed state
 import general from "../PostcardsImg/general"; // Import your image data
 import green from "../PostcardsImg/green"; // Import your image data
 import blue from "../PostcardsImg/blue"; // Import your image data
@@ -9,6 +9,7 @@ import vanGogh from "../PostcardsImg/vanGogh"; // Import your image data
 
 const PresetsPage = () => {
   const { category } = useParams(); // Extract category from the URL
+  const { state } = useLocation(); // Get state passed from the previous page
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [uploadedImages, setUploadedImages] = useState(null); // Default to "null"
 
@@ -146,10 +147,11 @@ const PresetsPage = () => {
           {/* Right Section: Order Details */}
           <div>
             <h1 className="text-2xl font-semibold mb-4 text-[#2E2210]">
-              Ordering Text
+              {state?.fromPage && `${state.fromPage}`}
             </h1>
+
             <p className="text-2xl text-gray-700 mb-6">
-              !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             </p>
 
             <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">

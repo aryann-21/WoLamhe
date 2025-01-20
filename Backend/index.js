@@ -66,7 +66,9 @@ app.post("/login", async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       token,
-      name: user.name  // Include the user's name in the same response
+      name: user.name,  // Include the user's name in the same response
+      email: user.email, // Include the user's email in the same response
+      phone: user.phone  // Include the user's phone in the same response
     });
 
   } catch (error) {

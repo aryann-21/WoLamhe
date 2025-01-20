@@ -21,19 +21,22 @@ const LoginPage = () => {
           },
         }
       );
-      
 
-      if (response.data.success || response.status === 200) {
+      // Check the response status
+      if (response.status === 200) {
         // Save token to local storage or cookies
         localStorage.setItem("token", response.data.token);
         console.log("Login Successful");
 
-        // Set user information in context
-        const userName = response.data.name; // Assuming the backend returns the user's name
-        setUser({ name: userName, email: response.data.email }); // Store user info in context
+        // Ensure you're setting user info correctly in context
+        setUser({
+          name: response.data.name, // This is coming through
+          email: response.data.email, // Ensure this is not undefined
+          phone: response.data.phone, // Ensure this is not undefined
+        });
 
-        // Redirect to home page after login
-        navigate("/", { state: { name: userName, email: response.data.email } }); // Since user data is now in context, no need to pass state via navigate
+        // Redirect to home page
+        navigate("/");
       } else {
         alert(response.data.message);
       }
@@ -92,7 +95,10 @@ const LoginPage = () => {
           </form>
           <p className="mt-8 text-sm text-gray-700">
             Not already a user?{" "}
-            <Link to="/signup" className="text-[#2E2210] font-semibold underline">
+            <Link
+              to="/signup"
+              className="text-[#2E2210] font-semibold underline"
+            >
               Sign Up
             </Link>
           </p>

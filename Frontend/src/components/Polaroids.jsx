@@ -31,7 +31,7 @@ const Polaroids = (props, ref) => {
   return (
     <div
       ref={ref}
-      className="relative group bg-[#D3B495] overflow-hidden min-h-[400px]"
+      className="relative group bg-[#EDE8E0] overflow-hidden min-h-[400px]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -61,7 +61,7 @@ const Polaroids = (props, ref) => {
             src={cameraPhoto}
             alt="Upload"
             className="w-24 h-24 object-cover mb-8 border-2 p-3 rounded-lg border-gray-300 cursor-pointer"
-            onClick={() => navigate("/upload")}
+            onClick={() => navigate("/upload", { state: { fromPage: "Polaroids" } })}
           />
           <p className="text-center text-xl font-semibold">
             Upload your own photos
@@ -72,7 +72,7 @@ const Polaroids = (props, ref) => {
 
         <div className="w-1/2 flex flex-col justify-center p-6">
           <h3 className="text-2xl font-bold mb-12 text-center z-40">
-            Categories
+            Polaroids
           </h3>
           <ul className="grid grid-cols-2 gap-4">
             {categories.map((category, index) => (

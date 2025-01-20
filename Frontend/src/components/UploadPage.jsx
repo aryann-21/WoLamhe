@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 const UploadPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -6,6 +7,7 @@ const UploadPage = () => {
   const [addedText, setAddedText] = useState({});
   const [uploadedImages, setUploadedImages] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+  const { state } = useLocation();
 
   // Scroll to top when the component is mounted
   useEffect(() => {
@@ -154,7 +156,7 @@ const UploadPage = () => {
           {/* Right Section: Order Details */}
           <div>
             <h1 className="text-2xl font-semibold mb-4 text-[#2E2210]">
-              Ordering Text
+              {state?.fromPage && `${state.fromPage}`}
             </h1>
             <p className="text-2xl text-gray-700 mb-6">
               !!!!!!!!!!!!!!!!!!!!!!!!!!!!

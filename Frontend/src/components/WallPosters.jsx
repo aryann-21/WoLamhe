@@ -53,7 +53,7 @@ const WallPosters = (props, ref) => {
             src={cameraPhoto}
             alt="Upload"
             className="w-24 h-24 object-cover mb-8 border-2 p-3 rounded-lg border-gray-300 cursor-pointer"
-            onClick={() => navigate("/upload")} // Navigate to upload page
+            onClick={() => navigate("/upload", { state: { fromPage: "Wall Posters" } })} // Navigate to upload page
           />
           <p className="text-center text-xl font-semibold">
             Upload your own photos

@@ -1,7 +1,7 @@
 
 
 const india = [
-    " https://imgur.com/6v5gtd5.jpg",
+    "   https://imgur.com/SWJwMxT.jpg",
     "https://imgur.com/TeRtP1a.jpg",
     "https://imgur.com/HPvs5D3.jpg",
     "https://imgur.com/i4whhcP.jpg",
@@ -10,7 +10,7 @@ const india = [
     "https://imgur.com/w6oQSWD.jpg", 
     "https://imgur.com/lqQ41Jr.jpg",
     "https://imgur.com/kid7Lcc.jpg",
-    "https://imgur.com/SWJwMxT.jpg",
+    "https://imgur.com/6v5gtd5.jpg",
    
   ];
   

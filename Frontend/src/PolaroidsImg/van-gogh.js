@@ -1,5 +1,5 @@
 const vangoghpol = [
-    "https://imgur.com/LntPvlu.jpg",
+    " https://imgur.com/08eqHSA.jpg",
     "https://imgur.com/I9EE0eP.jpg",
     "https://imgur.com/r9nsKoD.jpg",
     "https://imgur.com/jcHiTZG.jpg",
@@ -8,7 +8,7 @@ const vangoghpol = [
     "https://imgur.com/jIgKBQN.jpg", 
     "https://imgur.com/vjUOufT.jpg",
     "https://imgur.com/J1UUoXf.jpg",
-    "https://imgur.com/08eqHSA.jpg",
+    "https://imgur.com/LntPvlu.jpg",
    
   ];
   

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
+import { useNavigate }  from "react-router-dom";
 import general from "../PostcardsImg/general";
 import green from "../PostcardsImg/green";
 import blue from "../PostcardsImg/blue";
@@ -23,6 +24,7 @@ const PresetsPage = () => {
   const { category } = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [uploadedImages, setUploadedImages] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     switch (category) {
@@ -99,6 +101,14 @@ const PresetsPage = () => {
       );
     }
   };
+
+const handleOrder = () => {
+  if (Array.isArray(uploadedImages) && uploadedImages.length > 0) 
+    navigate('/order');
+}
+
+
+
 
   return (
     <main className="bg-[#FDF6F0] min-h-screen py-16 mt-[108px]">
@@ -193,7 +203,7 @@ const PresetsPage = () => {
               <button className="flex-1 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition">
                 Add to Cart
               </button>
-              <button className="flex-1 bg-[#97784c]  text-white py-2 px-4 rounded-md hover:bg-[#2E2210] transition">
+              <button onClick={handleOrder} className="flex-1 bg-[#97784c]  text-white py-2 px-4 rounded-md hover:bg-[#2E2210] transition">
                 View My Cart
               </button>
             </div>

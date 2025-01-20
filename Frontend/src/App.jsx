@@ -13,6 +13,8 @@ import mainPhoto from "./assets/main.jpg";
 import SignUpPage from "./components/SignUpPage";
 import Presets from "./components/Presets"; // Import PresetsPage
 import UploadPage from "./components/UploadPage";
+import OrderPage from "./components/OrderPage";
+import ProfilePage from "./components/ProfilePage";
 
 const App = () => {
   const polaroidsRef = useRef(null);
@@ -76,6 +78,8 @@ const App = () => {
           {/* Modify the /presets route to handle categories */}
           <Route path="/presets/:category" element={<Presets />} />
           <Route path="/upload" element={<UploadPage />} />
+          <Route path="/order" element={<OrderPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
         <Footer />
       </div>

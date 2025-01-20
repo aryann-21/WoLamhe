@@ -1,19 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom"; // Import useLocation to access the passed state
-import general from "../PostcardsImg/general"; // Import your image data
-import green from "../PostcardsImg/green"; // Import your image data
-import blue from "../PostcardsImg/blue"; // Import your image data
-import red from "../PostcardsImg/red"; // Import your image data
-import yellow from "../PostcardsImg/yellow"; // Import your image data
-import vanGogh from "../PostcardsImg/vanGogh"; // Import your image data
+import { useParams, useLocation } from "react-router-dom";
+import general from "../PostcardsImg/general";
+import green from "../PostcardsImg/green";
+import blue from "../PostcardsImg/blue";
+import red from "../PostcardsImg/red";
+import yellow from "../PostcardsImg/yellow";
+import vanGogh from "../PostcardsImg/vanGogh";
+import mountains from "../PolaroidsImg/mountains";
+import moons from "../PolaroidsImg/moon";
+import vangoghpol from "../PolaroidsImg/vangoghpol";
+import india from "../PolaroidsImg/india";
+import girly from "../PolaroidsImg/girly";
+import flowers from "../PolaroidsImg/flowers";
+import dogs from "../PolaroidsImg/dogs";
+import diljit from "../PolaroidsImg/diljit";
+import famoussingers from "../PolaroidsImg/famoussingers";
+import cats from "../PolaroidsImg/cats";
+import cars from "../PolaroidsImg/cars";
+import birds from "../PolaroidsImg/birds";
 
 const PresetsPage = () => {
-  const { category } = useParams(); // Extract category from the URL
-  const { state } = useLocation(); // Get state passed from the previous page
+  const { category } = useParams();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [uploadedImages, setUploadedImages] = useState(null); // Default to "null"
+  const [uploadedImages, setUploadedImages] = useState(null);
 
-  // Update uploadedImages based on the category in the URL
   useEffect(() => {
     switch (category) {
       case "general":
@@ -34,19 +44,46 @@ const PresetsPage = () => {
       case "vangogh":
         setUploadedImages(vanGogh);
         break;
+      case "mountains":
+        setUploadedImages(mountains);
+        break;
+      case "moons":
+        setUploadedImages(moons);
+        break;
+      case "india":
+        setUploadedImages(india);
+        break;
+      case "girly":
+        setUploadedImages(girly);
+        break;
+      case "flowers":
+        setUploadedImages(flowers);
+        break;
+      case "dogs":
+        setUploadedImages(dogs);
+        break;
+      case "diljit":
+        setUploadedImages(diljit);
+        break;
+      case "famous-singers":
+        setUploadedImages(famoussingers);
+        break;
+      case "cats":
+        setUploadedImages(cats);
+        break;
+      case "cars":
+        setUploadedImages(cars);
+        break;
+      case "birds":
+        setUploadedImages(birds);
+        break;
       default:
-        setUploadedImages(null); // Default to "null" if no category matches
+        setUploadedImages(null);
         break;
     }
-    setCurrentImageIndex(0); // Reset index when the category changes
+    setCurrentImageIndex(0);
   }, [category]);
 
-  // Scroll to top when the component is mounted
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  // Handle next image
   const handleNext = () => {
     if (Array.isArray(uploadedImages) && uploadedImages.length > 0) {
       setCurrentImageIndex(
@@ -55,7 +92,6 @@ const PresetsPage = () => {
     }
   };
 
-  // Handle previous image
   const handleBack = () => {
     if (Array.isArray(uploadedImages) && uploadedImages.length > 0) {
       setCurrentImageIndex((prevIndex) =>
@@ -68,9 +104,7 @@ const PresetsPage = () => {
     <main className="bg-[#FDF6F0] min-h-screen py-16 mt-[108px]">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Left Section: Image with Thumbnails */}
           <div className="flex">
-            {/* Thumbnail Images */}
             <div className="flex flex-col space-y-2 pr-4 overflow-y-auto max-h-[450px]">
               {Array.isArray(uploadedImages) && uploadedImages.length > 0 ? (
                 uploadedImages.map((image, index) => (
@@ -92,13 +126,6 @@ const PresetsPage = () => {
                           : "opacity-100"
                       }`}
                     />
-                    <div
-                      className={`absolute inset-0 bg-black transition-opacity duration-300 ${
-                        currentImageIndex === index
-                          ? "bg-opacity-70"
-                          : "bg-opacity-10"
-                      }`}
-                    ></div>
                   </div>
                 ))
               ) : (
@@ -108,7 +135,6 @@ const PresetsPage = () => {
               )}
             </div>
 
-            {/* Main Image with Navigation */}
             <div className="relative flex-1">
               {Array.isArray(uploadedImages) && uploadedImages.length > 0 ? (
                 <img
@@ -124,7 +150,6 @@ const PresetsPage = () => {
                 </div>
               )}
 
-              {/* Navigation Buttons */}
               {Array.isArray(uploadedImages) && uploadedImages.length > 0 && (
                 <>
                   <button
@@ -141,26 +166,21 @@ const PresetsPage = () => {
                   </button>
                 </>
               )}
-            </div>
+            </div>2E2210
           </div>
 
-          {/* Right Section: Order Details */}
           <div>
             <h1 className="text-2xl font-semibold mb-4 text-[#2E2210]">
-              {state?.fromPage && `${state.fromPage}`}
+              Ordering Text
             </h1>
-
             <p className="text-2xl text-gray-700 mb-6">
-              !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+              !!!!!!!!!!!!!!!!!!!!!!!!!!!!
             </p>
 
-            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">
-              Price:
-            </h2>
+            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Price:</h2>
             <p className="text-lg text-gray-800 mb-4">$XX.XX</p>
 
-            {/* Order Details */}
-            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">
+            <h2 className="text-lg font-semibold mb-2 text-[#]">
               Description:
             </h2>
             <p className="text-gray-700">
@@ -169,13 +189,12 @@ const PresetsPage = () => {
               instructions for the user.
             </p>
 
-            {/* Flex container for two buttons */}
             <div className="flex space-x-4 mt-6">
-              <button className="w-1/2 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition">
+              <button className="flex-1 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition">
                 Add to Cart
               </button>
-              <button className="w-1/2 bg-[#433218] text-white py-2 px-4 rounded-md hover:bg-[#613b1c] transition">
-                View Cart
+              <button className="flex-1 bg-[#97784c]  text-white py-2 px-4 rounded-md hover:bg-[#2E2210] transition">
+                View My Cart
               </button>
             </div>
           </div>

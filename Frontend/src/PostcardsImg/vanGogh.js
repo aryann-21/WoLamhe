@@ -1,4 +1,4 @@
-const yellow = [
+const vanGogh = [
   "https://imgur.com/HCXNSwo.jpg",
   "https://imgur.com/Lnf9BKH.jpg",
   "https://imgur.com/LrEooTJ.jpg",
@@ -13,4 +13,4 @@ const yellow = [
   "https://imgur.com/jIdPH12.jpg",
 ];
 
-export default yellow;
+export default vanGogh;

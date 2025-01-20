@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { useNavigate }  from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import general from "../PostcardsImg/general";
 import green from "../PostcardsImg/green";
 import blue from "../PostcardsImg/blue";
@@ -9,7 +9,7 @@ import yellow from "../PostcardsImg/yellow";
 import vanGogh from "../PostcardsImg/vanGogh";
 import mountains from "../PolaroidsImg/mountains";
 import moons from "../PolaroidsImg/moon";
-import vangoghpol from "../PolaroidsImg/vangoghpol";
+import vangoghpol from "../PolaroidsImg/van-gogh";
 import india from "../PolaroidsImg/india";
 import girly from "../PolaroidsImg/girly";
 import flowers from "../PolaroidsImg/flowers";
@@ -25,6 +25,12 @@ const PresetsPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [uploadedImages, setUploadedImages] = useState(null);
   const navigate = useNavigate();
+  const { state } = useLocation();
+
+  // Scroll to top when the component is mounted
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     switch (category) {
@@ -79,6 +85,9 @@ const PresetsPage = () => {
       case "birds":
         setUploadedImages(birds);
         break;
+      case "van-gogh":
+        setUploadedImages(vangoghpol);
+        break;
       default:
         setUploadedImages(null);
         break;
@@ -102,13 +111,10 @@ const PresetsPage = () => {
     }
   };
 
-const handleOrder = () => {
-  if (Array.isArray(uploadedImages) && uploadedImages.length > 0) 
-    navigate('/order');
-}
-
-
-
+  const handleOrder = () => {
+    if (Array.isArray(uploadedImages) && uploadedImages.length > 0)
+      navigate("/order");
+  };
 
   return (
     <main className="bg-[#FDF6F0] min-h-screen py-16 mt-[108px]">
@@ -132,7 +138,7 @@ const handleOrder = () => {
                       alt={`Thumbnail ${index + 1}`}
                       className={`w-full h-full object-cover transition-opacity duration-300 ${
                         currentImageIndex === index
-                          ? "opacity-80"
+                          ? "opacity-60"
                           : "opacity-100"
                       }`}
                     />
@@ -176,18 +182,20 @@ const handleOrder = () => {
                   </button>
                 </>
               )}
-            </div>2E2210
+            </div>
           </div>
 
           <div>
             <h1 className="text-2xl font-semibold mb-4 text-[#2E2210]">
-              Ordering Text
+              {state?.fromPage && `${state.fromPage}`}
             </h1>
             <p className="text-2xl text-gray-700 mb-6">
               !!!!!!!!!!!!!!!!!!!!!!!!!!!!
             </p>
 
-            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Price:</h2>
+            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">
+              Price:
+            </h2>
             <p className="text-lg text-gray-800 mb-4">$XX.XX</p>
 
             <h2 className="text-lg font-semibold mb-2 text-[#]">
@@ -203,7 +211,10 @@ const handleOrder = () => {
               <button className="flex-1 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition">
                 Add to Cart
               </button>
-              <button onClick={handleOrder} className="flex-1 bg-[#97784c]  text-white py-2 px-4 rounded-md hover:bg-[#2E2210] transition">
+              <button
+                onClick={handleOrder}
+                className="flex-1 bg-[#97784c]  text-white py-2 px-4 rounded-md hover:bg-[#2E2210] transition"
+              >
                 View My Cart
               </button>
             </div>

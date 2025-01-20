@@ -119,14 +119,14 @@ const Header = ({
           {/* Profile or User Name */}
           {user ? (
             <div className="flex items-center space-x-8">
-              <div className="lefty flex items-center justify-start space-x-2">
+              <button onClick={() => {navigate('/profile')}} className="lefty flex items-center justify-start space-x-2">
                 <img
                   src={profileIcon}
                   className="w-5 cursor-pointer"
                   alt="Profile Icon"
                 />
                 <span className="text-[#2E2210]">{user.name}</span>
-              </div>
+              </button>
               <button
                 onClick={handleLogout}
                 className="bg-red-700 text-[16px] text-white py-1 px-3 rounded-lg hover:bg-red-800"

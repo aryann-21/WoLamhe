@@ -34,7 +34,7 @@ const OrderPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex mt-20">
+    <div className="min-h-screen bg-gray-100 p-6 flex mt-[108px]">
       <div className="w-3/4 max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
         <h2 className="text-2xl font-bold mb-4">Checkout</h2>
 

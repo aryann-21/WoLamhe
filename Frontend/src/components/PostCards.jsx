@@ -49,7 +49,7 @@ const PostCards = (props, ref) => {
             src={cameraPhoto}
             alt="Upload"
             className="w-24 h-24 object-cover mb-8 border-2 p-3 rounded-lg border-gray-300 cursor-pointer"
-            onClick={() => navigate("/upload")}
+            onClick={() => navigate("/upload", { state: { fromPage: "Postcards" } })}
           />
           <p className="text-center text-xl font-semibold">
             Upload your own photos

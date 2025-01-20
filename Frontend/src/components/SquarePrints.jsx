@@ -8,7 +8,7 @@ const SquarePrints = (props, ref) => {
   const navigate = useNavigate(); // Initialize navigate
 
   const handleClick = () => {
-    navigate("/upload"); // Navigate to the Presets page when clicked
+    navigate("/upload", { state: { fromPage: "Square Prints" } }); // Navigate to the Presets page when clicked
   };
 
   return (

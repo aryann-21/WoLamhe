@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useUser } from "../context/UserContext"; // Assuming you have this context
 
 const OrderPage = () => {
+  const { user } = useUser(); // Accessing user data from context
   const [address, setAddress] = useState("");
   const [savedAddresses, setSavedAddresses] = useState([
-    "123, Main Street, New Delhi",
-    "456, Park Avenue, Mumbai",
+    "Mega Boys Hostel",
+    "Mega Girls Hostel",
   ]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [promoCode, setPromoCode] = useState("");
@@ -30,7 +32,10 @@ const OrderPage = () => {
   };
 
   const handleFileChange = (e) => {
-    setPaymentScreenshot(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      setPaymentScreenshot(URL.createObjectURL(file)); // Create a temporary URL for the file
+    }
   };
 
   return (
@@ -48,7 +53,17 @@ const OrderPage = () => {
           </button>
           {sections.login && (
             <div className="mt-4">
-              <p className="text-gray-700">Login details go here...</p>
+              <div className="space-y-2">
+                <p className="text-gray-700">
+                  <strong>Name:</strong> {user.name}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Phone:</strong> {user.phone}
+                </p>
+                <p className="text-gray-700">
+                  <strong>Email:</strong> {user.email}
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -151,18 +166,35 @@ const OrderPage = () => {
                   />
                 </div>
                 <div>
+                  {/* File Upload Section for Payment Screenshot */}
                   <label
                     htmlFor="paymentScreenshot"
-                    className="block text-gray-700 font-semibold mb-2"
+                    className="block text-sm font-semibold text-[#2E2210] my-3 mx-auto"
                   >
-                    Upload Payment Screenshot
+                    Upload Payment Screenshot:
                   </label>
-                  <input
-                    type="file"
-                    id="paymentScreenshot"
-                    onChange={handleFileChange}
-                    className="block w-full border border-gray-300 rounded p-2"
-                  />
+                  <div className="border-2 border-dashed border-gray-400 rounded-md p-6 mb-4 w-3/4 mx-auto">
+                    <input
+                      type="file"
+                      id="paymentScreenshot"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="paymentScreenshot"
+                      className="block text-center text-gray-500 cursor-pointer hover:underline"
+                    >
+                      {paymentScreenshot ? (
+                        <img
+                          src={paymentScreenshot}
+                          alt="Payment Screenshot"
+                          className="w-1/4 h-auto mx-auto"
+                        />
+                      ) : (
+                        "Click here to upload a screenshot"
+                      )}
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
@@ -181,7 +213,10 @@ const OrderPage = () => {
       </div>
 
       {/* Price Summary */}
-      <div className="w-1/4 ml-6 bg-brown-100 p-4 rounded-lg shadow-lg" style={{ height: "auto" }}>
+      <div
+        className="w-1/4 ml-6 bg-brown-100 p-4 rounded-lg shadow-lg"
+        style={{ height: "auto" }}
+      >
         <h3 className="text-lg font-semibold mb-4">Price Summary</h3>
         <div className="flex justify-between mb-2">
           <span>Subtotal</span>

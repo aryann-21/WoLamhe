@@ -4,7 +4,7 @@ import { useUser } from "../context/UserContext";
 
 const OrderPage = () => {
   const { user } = useUser();
-  const { cartItems, clearCart } = useCart(); // Access cart items and clearCart function
+  const { cartItems, removeFromCart, clearCart } = useCart(); // Access removeFromCart function
   const [address, setAddress] = useState("");
   const [savedAddresses, setSavedAddresses] = useState([
     "Mega Boys Hostel",
@@ -18,6 +18,10 @@ const OrderPage = () => {
     if (file) {
       setPaymentScreenshot(URL.createObjectURL(file));
     }
+  };
+
+  const handleRemoveItem = (index) => {
+    removeFromCart(index); // Call removeFromCart with the index of the item to remove it
   };
 
   const handlePlaceOrder = () => {
@@ -49,6 +53,13 @@ const OrderPage = () => {
                     className="w-20 h-20 rounded-lg object-cover shadow-md mb-2"
                   />
                   <p className="text-sm text-center text-gray-700">{item.name}</p>
+                  {/* Remove button */}
+                  <button
+                    onClick={() => handleRemoveItem(index)}
+                    className="bg-red-800 text-white text-sm py-1 px-2 rounded-md hover:bg-red-700 transition mt-2"
+                  >
+                    Remove
+                  </button>
                 </div>
               ))
             ) : (

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext"; // Import CartContext
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import toast styles
+
 import general from "../PostcardsImg/general";
 import green from "../PostcardsImg/green";
 import blue from "../PostcardsImg/blue";
@@ -22,76 +25,39 @@ import birds from "../PolaroidsImg/birds";
 
 const PresetsPage = () => {
   const { category } = useParams();
+  const { state } = useLocation();
+  const navigate = useNavigate();
+  const { addToCart } = useCart(); // Access addToCart from CartContext
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [uploadedImages, setUploadedImages] = useState(null);
-  const navigate = useNavigate();
-  const { state } = useLocation();
 
-  // Scroll to top when the component is mounted
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {
-    switch (category) {
-      case "general":
-        setUploadedImages(general);
-        break;
-      case "green":
-        setUploadedImages(green);
-        break;
-      case "blue":
-        setUploadedImages(blue);
-        break;
-      case "red":
-        setUploadedImages(red);
-        break;
-      case "yellow":
-        setUploadedImages(yellow);
-        break;
-      case "vangogh":
-        setUploadedImages(vanGogh);
-        break;
-      case "mountains":
-        setUploadedImages(mountains);
-        break;
-      case "moons":
-        setUploadedImages(moons);
-        break;
-      case "india":
-        setUploadedImages(india);
-        break;
-      case "girly":
-        setUploadedImages(girly);
-        break;
-      case "flowers":
-        setUploadedImages(flowers);
-        break;
-      case "dogs":
-        setUploadedImages(dogs);
-        break;
-      case "diljit":
-        setUploadedImages(diljit);
-        break;
-      case "famous-singers":
-        setUploadedImages(famoussingers);
-        break;
-      case "cats":
-        setUploadedImages(cats);
-        break;
-      case "cars":
-        setUploadedImages(cars);
-        break;
-      case "birds":
-        setUploadedImages(birds);
-        break;
-      case "van-gogh":
-        setUploadedImages(vangoghpol);
-        break;
-      default:
-        setUploadedImages(null);
-        break;
-    }
+    const categoryMap = {
+      general,
+      green,
+      blue,
+      red,
+      yellow,
+      vangogh: vanGogh,
+      mountains,
+      moons,
+      india,
+      girly,
+      flowers,
+      dogs,
+      diljit,
+      "famous-singers": famoussingers,
+      cats,
+      cars,
+      birds,
+      "van-gogh": vangoghpol,
+    };
+    setUploadedImages(categoryMap[category] || null);
     setCurrentImageIndex(0);
   }, [category]);
 
@@ -111,22 +77,51 @@ const PresetsPage = () => {
     }
   };
 
-  const handleOrder = () => {
-    if (Array.isArray(uploadedImages) && uploadedImages.length > 0)
-      navigate("/order");
+  const handleAddToCart = () => {
+    if (Array.isArray(uploadedImages) && uploadedImages[currentImageIndex]) {
+      const selectedImage = {
+        name: `${state?.fromPage || "Photo"} - ${currentImageIndex + 1}`,
+        image: uploadedImages[currentImageIndex],
+      };
+      addToCart(selectedImage);
+  
+      // Display toast notification in the center with a custom style
+      toast.success("Item added to cart!", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+        style: {
+          backgroundColor: "#ebe1d2", // Off-white background
+          color: "#2E2210", // Dark brown text color
+          boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+          borderRadius: "8px",
+          padding: "12px",
+        },
+      });
+    }
+  };
+  
+
+  const handleViewCart = () => {
+    navigate("/order");
   };
 
   return (
     <main className="bg-[#FDF6F0] min-h-screen py-16 mt-[108px]">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          {/* Image Section */}
           <div className="flex">
             <div className="flex flex-col space-y-2 pr-4 overflow-y-auto max-h-[450px]">
               {Array.isArray(uploadedImages) && uploadedImages.length > 0 ? (
                 uploadedImages.map((image, index) => (
                   <div
                     key={index}
-                    className={`relative w-16 h-16 rounded-lg overflow-hidden cursor-pointer ${
+                    className={`relative w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 ${
                       currentImageIndex === index
                         ? "border-[#C4A381]"
                         : "border-transparent"
@@ -185,20 +180,19 @@ const PresetsPage = () => {
             </div>
           </div>
 
+          {/* Details Section */}
           <div>
             <h1 className="text-2xl font-semibold mb-4 text-[#2E2210]">
-              {state?.fromPage && `${state.fromPage}`}
+              {state?.fromPage || "Selected Category"}
             </h1>
-            <p className="text-2xl text-gray-700 mb-6">
-              !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            <p className="text-xl text-gray-700 mb-6">
+              Pick your favorite designs and customize your cart effortlessly!
             </p>
 
-            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">
-              Price:
-            </h2>
+            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Price:</h2>
             <p className="text-lg text-gray-800 mb-4">$XX.XX</p>
 
-            <h2 className="text-lg font-semibold mb-2 text-[#]">
+            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">
               Description:
             </h2>
             <p className="text-gray-700">
@@ -208,12 +202,15 @@ const PresetsPage = () => {
             </p>
 
             <div className="flex space-x-4 mt-6">
-              <button className="flex-1 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition">
+              <button
+                onClick={handleAddToCart}
+                className="flex-1 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition"
+              >
                 Add to Cart
               </button>
               <button
-                onClick={handleOrder}
-                className="flex-1 bg-[#97784c]  text-white py-2 px-4 rounded-md hover:bg-[#2E2210] transition"
+                onClick={handleViewCart}
+                className="flex-1 bg-[#97784c] text-white py-2 px-4 rounded-md hover:bg-[#2E2210] transition"
               >
                 View My Cart
               </button>
@@ -221,6 +218,9 @@ const PresetsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer />
     </main>
   );
 };

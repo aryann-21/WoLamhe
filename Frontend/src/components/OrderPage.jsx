@@ -1,238 +1,173 @@
-import React, { useState } from "react";
-import { useUser } from "../context/UserContext"; // Assuming you have this context
+import React, { useState } from "react"
+import { useCart } from "../context/CartContext"
+import { useUser } from "../context/UserContext"
+import { Trash2 } from "lucide-react"
 
 const OrderPage = () => {
-  const { user } = useUser(); // Accessing user data from context
-  const [address, setAddress] = useState("");
-  const [savedAddresses, setSavedAddresses] = useState([
-    "Mega Boys Hostel",
-    "Mega Girls Hostel",
-  ]);
-  const [selectedAddress, setSelectedAddress] = useState("");
-  const [promoCode, setPromoCode] = useState("");
-  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
-
-  const handlePayment = () => {
-    if (!paymentScreenshot) {
-      alert("Please upload a screenshot of the payment.");
-      return;
-    }
-    alert("Proceeding to payment...");
-  };
-
-  const [sections, setSections] = useState({
-    login: false,
-    address: false,
-    summary: false,
-    payment: false,
-  });
-
-  const toggleSection = (section) => {
-    setSections({ ...sections, [section]: !sections[section] });
-  };
+  const { user } = useUser()
+  const { cartItems, removeFromCart, clearCart } = useCart()
+  const [address, setAddress] = useState("")
+  const [savedAddresses, setSavedAddresses] = useState(["Mega Boys Hostel", "Mega Girls Hostel"])
+  const [selectedAddress, setSelectedAddress] = useState("")
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null)
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]
     if (file) {
-      setPaymentScreenshot(URL.createObjectURL(file)); // Create a temporary URL for the file
+      setPaymentScreenshot(URL.createObjectURL(file))
     }
-  };
+  }
+
+  const handleRemoveItem = (index) => {
+    removeFromCart(index)
+  }
+
+  const handleAddAddress = () => {
+    if (address.trim()) {
+      setSavedAddresses([...savedAddresses, address.trim()])
+      setSelectedAddress(address.trim())
+      setAddress("")
+    }
+  }
+
+  const handlePlaceOrder = () => {
+    if (!selectedAddress) {
+      alert("Please select or add an address.")
+      return
+    }
+    if (!paymentScreenshot) {
+      alert("Please upload a screenshot of the payment.")
+      return
+    }
+    alert("Your order has been placed successfully!")
+    clearCart()
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex mt-[108px]">
-      <div className="w-3/4 max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4">Checkout</h2>
-
-        {/* Login Section */}
-        <div className="border-b pb-4 mb-4">
-          <button
-            className="w-full text-left font-semibold text-lg p-2 bg-brown-100 rounded"
-            onClick={() => toggleSection("login")}
-          >
-            1. Login
-          </button>
-          {sections.login && (
-            <div className="mt-4">
-              <div className="space-y-2">
-                <p className="text-gray-700">
-                  <strong>Name:</strong> {user.name}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Phone:</strong> {user.phone}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Email:</strong> {user.email}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Address Section */}
-        <div className="border-b pb-4 mb-4">
-          <button
-            className="w-full text-left font-semibold text-lg p-2 bg-brown-100 rounded"
-            onClick={() => toggleSection("address")}
-          >
-            2. Delivery Address
-          </button>
-          {sections.address && (
-            <div className="mt-4">
-              <h3 className="text-xl font-semibold mb-4">Delivery Address</h3>
-              <ul className="space-y-3">
-                {savedAddresses.map((addr, index) => (
-                  <li key={index} className="flex items-center space-x-3">
-                    <input
-                      type="radio"
-                      name="address"
-                      value={addr}
-                      checked={selectedAddress === addr}
-                      onChange={(e) => setSelectedAddress(e.target.value)}
-                      className="text-blue-500"
+    <div className="min-h-screen bg-[#FDF6F0] p-6 mt-[108px]">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold text-[#2E2210] mb-8">Your Order</h1>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Left Section: Order Summary */}
+          <div className="md:col-span-2 bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-semibold text-[#2E2210] mb-4">Order Summary</h2>
+            {cartItems.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {cartItems.map((item, index) => (
+                  <div key={index} className="bg-[#eee1cf] rounded-lg p-4 flex flex-col items-center">
+                    <img
+                      src={item.image || "/placeholder.svg"}
+                      alt={item.name}
+                      className="w-full h-40 object-cover rounded-md mb-2"
                     />
-                    <label className="text-gray-700">{addr}</label>
-                  </li>
+                    <div className="space-y-1 w-full">
+                      <p className="text-sm text-center text-[#2E2210] font-medium">
+                        {item.type === "preset" ? (
+                          <>
+                            <span className="block font-semibold">Preset Image</span>
+                            <span className="block text-xs mt-1">{item.name}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="block font-semibold">Custom Upload</span>
+                            <span className="block text-xs mt-1">{item.text || "No custom text added"}</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveItem(index)}
+                      className="mt-3 flex items-center justify-center w-full bg-[#caac80] text-[#2E2210] rounded-md py-1 px-2 hover:bg-[#a58049] transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Remove
+                    </button>
+                  </div>
                 ))}
-              </ul>
-              <div className="mt-4">
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-8">Your cart is empty.</p>
+            )}
+          </div>
+
+          {/* Right Section: Checkout Details */}
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-semibold text-[#2E2210] mb-4">Checkout</h2>
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">User Information</h3>
+              <p className="text-gray-600">Name: {user?.name || "Guest"}</p>
+              <p className="text-gray-600">Phone: {user?.phone || "Not provided"}</p>
+              <p className="text-gray-600">Email: {user?.email || "Not provided"}</p>
+            </div>
+
+            {/* Address Section */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">Delivery Address</h3>
+              {savedAddresses.map((addr, index) => (
+                <label key={index} className="flex items-center mb-2">
+                  <input
+                    type="radio"
+                    name="address"
+                    value={addr}
+                    checked={selectedAddress === addr}
+                    onChange={() => setSelectedAddress(addr)}
+                    className="mr-2"
+                  />
+                  <span className="text-gray-600">{addr}</span>
+                </label>
+              ))}
+              <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Add a new address"
+                  className="mt-2 flex-1 p-2 border border-gray-300 rounded"
+                  placeholder="Add new address"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full border border-gray-300 rounded p-2"
+                  onKeyPress={(e) => e.key === "Enter" && handleAddAddress()}
                 />
                 <button
-                  onClick={() => {
-                    setSavedAddresses([...savedAddresses, address]);
-                    setAddress("");
-                  }}
-                  className="mt-3 bg-[#2E2210] text-white px-4 py-2 rounded"
+                  onClick={handleAddAddress}
+                  className="mt-2 px-4 py-2 bg-[#C4A381] text-white rounded hover:bg-[#af8a6c] transition-colors"
                 >
-                  Add Address
+                  Add
                 </button>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Order Summary */}
-        <div className="border-b pb-4 mb-4">
-          <button
-            className="w-full text-left font-semibold text-lg p-2 bg-brown-100 rounded"
-            onClick={() => toggleSection("summary")}
-          >
-            3. Order Summary
-          </button>
-          {sections.summary && (
-            <div className="mt-4">
-              <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
-              <div className="flex justify-between mb-2">
-                <span>Item 1</span>
-                <span>₹500</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>Item 2</span>
-                <span>₹300</span>
-              </div>
-              <div className="flex justify-between text-lg font-semibold">
-                <span>Total</span>
-                <span>₹800</span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Payment Section */}
-        <div className="border-b pb-4 mb-4">
-          <button
-            className="w-full text-left font-semibold text-lg p-2 bg-brown-100 rounded"
-            onClick={() => toggleSection("payment")}
-          >
-            4. Payment
-          </button>
-          {sections.payment && (
-            <div className="mt-4">
-              <h3 className="text-xl font-semibold mb-4">Payment Options</h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-gray-700 font-semibold mb-2">
-                    UPI Payment
-                  </label>
+            {/* Payment Section */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">Payment</h3>
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
+                {paymentScreenshot ? (
                   <img
-                    src="/src/assets/orders.jpg" // Replace with the correct path to the UPI scanner image
-                    alt="UPI Scanner"
-                    className="w-1/2 mx-auto mb-4"
+                    src={paymentScreenshot || "/placeholder.svg"}
+                    alt="Payment Screenshot"
+                    className="max-w-full h-auto rounded-md"
                   />
-                </div>
-                <div>
-                  {/* File Upload Section for Payment Screenshot */}
-                  <label
-                    htmlFor="paymentScreenshot"
-                    className="block text-sm font-semibold text-[#2E2210] my-3 mx-auto"
-                  >
-                    Upload Payment Screenshot:
-                  </label>
-                  <div className="border-2 border-dashed border-gray-400 rounded-md p-6 mb-4 w-3/4 mx-auto">
-                    <input
-                      type="file"
-                      id="paymentScreenshot"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                    <label
-                      htmlFor="paymentScreenshot"
-                      className="block text-center text-gray-500 cursor-pointer hover:underline"
-                    >
-                      {paymentScreenshot ? (
-                        <img
-                          src={paymentScreenshot}
-                          alt="Payment Screenshot"
-                          className="w-1/4 h-auto mx-auto"
-                        />
-                      ) : (
-                        "Click here to upload a screenshot"
-                      )}
+                ) : (
+                  <>
+                    <input type="file" id="upload" className="hidden" onChange={handleFileChange} />
+                    <label htmlFor="upload" className="cursor-pointer text-[#C4A381] hover:text-[#af8a6c]">
+                      Click here to upload payment screenshot
                     </label>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Place Order Button */}
-        <div className="p-6">
-          <button
-            onClick={handlePayment}
-            className="w-full bg-[#2E2210] text-white text-lg font-semibold px-4 py-2 rounded"
-          >
-            Place Order
-          </button>
-        </div>
-      </div>
-
-      {/* Price Summary */}
-      <div
-        className="w-1/4 ml-6 bg-brown-100 p-4 rounded-lg shadow-lg"
-        style={{ height: "auto" }}
-      >
-        <h3 className="text-lg font-semibold mb-4">Price Summary</h3>
-        <div className="flex justify-between mb-2">
-          <span>Subtotal</span>
-          <span>₹800</span>
-        </div>
-        <div className="flex justify-between mb-2">
-          <span>Shipping</span>
-          <span>₹50</span>
-        </div>
-        <div className="flex justify-between text-lg font-semibold">
-          <span>Total</span>
-          <span>₹850</span>
+            {/* Place Order Button */}
+            <button
+              onClick={handlePlaceOrder}
+              className="w-full bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition-colors"
+            >
+              Place Order
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default OrderPage;
+export default OrderPage
+

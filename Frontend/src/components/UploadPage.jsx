@@ -1,106 +1,108 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { useCart } from "../context/CartContext"
 
 const UploadPage = () => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [customText, setCustomText] = useState("");
-  const [addedText, setAddedText] = useState({});
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const { state } = useLocation();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [uploadedImages, setUploadedImages] = useState([])
+  const [customText, setCustomText] = useState("")
+  const [addedText, setAddedText] = useState({})
+  const [isEditing, setIsEditing] = useState(false)
+  const { state } = useLocation()
+  const navigate = useNavigate()
+  const { addToCart } = useCart()
 
   // Scroll to top when the component is mounted
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    window.scrollTo(0, 0)
+  }, [])
 
   const handleNext = () => {
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex + 1) % uploadedImages.length
-    );
-    setIsEditing(false);
-  };
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % uploadedImages.length)
+    setIsEditing(false)
+  }
 
   const handleBack = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? uploadedImages.length - 1 : prevIndex - 1
-    );
-    setIsEditing(false);
-  };
+    setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? uploadedImages.length - 1 : prevIndex - 1))
+    setIsEditing(false)
+  }
+
+  const handleFileChange = (e) => {
+    const files = e.target.files
+    const newImages = Array.from(files).map((file) => URL.createObjectURL(file))
+    setUploadedImages((prevImages) => [...prevImages, ...newImages])
+  }
+
+  const handleAddToCart = () => {
+    if (uploadedImages.length > 0) {
+      const selectedImage = {
+        name: `Uploaded Image ${currentImageIndex + 1}`,
+        image: uploadedImages[currentImageIndex],
+        text: addedText[currentImageIndex] || "",
+        type: "uploaded",
+      }
+
+      addToCart(selectedImage)
+      alert("Item added to cart!")
+    }
+  }
+
+  const handleViewCart = () => {
+    navigate("/order")
+  }
 
   const handleAddText = () => {
     if (customText.trim()) {
       setAddedText((prevAddedText) => ({
         ...prevAddedText,
         [currentImageIndex]: customText,
-      }));
-      setCustomText("");
-      setIsEditing(false);
+      }))
+      setCustomText("")
+      setIsEditing(false)
     }
-  };
+  }
 
   const handleEditText = () => {
-    setCustomText(addedText[currentImageIndex] || "");
-    setIsEditing(true);
-  };
-
-  const handleFileChange = (e) => {
-    const files = e.target.files;
-    const newImages = Array.from(files).map((file) =>
-      URL.createObjectURL(file)
-    );
-    setUploadedImages((prevImages) => [...prevImages, ...newImages]);
-  };
+    setCustomText(addedText[currentImageIndex] || "")
+    setIsEditing(true)
+  }
 
   return (
     <main className="bg-[#FDF6F0] min-h-screen py-16 mt-[108px]">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          {/* Left Section: Image with Thumbnails */}
+          {/* Left Section: Thumbnails and Main Image */}
           <div className="flex">
             {/* Thumbnail Images */}
             <div className="flex flex-col space-y-2 pr-4 overflow-y-auto max-h-[450px]">
               {uploadedImages.map((image, index) => (
                 <div
                   key={index}
-                  className={`relative w-16 h-16 rounded-lg overflow-hidden cursor-pointer ${
-                    currentImageIndex === index
-                      ? "border-[#C4A381]"
-                      : "border-transparent"
+                  className={`relative w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 ${
+                    currentImageIndex === index ? "border-[#C4A381]" : "border-transparent"
                   }`}
+                  onClick={() => setCurrentImageIndex(index)}
                 >
                   <img
-                    src={image}
+                    src={image || "/placeholder.svg"}
                     alt={`Thumbnail ${index + 1}`}
-                    className={`w-full h-full object-cover transition-opacity duration-300 ${
-                      currentImageIndex === index ? "opacity-80" : "opacity-100"
-                    }`}
-                    onClick={() => setCurrentImageIndex(index)}
+                    className="w-full h-full object-cover transition-opacity duration-300"
                   />
-                  <div
-                    className={`absolute inset-0 bg-black transition-opacity duration-300 ${
-                      currentImageIndex === index
-                        ? "bg-opacity-70"
-                        : "bg-opacity-10"
-                    }`}
-                  ></div>
                 </div>
               ))}
             </div>
 
-            {/* Main Image with Navigation */}
+            {/* Main Image */}
             <div className="relative flex-1">
               {uploadedImages.length > 0 ? (
                 <img
-                  src={uploadedImages[currentImageIndex]}
-                  alt="Main Polaroid"
+                  src={uploadedImages[currentImageIndex] || "/placeholder.svg"}
+                  alt="Main Upload"
                   className="rounded-lg shadow-lg max-h-96 object-cover mx-auto"
                 />
               ) : (
                 <div className="flex items-center justify-center h-full">
-                  <p className="text-center text-gray-500 text-2xl">
-                    No images uploaded yet. Please upload images.
-                  </p>
+                  <p className="text-center text-gray-500 text-2xl">No images uploaded yet. Please upload images.</p>
                 </div>
               )}
 
@@ -153,57 +155,47 @@ const UploadPage = () => {
             </div>
           </div>
 
-          {/* Right Section: Order Details */}
+          {/* Right Section: Upload, Cart, and Actions */}
           <div>
-            <h1 className="text-2xl font-semibold mb-4 text-[#2E2210]">
-              {state?.fromPage && `${state.fromPage}`}
-            </h1>
-            <p className="text-2xl text-gray-700 mb-6">
-              !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            </p>
+            <h1 className="text-2xl font-semibold mb-4 text-[#2E2210]">{state?.fromPage || "Upload Page"}</h1>
+            <p className="text-xl text-gray-700 mb-6">Upload your custom images and add them to your cart!</p>
 
-            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Price:</h2>
-            <p className="text-lg text-gray-800 mb-4">$XX.XX</p>
-
-            <label
-              htmlFor="upload"
-              className="block text-sm font-medium text-[#2E2210] mb-2"
-            >
+            <label htmlFor="upload" className="block text-sm font-medium text-[#2E2210] mb-2">
               Upload Photos Here:
             </label>
             <div className="border-2 border-dashed border-gray-400 rounded-md p-6 mb-4">
-              <input
-                type="file"
-                id="upload"
-                className="hidden"
-                multiple
-                onChange={handleFileChange}
-              />
-              <label
-                htmlFor="upload"
-                className="block text-center text-gray-500 cursor-pointer hover:underline"
-              >
+              <input type="file" id="upload" className="hidden" multiple onChange={handleFileChange} />
+              <label htmlFor="upload" className="block text-center text-gray-500 cursor-pointer hover:underline">
                 Click here to upload images
               </label>
             </div>
 
-            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">
-              Description:
-            </h2>
-            <p className="text-gray-700">
-              Add a description here about the product. For example, details
-              about the print quality, sizes available, or any special
-              instructions for the user.
-            </p>
+            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Price:</h2>
+            <p className="text-lg text-gray-800 mb-4">$XX.XX</p>
 
-            <button className="mt-6 w-full bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition">
-              Add to Cart
-            </button>
+            <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Description:</h2>
+            <p className="text-gray-700 mb-4">Customize your photos and make them truly unique!</p>
+
+            <div className="flex space-x-4 mt-6">
+              <button
+                onClick={handleAddToCart}
+                className="flex-1 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition"
+              >
+                Add to Cart
+              </button>
+              <button
+                onClick={handleViewCart}
+                className="flex-1 bg-[#97784c] text-white py-2 px-4 rounded-md hover:bg-[#2E2210] transition"
+              >
+                View My Cart
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </main>
-  );
-};
+  )
+}
 
-export default UploadPage;
+export default UploadPage
+

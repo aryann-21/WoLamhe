@@ -1,72 +1,59 @@
-import React from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import headerPhoto from "../assets/header.png";
-import profileIcon from "../assets/profile.png";
-import { useUser } from "../context/UserContext";
+import React from "react"
+import { Link, useNavigate, useLocation } from "react-router-dom"
+import headerPhoto from "../assets/header.png"
+import { useUser } from "../context/UserContext"
+import { ShoppingCart, User, LogOut } from "lucide-react"
+import { useCart } from "../context/CartContext"
 
-const Header = ({
-  polaroidsRef,
-  postcardsRef,
-  wallPostersRef,
-  squarePrintsRef,
-  photoStripsRef,
-}) => {
-  const { user, setUser } = useUser();
-  const navigate = useNavigate();
-  const location = useLocation();
+const Header = ({ polaroidsRef, postcardsRef, wallPostersRef, squarePrintsRef, photoStripsRef }) => {
+  const { user, setUser } = useUser()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { cartItems } = useCart()
 
-  // Log out handler
   const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem("user"); // Clear user from localStorage on logout
-    navigate("/", { replace: true });
-  };
+    setUser(null)
+    localStorage.removeItem("user")
+    navigate("/", { replace: true })
+  }
 
-  // Scroll to section handler
   const scrollToSection = (ref) => {
     if (ref.current) {
-      const offset = -110; // Adjust the scroll position by 10px above the section
+      const offset = -110
       window.scrollTo({
-        top:
-          ref.current.getBoundingClientRect().top + window.pageYOffset + offset,
+        top: ref.current.getBoundingClientRect().top + window.pageYOffset + offset,
         behavior: "smooth",
-      });
+      })
     }
-  };
+  }
 
-  // Scroll to the top of the page
   const scrollToTop = () => {
-    navigate("/", { replace: true });
+    navigate("/", { replace: true })
     window.scrollTo({
       top: 0,
       behavior: "smooth",
-    });
-  };
+    })
+  }
 
-  // Handle scroll to section and redirection
   const handleSectionClick = (ref) => {
     if (location.pathname === "/") {
-      // If we are on the home page, scroll directly to the section
-      scrollToSection(ref);
+      scrollToSection(ref)
     } else {
-      // If we are on another route, navigate to home and then scroll to the section
-      navigate("/", { replace: true });
+      navigate("/", { replace: true })
       setTimeout(() => {
-        scrollToSection(ref);
-      }, 350); // Delay to allow navigation to happen first
+        scrollToSection(ref)
+      }, 350)
     }
-  };
+  }
 
   return (
     <header className="fixed top-0 left-0 w-full z-50">
-      {/* Top Strip with Photo */}
       <div className="bg-[#2E2210] text-[#EDE8E0] flex justify-center items-center">
-        <img src={headerPhoto} className="w-40" alt="Header" />
+        <img src={headerPhoto || "/placeholder.svg"} className="w-40" alt="Header" />
       </div>
 
-      {/* Navbar */}
       <div className="bg-[#ebe1d2] text-[#2E2210] py-3">
-        <div className="container mx-auto flex justify-between items-center text-lg font-semibold px-10">
+        <div className="container mx-auto flex justify-between items-center text-lg font-semibold px-4 lg:px-10">
           <nav className="flex-1">
             <ul className="flex justify-start space-x-24">
               <li>
@@ -75,81 +62,80 @@ const Header = ({
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => handleSectionClick(postcardsRef)}
-                  className="hover:underline"
-                >
+                <button onClick={() => handleSectionClick(postcardsRef)} className="hover:underline">
                   Postcards
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => handleSectionClick(polaroidsRef)}
-                  className="hover:underline"
-                >
+                <button onClick={() => handleSectionClick(polaroidsRef)} className="hover:underline">
                   Polaroids
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => handleSectionClick(wallPostersRef)}
-                  className="hover:underline"
-                >
+                <button onClick={() => handleSectionClick(wallPostersRef)} className="hover:underline">
                   Wall Posters
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => handleSectionClick(squarePrintsRef)}
-                  className="hover:underline"
-                >
+                <button onClick={() => handleSectionClick(squarePrintsRef)} className="hover:underline">
                   Square Prints
                 </button>
               </li>
               <li>
-                <button
-                  onClick={() => handleSectionClick(photoStripsRef)}
-                  className="hover:underline"
-                >
+                <button onClick={() => handleSectionClick(photoStripsRef)} className="hover:underline">
                   Photo Strips
                 </button>
               </li>
             </ul>
           </nav>
-          {/* Profile or User Name */}
+
           {user ? (
-            <div className="flex items-center space-x-8">
-              <button onClick={() => {navigate('/profile')}} className="lefty flex items-center justify-start space-x-2">
-                <img
-                  src={profileIcon}
-                  className="w-5 cursor-pointer"
-                  alt="Profile Icon"
-                />
-                <span className="text-[#2E2210]">{user.name}</span>
-              </button>
-              <button
-                onClick={handleLogout}
-                className="bg-red-700 text-[16px] text-white py-1 px-3 rounded-lg hover:bg-red-800"
-              >
-                Logout
-              </button>
+            <div className="flex items-center space-x-6">
+              <Link to="/cart" className="relative hover:opacity-80 transition-opacity">
+                <ShoppingCart className="w-6 h-6 text-[#2E2210]" />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-medium">
+                    {cartItems.length}
+                  </span>
+                )}
+              </Link>
+              <div className="relative group">
+                <button className="flex items-center space-x-2 focus:outline-none hover:opacity-80 transition-opacity">
+                  <User className="w-6 h-6 text-[#2E2210]" />
+                  <span className="text-[#2E2210]">{user.name}</span>
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-300">
+                  <Link
+                    to="/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-[#ebe1d2] transition-colors"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#ebe1d2] transition-colors"
+                  >
+                    <LogOut className="w-4 h-4 inline-block mr-2" />
+                    Logout
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
-            <div>
-            <Link to="/login">
-              {/* <img src={profileIcon} className="w-6 cursor-pointer" alt="Profile Icon" /> */}
-              <span className="text-green-950 hover:underline">Login</span> /{" "}
-              {/* <span className="text-blue-700 hover:underline">SignUp</span> */}
-            </Link>
-            <Link to="/signup">
-              <span className="text-blue-950 hover:underline">SignUp</span>
-            </Link>
+            <div className="space-x-4">
+              <Link to="/login" className="text-[#2E2210] hover:underline">
+                Login
+              </Link>
+              <Link to="/signup" className="text-[#2E2210] hover:underline">
+                Sign Up
+              </Link>
             </div>
           )}
         </div>
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
+

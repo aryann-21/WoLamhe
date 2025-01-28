@@ -1,34 +1,34 @@
-import React, { forwardRef, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import Square from "../assets/square.jpg";
-import cameraPhoto from "../assets/camera.png";
+import React, { forwardRef, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import Square from "../assets/square.jpg"
+import cameraPhoto from "../assets/camera.png"
 
-const SquarePrints = (props, ref) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const navigate = useNavigate(); // Initialize navigate
+const SquarePrints = forwardRef((props, ref) => {
+  const [isHovered, setIsHovered] = useState(false)
+  const navigate = useNavigate()
 
   const handleClick = () => {
-    navigate("/upload", { state: { fromPage: "Square Prints" } }); // Navigate to the Presets page when clicked
-  };
+    navigate("/upload", { state: { fromPage: "Square Prints" } })
+  }
 
   return (
     <div
       ref={ref}
-      className="relative group bg-[#D3B495] text-[#2E2210] overflow-hidden min-h-[400px]"
+      className="relative group bg-[#D3B495] text-[#2E2210] overflow-hidden min-h-[300px] md:min-h-[400px]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Background Image */}
       <img
-        src={Square}
+        src={Square || "/placeholder.svg"}
         alt="Square Prints"
-        className="absolute bottom-0 right-0 w-[80%] h-[80%] object-cover"
+        className="absolute bottom-0 right-0 w-full md:w-[80%] h-[80%] object-cover"
       />
 
       {/* Title */}
       <div className="absolute top-0 right-0 z-10 p-4">
         <h3
-          className={`text-3xl text-[#2E2210] transition-opacity duration-700 ${
+          className={`text-2xl md:text-3xl text-[#2E2210] transition-opacity duration-700 ${
             isHovered ? "opacity-0" : "opacity-100"
           }`}
         >
@@ -44,27 +44,23 @@ const SquarePrints = (props, ref) => {
       >
         {/* Top Section */}
         <div className="w-full flex flex-col items-center justify-center p-4">
-          <h3 className="text-xl font-bold mb-3 text-center z-40">
-            Square Prints
-          </h3>
+          <h3 className="text-xl font-bold mb-3 text-center z-40">Square Prints</h3>
 
           {/* Divider Line */}
-          <div className="h-px bg-white w-3/4 self-center my-8" />
+          <div className="h-px bg-white w-3/4 self-center my-4 md:my-8" />
 
           <img
-            src={cameraPhoto}
+            src={cameraPhoto || "/placeholder.svg"}
             alt="Upload"
-            className="w-20 h-20 object-cover mb-6 border-2 p-2 rounded-lg border-gray-300 cursor-pointer"
-            onClick={handleClick} // Add onClick handler
+            className="w-16 h-16 md:w-20 md:h-20 object-cover mb-4 md:mb-6 border-2 p-2 rounded-lg border-gray-300 cursor-pointer"
+            onClick={handleClick}
           />
-          <p className="text-center text-lg font-semibold">
-            Upload your own photos
-          </p>
+          <p className="text-center text-base md:text-lg font-semibold">Upload your own photos</p>
         </div>
       </div>
     </div>
-  );
-};
+  )
+})
 
-// Wrap with forwardRef
-export default forwardRef(SquarePrints);
+export default SquarePrints
+

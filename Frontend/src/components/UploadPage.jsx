@@ -12,7 +12,6 @@ const UploadPage = () => {
   const navigate = useNavigate()
   const { addToCart } = useCart()
 
-  // Scroll to top when the component is mounted
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -68,13 +67,13 @@ const UploadPage = () => {
   }
 
   return (
-    <main className="bg-[#FDF6F0] min-h-screen py-16 mt-[108px]">
+    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 mt-[108px]">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
           {/* Left Section: Thumbnails and Main Image */}
-          <div className="flex">
+          <div className="flex flex-col md:flex-row">
             {/* Thumbnail Images */}
-            <div className="flex flex-col space-y-2 pr-4 overflow-y-auto max-h-[450px]">
+            <div className="flex md:flex-col space-x-2 md:space-x-0 md:space-y-2 md:pr-4 overflow-x-auto md:overflow-y-auto md:max-h-[450px] mb-4 md:mb-0">
               {uploadedImages.map((image, index) => (
                 <div
                   key={index}
@@ -101,28 +100,34 @@ const UploadPage = () => {
                   className="rounded-lg shadow-lg max-h-96 object-cover mx-auto"
                 />
               ) : (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-center text-gray-500 text-2xl">No images uploaded yet. Please upload images.</p>
+                <div className="flex items-center justify-center h-64 md:h-96">
+                  <p className="text-center text-gray-500 text-lg md:text-2xl">
+                    No images uploaded yet. Please upload images.
+                  </p>
                 </div>
               )}
 
               {/* Navigation Buttons */}
-              <button
-                onClick={handleBack}
-                className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-[#C4A381] text-white px-2 py-1 rounded-l-md hover:bg-[#af8a6c] transition"
-              >
-                &#9664;
-              </button>
-              <button
-                onClick={handleNext}
-                className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-[#C4A381] text-white px-2 py-1 rounded-r-md hover:bg-[#af8a6c] transition"
-              >
-                &#9654;
-              </button>
+              {uploadedImages.length > 1 && (
+                <>
+                  <button
+                    onClick={handleBack}
+                    className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-[#C4A381] text-white px-2 py-1 rounded-l-md hover:bg-[#af8a6c] transition"
+                  >
+                    &#9664;
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-[#C4A381] text-white px-2 py-1 rounded-r-md hover:bg-[#af8a6c] transition"
+                  >
+                    &#9654;
+                  </button>
+                </>
+              )}
 
               {/* Custom Text and Edit Button */}
               {uploadedImages.length > 0 && (
-                <div className="mt-8 flex justify-center items-center space-x-2">
+                <div className="mt-4 md:mt-8 flex justify-center items-center space-x-2">
                   {isEditing || !addedText[currentImageIndex] ? (
                     <>
                       <input
@@ -176,7 +181,7 @@ const UploadPage = () => {
             <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Description:</h2>
             <p className="text-gray-700 mb-4">Customize your photos and make them truly unique!</p>
 
-            <div className="flex space-x-4 mt-6">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
               <button
                 onClick={handleAddToCart}
                 className="flex-1 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition"

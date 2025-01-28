@@ -1,33 +1,33 @@
-import React, { useRef } from "react";
-import { Routes, Route } from "react-router-dom";
-import { UserProvider } from "./context/UserContext";
-import { CartProvider } from "./context/CartContext";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Polaroids from "./components/Polaroids";
-import PostCards from "./components/PostCards";
-import WallPosters from "./components/WallPosters";
-import SquarePrints from "./components/SquarePrints";
-import PhotoStrips from "./components/PhotoStrips";
-import LoginPage from "./components/LoginPage";
-import mainPhoto from "./assets/main.jpg";
-import SignUpPage from "./components/SignUpPage";
-import Presets from "./components/Presets"; // Import PresetsPage
-import UploadPage from "./components/UploadPage";
-import OrderPage from "./components/OrderPage";
-import ProfilePage from "./components/ProfilePage";
+import React, { useRef } from "react"
+import { Routes, Route } from "react-router-dom"
+import { UserProvider } from "./context/UserContext"
+import { CartProvider } from "./context/CartContext"
+import Header from "./components/Header"
+import Footer from "./components/Footer"
+import Polaroids from "./components/Polaroids"
+import PostCards from "./components/PostCards"
+import WallPosters from "./components/WallPosters"
+import SquarePrints from "./components/SquarePrints"
+import PhotoStrips from "./components/PhotoStrips"
+import LoginPage from "./components/LoginPage"
+import mainPhoto from "./assets/main.jpg"
+import SignUpPage from "./components/SignUpPage"
+import Presets from "./components/Presets"
+import UploadPage from "./components/UploadPage"
+import OrderPage from "./components/OrderPage"
+import ProfilePage from "./components/ProfilePage"
 
 const App = () => {
-  const polaroidsRef = useRef(null);
-  const postcardsRef = useRef(null);
-  const wallPostersRef = useRef(null);
-  const squarePrintsRef = useRef(null);
-  const photoStripsRef = useRef(null);
+  const polaroidsRef = useRef(null)
+  const postcardsRef = useRef(null)
+  const wallPostersRef = useRef(null)
+  const squarePrintsRef = useRef(null)
+  const photoStripsRef = useRef(null)
 
   return (
     <UserProvider>
       <CartProvider>
-        <div>
+        <div className="flex flex-col min-h-screen">
           <Header
             polaroidsRef={polaroidsRef}
             postcardsRef={postcardsRef}
@@ -39,26 +39,20 @@ const App = () => {
             <Route
               path="/"
               element={
-                <main className="bg-gray-100">
-                  <section className="h-screen flex">
-                    <div className="w-1/2">
-                      <img
-                        src={mainPhoto}
-                        alt="Main"
-                        className="object-cover h-full w-full"
-                      />
+                <main className="flex-grow bg-gray-100">
+                  <section className="min-h-screen flex flex-col md:flex-row">
+                    <div className="w-full md:w-1/2 h-[50vh] md:h-auto">
+                      <img src={mainPhoto || "/placeholder.svg"} alt="Main" className="object-cover w-full h-full" />
                     </div>
-                    <div className="w-1/2 flex flex-col justify-center items-start bg-[#D3B495] text-[#2E2210] p-8">
-                      <h1 className="text-6xl font-bold mb-12 tracking-wider leading-tight">
+                    <div className="w-full md:w-1/2 flex flex-col justify-center items-start bg-[#D3B495] text-[#2E2210] p-8">
+                      <h1 className="text-4xl md:text-6xl font-bold mb-8 md:mb-12 tracking-wider leading-tight">
                         Heyy...
                       </h1>
-                      <p className="text-xl max-w-md tracking-wide leading-relaxed font-semibold">
-                        Realize the power of print and let your memories shine!
-                        From personalized polaroids to stunning postcards,
-                        trendy strips, sleek square prints, and epic wall
-                        posters—every format tells your story in style.
-                        Transform moments into timeless treasures, because your
-                        memories deserve more than just a screen!
+                      <p className="text-lg md:text-xl max-w-md tracking-wide leading-relaxed font-semibold">
+                        Realize the power of print and let your memories shine! From personalized polaroids to stunning
+                        postcards, trendy strips, sleek square prints, and epic wall posters—every format tells your
+                        story in style. Transform moments into timeless treasures, because your memories deserve more
+                        than just a screen!
                       </p>
                     </div>
                   </section>
@@ -88,7 +82,6 @@ const App = () => {
             <Route path="/strips" element={<PhotoStrips />} />
             <Route path="/squareprints" element={<SquarePrints />} />
             <Route path="/signup" element={<SignUpPage />} />
-            {/* Modify the /presets route to handle categories */}
             <Route path="/presets/:category" element={<Presets />} />
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/order" element={<OrderPage />} />
@@ -98,7 +91,8 @@ const App = () => {
         </div>
       </CartProvider>
     </UserProvider>
-  );
-};
+  )
+}
 
-export default App;
+export default App
+

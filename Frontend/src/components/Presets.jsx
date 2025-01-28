@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react"
 import { useParams, useLocation, useNavigate } from "react-router-dom"
-import { useCart } from "../context/CartContext" // Import CartContext
+import { useCart } from "../context/CartContext"
 import { toast, ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css" // Import toast styles
+import "react-toastify/dist/ReactToastify.css"
 
 import general from "../PostcardsImg/general"
 import green from "../PostcardsImg/green"
@@ -27,7 +27,7 @@ const PresetsPage = () => {
   const { category } = useParams()
   const { state } = useLocation()
   const navigate = useNavigate()
-  const { addToCart } = useCart() // Access addToCart from CartContext
+  const { addToCart } = useCart()
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [uploadedImages, setUploadedImages] = useState(null)
@@ -58,8 +58,8 @@ const PresetsPage = () => {
       "van-gogh": vangoghpol,
     }
     setUploadedImages(categoryMap[category] || null)
-    setCurrentImageIndex(category === "Polaroids" ? 0 : currentImageIndex) // Show first image if "Polaroids" category
-  }, [category, currentImageIndex]) // Added currentImageIndex to dependencies
+    setCurrentImageIndex(category === "Polaroids" ? 0 : currentImageIndex)
+  }, [category, currentImageIndex])
 
   const handleNext = () => {
     if (Array.isArray(uploadedImages) && uploadedImages.length > 0) {
@@ -75,18 +75,16 @@ const PresetsPage = () => {
 
   const handleAddToCart = () => {
     if (Array.isArray(uploadedImages) && uploadedImages.length > 0) {
-      // Dynamically create the image name based on the category and fromPage state
       const imageName = `${state?.fromPage} - ${category}`
 
       const selectedImage = {
-        name: imageName, // Use the dynamic name
-        image: state?.fromPage === "Polaroids" ? uploadedImages[0] : uploadedImages[currentImageIndex], // Check category and use the 0th image if "Polaroids"
+        name: imageName,
+        image: state?.fromPage === "Polaroids" ? uploadedImages[0] : uploadedImages[currentImageIndex],
         type: "preset",
       }
 
       addToCart(selectedImage)
 
-      // Display toast notification in the center with a custom style
       toast.success("Item added to cart!", {
         position: "top-center",
         autoClose: 3000,
@@ -96,8 +94,8 @@ const PresetsPage = () => {
         draggable: true,
         theme: "light",
         style: {
-          backgroundColor: "#ebe1d2", // Off-white background
-          color: "#2E2210", // Dark brown text color
+          backgroundColor: "#ebe1d2",
+          color: "#2E2210",
           boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
           borderRadius: "8px",
           padding: "12px",
@@ -116,12 +114,12 @@ const PresetsPage = () => {
       : "Any of these photos can be chosen independently for printing."
 
   return (
-    <main className="bg-[#FDF6F0] min-h-screen py-16 mt-[108px]">
+    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 mt-[108px]">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
           {/* Image Section */}
-          <div className="flex">
-            <div className="flex flex-col space-y-2 pr-4 overflow-y-auto max-h-[450px]">
+          <div className="flex flex-col md:flex-row">
+            <div className="flex md:flex-col space-x-2 md:space-x-0 md:space-y-2 md:pr-4 overflow-x-auto md:overflow-y-auto md:max-h-[450px] mb-4 md:mb-0">
               {Array.isArray(uploadedImages) && uploadedImages.length > 0 ? (
                 uploadedImages.map((image, index) => (
                   <div
@@ -153,12 +151,14 @@ const PresetsPage = () => {
                   className="rounded-lg shadow-lg max-h-96 object-cover mx-auto"
                 />
               ) : (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-center text-gray-500 text-2xl">No images uploaded yet. Please upload images.</p>
+                <div className="flex items-center justify-center h-64 md:h-96">
+                  <p className="text-center text-gray-500 text-lg md:text-2xl">
+                    No images uploaded yet. Please upload images.
+                  </p>
                 </div>
               )}
 
-              {Array.isArray(uploadedImages) && uploadedImages.length > 0 && (
+              {Array.isArray(uploadedImages) && uploadedImages.length > 1 && (
                 <>
                   <button
                     onClick={handleBack}
@@ -190,7 +190,7 @@ const PresetsPage = () => {
             <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Description:</h2>
             <p className="text-gray-700">{descriptionText}</p>
 
-            <div className="flex space-x-4 mt-6">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
               <button
                 onClick={handleAddToCart}
                 className="flex-1 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition"

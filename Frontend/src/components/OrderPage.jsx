@@ -44,21 +44,21 @@ const OrderPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDF6F0] p-6 mt-[108px]">
+    <div className="min-h-screen bg-[#FDF6F0] p-4 md:p-6 mt-[108px]">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-[#2E2210] mb-8">Your Order</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#2E2210] mb-6 md:mb-8">Your Order</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Left Section: Order Summary */}
-          <div className="md:col-span-2 bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-[#2E2210] mb-4">Order Summary</h2>
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <h2 className="text-xl md:text-2xl font-semibold text-[#2E2210] mb-4">Order Summary</h2>
             {cartItems.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {cartItems.map((item, index) => (
                   <div key={index} className="bg-[#eee1cf] rounded-lg p-4 flex flex-col items-center">
                     <img
                       src={item.image || "/placeholder.svg"}
                       alt={item.name}
-                      className="w-full h-40 object-cover rounded-md mb-2"
+                      className="w-full h-32 md:h-40 object-cover rounded-md mb-2"
                     />
                     <div className="space-y-1 w-full">
                       <p className="text-sm text-center text-[#2E2210] font-medium">
@@ -91,8 +91,8 @@ const OrderPage = () => {
           </div>
 
           {/* Right Section: Checkout Details */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-[#2E2210] mb-4">Checkout</h2>
+          <div className="bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <h2 className="text-xl md:text-2xl font-semibold text-[#2E2210] mb-4">Checkout</h2>
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">User Information</h3>
               <p className="text-gray-600">Name: {user?.name || "Guest"}</p>
@@ -116,7 +116,7 @@ const OrderPage = () => {
                   <span className="text-gray-600">{addr}</span>
                 </label>
               ))}
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   className="mt-2 flex-1 p-2 border border-gray-300 rounded"

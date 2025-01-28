@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import { X } from "lucide-react"
 
 const UploadPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
@@ -32,17 +35,111 @@ const UploadPage = () => {
     setUploadedImages((prevImages) => [...prevImages, ...newImages])
   }
 
+  const handleRemoveImage = (indexToRemove) => {
+    setUploadedImages((prevImages) => prevImages.filter((_, index) => index !== indexToRemove))
+    setAddedText((prevText) => {
+      const newText = { ...prevText }
+      delete newText[indexToRemove]
+      return newText
+    })
+    if (currentImageIndex >= uploadedImages.length - 1) {
+      setCurrentImageIndex(Math.max(uploadedImages.length - 2, 0))
+    }
+  }
+
+  const getPriceForType = (type, quantity) => {
+    switch (type) {
+      case "Polaroids":
+        if (quantity >= 25) return 16
+        if (quantity >= 15) return 17
+        return 19
+      case "Square Prints":
+        return 29
+      case "Postcards":
+        return 39
+      case "Wall Posters":
+        return 79
+      case "Photo Strips":
+        return 99
+      default:
+        return 0
+    }
+  }
+
+  const calculateTotalPrice = (quantity) => {
+    if (state?.fromPage === "Polaroids") {
+      if (quantity < 5) return 0 // Minimum order not met
+      if (quantity >= 25) return quantity * 16
+      if (quantity >= 15) return quantity * 17
+      if (quantity >= 6) {
+        const freeItems = Math.floor(quantity / 6)
+        return (quantity - freeItems) * 19
+      }
+      return quantity * 19
+    }
+    return quantity * getPriceForType(state?.fromPage, quantity)
+  }
+
   const handleAddToCart = () => {
     if (uploadedImages.length > 0) {
-      const selectedImage = {
-        name: `Uploaded Image ${currentImageIndex + 1}`,
-        image: uploadedImages[currentImageIndex],
-        text: addedText[currentImageIndex] || "",
-        type: "uploaded",
+      if (state?.fromPage === "Polaroids" && uploadedImages.length < 5) {
+        toast.error("Minimum order of 5 Polaroids required!", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+          style: {
+            backgroundColor: "#ebe1d2",
+            color: "#2E2210",
+            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+            borderRadius: "8px",
+            padding: "12px",
+          },
+        })
+        return
       }
 
-      addToCart(selectedImage)
-      alert("Item added to cart!")
+      const quantity = uploadedImages.length
+      const totalPrice = calculateTotalPrice(quantity)
+      const pricePerItem = totalPrice / quantity
+
+      uploadedImages.forEach((image, index) => {
+        const selectedImage = {
+          name: `Uploaded Image ${index + 1}`,
+          image: image,
+          text: addedText[index] || "",
+          type: "uploaded",
+          price: pricePerItem,
+          productType: state?.fromPage,
+        }
+        addToCart(selectedImage)
+      })
+
+      const freeItems = state?.fromPage === "Polaroids" ? Math.floor(quantity / 6) : 0
+      toast.success(
+        `${quantity} items added to cart! Total price: ₹${totalPrice}${
+          freeItems > 0 ? ` (Includes ${freeItems} free Polaroid${freeItems > 1 ? "s" : ""})` : ""
+        }`,
+        {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+          style: {
+            backgroundColor: "#ebe1d2",
+            color: "#2E2210",
+            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+            borderRadius: "8px",
+            padding: "12px",
+          },
+        },
+      )
     }
   }
 
@@ -66,14 +163,27 @@ const UploadPage = () => {
     setIsEditing(true)
   }
 
+  const getDescription = (type) => {
+    switch (type) {
+      case "Polaroids":
+        return "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: 5.6 cm x 8.4 cm (Including white space)"
+      case "Wall Posters":
+        return "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: A4 (Including white space)"
+      case "Postcards":
+        return "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 240 GSM Photo paper\nPaper Finish: Matte\nSize: 4 x 6 inch"
+      default:
+        return "Select your photos, upload and purchase to create beautiful prints of your memories."
+    }
+  }
+
   return (
-    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 mt-[108px]">
+    <main className="bg-[#FDF6F0] min-h-screen py-16 mt-[108px]">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Left Section: Thumbnails and Main Image */}
-          <div className="flex flex-col md:flex-row">
+          <div className="flex">
             {/* Thumbnail Images */}
-            <div className="flex md:flex-col space-x-2 md:space-x-0 md:space-y-2 md:pr-4 overflow-x-auto md:overflow-y-auto md:max-h-[450px] mb-4 md:mb-0">
+            <div className="flex flex-col space-y-2 pr-4 overflow-y-auto max-h-[450px]">
               {uploadedImages.map((image, index) => (
                 <div
                   key={index}
@@ -87,6 +197,15 @@ const UploadPage = () => {
                     alt={`Thumbnail ${index + 1}`}
                     className="w-full h-full object-cover transition-opacity duration-300"
                   />
+                  <button
+                    className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-bl-lg opacity-0 hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleRemoveImage(index)
+                    }}
+                  >
+                    <X size={12} />
+                  </button>
                 </div>
               ))}
             </div>
@@ -100,34 +219,28 @@ const UploadPage = () => {
                   className="rounded-lg shadow-lg max-h-96 object-cover mx-auto"
                 />
               ) : (
-                <div className="flex items-center justify-center h-64 md:h-96">
-                  <p className="text-center text-gray-500 text-lg md:text-2xl">
-                    No images uploaded yet. Please upload images.
-                  </p>
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-center text-gray-500 text-2xl">No images uploaded yet. Please upload images.</p>
                 </div>
               )}
 
               {/* Navigation Buttons */}
-              {uploadedImages.length > 1 && (
-                <>
-                  <button
-                    onClick={handleBack}
-                    className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-[#C4A381] text-white px-2 py-1 rounded-l-md hover:bg-[#af8a6c] transition"
-                  >
-                    &#9664;
-                  </button>
-                  <button
-                    onClick={handleNext}
-                    className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-[#C4A381] text-white px-2 py-1 rounded-r-md hover:bg-[#af8a6c] transition"
-                  >
-                    &#9654;
-                  </button>
-                </>
-              )}
+              <button
+                onClick={handleBack}
+                className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-[#C4A381] text-white px-2 py-1 rounded-l-md hover:bg-[#af8a6c] transition"
+              >
+                &#9664;
+              </button>
+              <button
+                onClick={handleNext}
+                className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-[#C4A381] text-white px-2 py-1 rounded-r-md hover:bg-[#af8a6c] transition"
+              >
+                &#9654;
+              </button>
 
               {/* Custom Text and Edit Button */}
               {uploadedImages.length > 0 && (
-                <div className="mt-4 md:mt-8 flex justify-center items-center space-x-2">
+                <div className="mt-8 flex justify-center items-center space-x-2">
                   {isEditing || !addedText[currentImageIndex] ? (
                     <>
                       <input
@@ -176,12 +289,40 @@ const UploadPage = () => {
             </div>
 
             <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Price:</h2>
-            <p className="text-lg text-gray-800 mb-4">$XX.XX</p>
+            {state?.fromPage === "Polaroids" ? (
+              <div className="mb-4">
+                <p className="text-lg text-gray-800">Base price: ₹19 per Polaroid</p>
+                <div className="mt-2 p-3 bg-[#eee1cf] rounded-lg">
+                  <h3 className="font-semibold text-[#2E2210]">Special Offers:</h3>
+                  <ul className="list-disc list-inside text-sm text-gray-700">
+                    <li>Buy 6 get 1 free</li>
+                    <li>On order of 15+ Polaroids: ₹17 each</li>
+                    <li>On order of 25+ Polaroids: ₹16 each</li>
+                    <li>Minimum order of 5 required</li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <p className="text-lg text-gray-800 mb-4">
+                ₹{getPriceForType(state?.fromPage, uploadedImages.length)} per item
+              </p>
+            )}
+            {uploadedImages.length > 0 && (
+              <p className="text-lg text-gray-800 mb-4">
+                Total: ₹{calculateTotalPrice(uploadedImages.length)} for {uploadedImages.length} items
+                {state?.fromPage === "Polaroids" && uploadedImages.length >= 6 && (
+                  <span className="block text-sm text-green-600 mt-1">
+                    (Includes {Math.floor(uploadedImages.length / 6)} free Polaroid
+                    {uploadedImages.length >= 12 ? "s" : ""})
+                  </span>
+                )}
+              </p>
+            )}
 
             <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Description:</h2>
-            <p className="text-gray-700 mb-4">Customize your photos and make them truly unique!</p>
+            <p className="text-gray-700 mb-4 whitespace-pre-line">{getDescription(state?.fromPage)}</p>
 
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-6">
+            <div className="flex space-x-4 mt-6">
               <button
                 onClick={handleAddToCart}
                 className="flex-1 bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition"
@@ -198,6 +339,7 @@ const UploadPage = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </main>
   )
 }

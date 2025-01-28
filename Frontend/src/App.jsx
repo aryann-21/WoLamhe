@@ -46,13 +46,12 @@ const App = () => {
                     </div>
                     <div className="w-full md:w-1/2 flex flex-col justify-center items-start bg-[#D3B495] text-[#2E2210] p-8">
                       <h1 className="text-4xl md:text-6xl font-bold mb-8 md:mb-12 tracking-wider leading-tight">
-                        Heyy...
+                        Mishri si yeh yaadein sambhali padhi hai in kagaz ke tukdo mein
                       </h1>
                       <p className="text-lg md:text-xl max-w-md tracking-wide leading-relaxed font-semibold">
-                        Realize the power of print and let your memories shine! From personalized polaroids to stunning
-                        postcards, trendy strips, sleek square prints, and epic wall posters—every format tells your
-                        story in style. Transform moments into timeless treasures, because your memories deserve more
-                        than just a screen!
+                        Why let memories fade when you can turn them into timeless treasures? From Polaroids to
+                        postcards, film strips to posters, we create prints that make your moments unforgettable. Start
+                        preserving your story today!
                       </p>
                     </div>
                   </section>

@@ -131,9 +131,9 @@ const PresetsPage = () => {
       case "Polaroids":
         return "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: 5.6 cm x 8.4 cm (Including white space)"
       case "Wall Posters":
-        return "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: A4 (Including white space)"
+        return "Print your retro instant style Wall Posters online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: A4 (Including white space)"
       case "Postcards":
-        return "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 240 GSM Photo paper\nPaper Finish: Matte\nSize: 4 x 6 inch"
+        return "Print your retro instant style PostCards online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 240 GSM Photo paper\nPaper Finish: Matte\nSize: 4 x 6 inch"
       default:
         return "Select your photos, upload and purchase to create beautiful prints of your memories."
     }

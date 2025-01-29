@@ -1,25 +1,36 @@
 import React, { useState } from "react"
 import { useCart } from "../context/CartContext"
 import { useUser } from "../context/UserContext"
-import { Trash2 } from "lucide-react"
+import { Trash2, Copy } from "lucide-react"
+import { Toaster, toast } from "react-hot-toast"
+import { useNavigate } from "react-router-dom"
 
 const OrderPage = () => {
-  const { user } = useUser()
+  const navigate = useNavigate()
+  const { user, updateUser } = useUser()
   const { cartItems, removeFromCart, clearCart } = useCart()
   const [address, setAddress] = useState("")
   const [savedAddresses, setSavedAddresses] = useState(["Mega Boys Hostel", "Mega Girls Hostel"])
   const [selectedAddress, setSelectedAddress] = useState("")
   const [paymentScreenshot, setPaymentScreenshot] = useState(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const upiId = "dpsingh05656-1@okhdfcbank"
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]
     if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast.error("File size should be less than 5MB")
+        return
+      }
       setPaymentScreenshot(URL.createObjectURL(file))
+      toast.success("Payment screenshot uploaded successfully")
     }
   }
 
   const handleRemoveItem = (index) => {
     removeFromCart(index)
+    toast.success("Item removed from cart")
   }
 
   const handleAddAddress = () => {
@@ -27,20 +38,8 @@ const OrderPage = () => {
       setSavedAddresses([...savedAddresses, address.trim()])
       setSelectedAddress(address.trim())
       setAddress("")
+      toast.success("New address added")
     }
-  }
-
-  const handlePlaceOrder = () => {
-    if (!selectedAddress) {
-      alert("Please select or add an address.")
-      return
-    }
-    if (!paymentScreenshot) {
-      alert("Please upload a screenshot of the payment.")
-      return
-    }
-    alert("Your order has been placed successfully!")
-    clearCart()
   }
 
   const calculateTotalPrice = () => {
@@ -49,11 +48,11 @@ const OrderPage = () => {
 
     cartItems.forEach((item) => {
       if (item.type === "preset" && item.name.includes("Polaroids set")) {
-        total += item.price
+        total += item.price || 0
       } else if (item.type === "uploaded" && item.name.includes("Polaroid")) {
         polaroidCount++
       } else {
-        total += item.price
+        total += item.price || 0
       }
     })
 
@@ -71,8 +70,96 @@ const OrderPage = () => {
     return total
   }
 
+  const handlePlaceOrder = async () => {
+    try {
+      setIsProcessing(true)
+
+      // Validation checks
+      if (!user) {
+        toast.error("Please login to place an order")
+        return
+      }
+
+      if (cartItems.length === 0) {
+        toast.error("Your cart is empty. Please add items before placing an order.")
+        return
+      }
+
+      if (!selectedAddress) {
+        toast.error("Please select or add a delivery address.")
+        return
+      }
+
+      if (!paymentScreenshot) {
+        toast.error("Please upload a screenshot of the payment.")
+        return
+      }
+
+      // Create the order object
+      const newOrder = {
+        id: Date.now().toString(),
+        products: cartItems.map((item) => ({
+          name: item.name,
+          price: item.price,
+          type: item.type,
+          text: item.text || null
+        })),
+        date: new Date().toISOString(),
+        status: "Placed",
+        total: calculateTotalPrice(),
+        deliveryAddress: selectedAddress,
+        paymentProof: paymentScreenshot
+      }
+
+      // If user doesn't have orderHistory, initialize it
+      const currentHistory = user.orderHistory || []
+      
+      const updatedUser = {
+        ...user,
+        orderHistory: [...currentHistory, newOrder]
+      }
+
+      // Update user with new order
+      await updateUser(updatedUser)
+
+      // Clear cart
+      clearCart()
+
+      // Show success message and redirect
+      toast.success("Order placed successfully!")
+      
+      // Wait for toast to be visible before navigation
+      setTimeout(() => {
+        navigate("/profile")
+      }, 1500)
+
+    } catch (error) {
+      console.error("Error placing order:", error)
+      toast.error("Failed to place order. Please try again.")
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const copyUpiId = () => {
+    navigator.clipboard.writeText(upiId)
+      .then(() => toast.success("UPI ID copied to clipboard!"))
+      .catch(() => toast.error("Failed to copy UPI ID"))
+  }
+
   return (
     <div className="min-h-screen bg-[#FDF6F0] p-6 mt-[108px]">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#FDF6F0",
+            color: "#2E2210",
+            border: "1px solid #C4A381",
+          },
+        }}
+      />
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold text-[#2E2210] mb-8">Your Order</h1>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -169,17 +256,43 @@ const OrderPage = () => {
             {/* Payment Section */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">Payment</h3>
+              <div className="bg-[#eee1cf] p-4 rounded-lg mb-4">
+                <p className="text-sm font-medium text-[#2E2210] mb-2">UPI ID for Payment:</p>
+                <div className="flex items-center justify-between bg-white p-2 rounded">
+                  <span className="text-gray-700">{upiId}</span>
+                  <button onClick={copyUpiId} className="text-[#C4A381] hover:text-[#a58049]">
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
               <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
                 {paymentScreenshot ? (
-                  <img
-                    src={paymentScreenshot || "/placeholder.svg"}
-                    alt="Payment Screenshot"
-                    className="max-w-full h-auto rounded-md"
-                  />
+                  <div className="relative">
+                    <img
+                      src={paymentScreenshot}
+                      alt="Payment Screenshot"
+                      className="max-w-full h-auto rounded-md"
+                    />
+                    <button
+                      onClick={() => setPaymentScreenshot(null)}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
                 ) : (
                   <>
-                    <input type="file" id="upload" className="hidden" onChange={handleFileChange} />
-                    <label htmlFor="upload" className="cursor-pointer text-[#C4A381] hover:text-[#af8a6c]">
+                    <input 
+                      type="file" 
+                      id="upload" 
+                      className="hidden" 
+                      onChange={handleFileChange}
+                      accept="image/*"
+                    />
+                    <label 
+                      htmlFor="upload" 
+                      className="cursor-pointer text-[#C4A381] hover:text-[#af8a6c]"
+                    >
                       Click here to upload payment screenshot
                     </label>
                   </>
@@ -190,9 +303,40 @@ const OrderPage = () => {
             {/* Place Order Button */}
             <button
               onClick={handlePlaceOrder}
-              className="w-full bg-[#C4A381] text-white py-2 px-4 rounded-md hover:bg-[#af8a6c] transition-colors"
+              disabled={isProcessing || cartItems.length === 0}
+              className={`w-full py-2 px-4 rounded-md transition-colors ${
+                isProcessing || cartItems.length === 0
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#C4A381] hover:bg-[#af8a6c] text-white"
+              }`}
             >
-              Place Order
+              {isProcessing ? (
+                <div className="flex items-center justify-center">
+                  <svg 
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24"
+                  >
+                    <circle 
+                      className="opacity-25" 
+                      cx="12" 
+                      cy="12" 
+                      r="10" 
+                      stroke="currentColor" 
+                      strokeWidth="4"
+                    />
+                    <path 
+                      className="opacity-75" 
+                      fill="currentColor" 
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Processing...
+                </div>
+              ) : (
+                "Place Order"
+              )}
             </button>
           </div>
         </div>
@@ -202,4 +346,3 @@ const OrderPage = () => {
 }
 
 export default OrderPage
-

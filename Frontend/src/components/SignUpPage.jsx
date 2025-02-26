@@ -1,48 +1,51 @@
-import React, { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import axios from "axios"
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const SignUpPage = () => {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [phone, setPhone] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const navigate = useNavigate()
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const { signup, loading } = useUser();
 
   const handleSignUp = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
+    setError("");
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match!")
-      return
+      setError("Passwords do not match!");
+      return;
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/signup", {
+      const result = await signup({
         name,
         email,
         phone,
         password,
-      })
+      });
 
-      if (response.data.success || response.status === 201) {
-        console.log("Sign Up Successful! Please log in.")
-        navigate("/login")
+      if (result.success) {
+        navigate("/login");
       } else {
-        alert(response.data.message)
+        setError(result.message);
       }
     } catch (error) {
-      console.error("Sign Up failed:", error)
-      alert("Sign Up failed. Please try again.")
+      console.error("Sign Up failed:", error);
+      setError("An unexpected error occurred. Please try again.");
     }
-  }
+  };
 
   return (
     <div className="bg-[#faf5f0] flex justify-center p-4 mt-[108px]">
       <div className="flex flex-col md:flex-row bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-full max-w-4xl">
         <div className="w-full md:w-1/2 bg-[#e4ccb4] p-6 flex flex-col items-center justify-start text-center pt-8 md:pt-12">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4 md:mb-6 text-black">Sign Up</h2>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
           <form onSubmit={handleSignUp} className="w-full max-w-sm">
             <div className="mb-3 relative">
               <span className="absolute left-3 top-[11px]">
@@ -111,9 +114,10 @@ const SignUpPage = () => {
             </div>
             <button
               type="submit"
-              className="bg-[#65350f] text-white px-6 py-2 rounded-full w-full hover:bg-[#875223] transition duration-300"
+              disabled={loading}
+              className="bg-[#65350f] text-white px-6 py-2 rounded-full w-full hover:bg-[#875223] transition duration-300 disabled:opacity-50"
             >
-              Sign Up
+              {loading ? "Signing up..." : "Sign Up"}
             </button>
           </form>
           <p className="mt-6 md:mt-8 text-sm text-gray-700">
@@ -128,8 +132,7 @@ const SignUpPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SignUpPage
-
+export default SignUpPage;

@@ -1,6 +1,10 @@
-import React, { useState } from "react"
+import { useState, useEffect } from "react"
 import { useUser } from "../context/UserContext"
 import { Edit2, Save, Package } from "lucide-react"
+import axios from "axios"
+
+// Create a consistent base URL
+const API_BASE_URL = "http://localhost:5000"
 
 const ProfilePage = () => {
   const { user, updateUser } = useUser()
@@ -10,19 +14,61 @@ const ProfilePage = () => {
     email: false,
   })
   const [editedUser, setEditedUser] = useState({ ...user })
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (user) {
+      setEditedUser({ ...user });
+      fetchOrders();
+    }
+  }, [user]);
+  
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      if (!token || !user?.id) return;
+  
+      const response = await axios.get(`${API_BASE_URL}/api/orders/${user.id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+  
+      setOrders(response.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
   const handleEdit = (field) => {
     setEditMode({ ...editMode, [field]: true })
   }
 
-  const handleSave = (field) => {
-    updateUser({ ...user, [field]: editedUser[field] })
-    setEditMode({ ...editMode, [field]: false })
+  const handleSave = async (field) => {
+    try {
+      // Use the updateUser function from UserContext
+      const result = await updateUser({ [field]: editedUser[field] })
+      
+      if (result.success) {
+        setEditMode({ ...editMode, [field]: false })
+      }
+    } catch (error) {
+      console.error("Error updating user:", error)
+    }
   }
 
   const handleChange = (e, field) => {
     setEditedUser({ ...editedUser, [field]: e.target.value })
   }
+
+  if (!user) {
+    return <div className="text-center text-gray-600">Loading...</div>;
+  }
+  
 
   return (
     <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 mt-[108px]">
@@ -67,21 +113,22 @@ const ProfilePage = () => {
             <div className="bg-white p-6 rounded-lg shadow-lg border border-[#C4A381]">
               <h2 className="text-2xl font-semibold mb-6 text-[#2E2210] border-b pb-2">Order History</h2>
               <div className="space-y-6">
-                {user.orderHistory && user.orderHistory.length > 0 ? (
-                  user.orderHistory.map((order, index) => (
-                    <div key={index} className="bg-[#FDF6F0] p-4 rounded-lg shadow-sm border border-[#C4A381]">
+                {orders.length > 0 ? (
+                  orders.map((order) => (
+                    <div key={order._id} className="bg-[#FDF6F0] p-4 rounded-lg shadow-sm border border-[#C4A381]">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-medium text-[#2E2210]">Order #{order.id}</h3>
+                        <h3 className="text-lg font-medium text-[#2E2210]">Order #{order._id}</h3>
                         <span className="text-sm font-medium text-[#6b543d] bg-[#ebe1d2] px-2 py-1 rounded">
                           {order.status}
                         </span>
                       </div>
                       <div className="space-y-2 text-sm">
                         <p className="text-gray-700">
-                          <span className="font-medium">Products:</span> {order.products.join(", ")}
+                          <span className="font-medium">Products:</span>{" "}
+                          {order.products.map((product) => product.name).join(", ")}
                         </p>
                         <p className="text-gray-700">
-                          <span className="font-medium">Date:</span> {new Date(order.date).toLocaleDateString()}
+                          <span className="font-medium">Date:</span> {new Date(order.createdAt).toLocaleDateString()}
                         </p>
                         <p className="text-gray-700">
                           <span className="font-medium">Total:</span> ₹{order.total.toFixed(2)}

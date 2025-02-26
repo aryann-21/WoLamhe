@@ -1,20 +1,19 @@
-import React, { useState } from "react"
+import { useState } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import headerPhoto from "../assets/header.png"
-import { useUser } from "../context/UserContext"
 import { ShoppingCart, User, LogOut, Menu, X } from "lucide-react"
 import { useCart } from "../context/CartContext"
+import { useUser } from "../context/UserContext"
 
 const Header = ({ polaroidsRef, postcardsRef, wallPostersRef, squarePrintsRef, photoStripsRef }) => {
-  const { user, setUser } = useUser()
+  const { user, logout } = useUser()
   const navigate = useNavigate()
   const location = useLocation()
   const { cartItems } = useCart()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const handleLogout = () => {
-    setUser(null)
-    localStorage.removeItem("user")
+    logout()
     navigate("/", { replace: true })
   }
 

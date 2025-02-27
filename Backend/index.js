@@ -1,132 +1,130 @@
-const express = require("express")
-const mongoose = require("mongoose")
-const cors = require("cors")
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
-const User = require("./models/user")
-const Order = require("./models/order")
-const multer = require("multer")
-const path = require("path")
-const fs = require("fs")
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const nodemailer = require("nodemailer");
+const User = require("./models/user");
+const Order = require("./models/order");
 
 // Load environment variables
-require("dotenv").config()
+require("dotenv").config();
 
-const app = express()
-const PORT = process.env.PORT || 5000
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Cloudinary configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Nodemailer transporter setup
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 // Enhanced CORS configuration
 app.use(
   cors({
-    origin: "http://localhost:5173", // Adjust to your frontend URL
+    origin: "http://localhost:5173",
     credentials: true,
-  }),
-)
+  })
+);
 
 // Middleware
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection with improved error handling
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB Connected Successfully"))
   .catch((err) => {
-    console.error("MongoDB Connection Error:", err)
-    process.exit(1) // Exit process if DB connection fails
-  })
+    console.error("MongoDB Connection Error:", err);
+    process.exit(1);
+  });
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, "uploads")
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true })
-    }
-    cb(null, uploadDir)
-  },
-  filename: (req, file, cb) => {
-    // Create unique filename with timestamp
-    cb(null, `${Date.now()}-${file.originalname}`)
-  },
-})
-
+// Configure multer for file uploads (temporary storage before Cloudinary upload)
+const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
-    // Accept only images
     if (file.mimetype.startsWith("image/")) {
-      cb(null, true)
+      cb(null, true);
     } else {
-      cb(new Error("Only image files are allowed"), false)
+      cb(new Error("Only image files are allowed"), false);
     }
   },
-})
+});
 
-// Serve static files from the uploads directory
-app.use("/uploads", express.static(path.join(__dirname, "uploads")))
+// Helper function to upload images to Cloudinary
+const uploadToCloudinary = (fileBuffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder },
+      (error, result) => (error ? reject(error) : resolve(result.secure_url))
+    );
+    uploadStream.end(fileBuffer);
+  });
+};
 
 // User registration route
 app.post("/signup", async (req, res) => {
   try {
-    const { name, email, phone, password } = req.body
+    const { name, email, phone, password } = req.body;
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email })
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" })
+      return res.status(400).json({ message: "User already exists" });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const user = new User({
       name,
       email,
       phone,
       password: hashedPassword,
-    })
+    });
 
-    await user.save()
-    res.status(201).json({ message: "User registered successfully" })
+    await user.save();
+    res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    console.error("Registration Error:", error)
-    res.status(500).json({
-      message: "Error registering user",
-      error: error.message,
-    })
+    console.error("Registration Error:", error);
+    res.status(500).json({ message: "Error registering user", error: error.message });
   }
-})
+});
 
-// User login route with comprehensive error handling
+// User login route
 app.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body
+    const { email, password } = req.body;
 
-    // Validate input
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" })
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
-    // Find user
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "User not found" })
+      return res.status(404).json({ message: "User not found" });
     }
 
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" })
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" })
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    // Respond with token and user info
     res.json({
       token,
       user: {
@@ -135,114 +133,116 @@ app.post("/login", async (req, res) => {
         email: user.email,
         phone: user.phone,
       },
-    })
+    });
   } catch (error) {
-    console.error("Login Error Details:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-    })
-    res.status(500).json({
-      message: "Internal server error",
-      errorDetails: error.message,
-    })
+    console.error("Login Error:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
-})
+});
 
-// Get user data route (requires authentication)
+// Get user data route
 app.get("/api/user", async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1]
+    const token = req.headers.authorization?.split(" ")[1];
     if (!token) {
-      return res.status(401).json({ message: "No token provided" })
+      return res.status(401).json({ message: "No token provided" });
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    const user = await User.findById(decoded.userId).select("-password")
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select("-password");
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" })
+      return res.status(404).json({ message: "User not found" });
     }
 
-    res.json(user)
+    res.json(user);
   } catch (error) {
-    console.error("User Fetch Error:", error)
-    res.status(401).json({ message: "Invalid token" })
+    console.error("User Fetch Error:", error);
+    res.status(401).json({ message: "Invalid token" });
   }
-})
+});
 
-// Create order with enhanced logging and error handling
-app.post("/api/orders", upload.single("paymentProof"), async (req, res) => {
-  console.log("Received order request")
+// Create order with Cloudinary and email notifications
+app.post("/api/orders", async (req, res) => {
   try {
-    const { userId, total, deliveryAddress, products } = req.body
-    console.log("Request body:", { userId, total, deliveryAddress, products: JSON.parse(products) })
+    console.log("Incoming Order Data:", req.body);
 
-    // Validate userId
-    if (!userId || typeof userId !== "string") {
-      console.error("Invalid user ID:", userId)
-      return res.status(400).json({ message: "Invalid user ID" })
+    const { userId, total, deliveryAddress, paymentProof, products } = req.body;
+
+    if (!userId || !total || !deliveryAddress || !products || !paymentProof) {
+      return res.status(400).json({ message: "Missing required order details" });
     }
 
-    let parsedProducts
-    try {
-      parsedProducts = JSON.parse(products)
-      console.log("Parsed products:", parsedProducts)
-    } catch (error) {
-      console.error("Error parsing products:", error)
-      return res.status(400).json({ message: "Invalid products data format" })
-    }
+    // Ensure products is an array
+    const parsedProducts = Array.isArray(products) ? products : JSON.parse(products);
 
-    if (!req.file) {
-      console.error("No payment proof file uploaded")
-      return res.status(400).json({ message: "Payment proof is required" })
-    }
-    console.log("Payment proof file:", req.file.filename)
-
-    // Use findOne instead of findById to avoid potential casting issues
-    const user = await User.findOne({ _id: userId })
+    // Verify user exists
+    const user = await User.findById(userId);
     if (!user) {
-      console.error("User not found for ID:", userId)
-      return res.status(404).json({ message: "User not found" })
+      return res.status(404).json({ message: "User not found" });
     }
-    console.log("User found:", user._id)
 
+    console.log("User found:", user.email);
+
+    // Save order to DB
     const order = new Order({
       user: userId,
-      products: parsedProducts,
+      products: parsedProducts, // No need to modify imageUrl, it's already provided by frontend
       total: Number.parseFloat(total),
       deliveryAddress,
-      paymentProof: `/uploads/${req.file.filename}`,
+      paymentProof, // Directly use the URL sent from frontend
       status: "Processing",
-    })
+    });
 
-    console.log("Order object created:", order)
+    await order.save();
+    console.log("Order saved successfully:", order._id);
 
-    await order.save()
-    console.log("Order saved successfully")
+    // Send admin email notification
+    console.log("Sending email notification...");
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL,
+      subject: "New Order Placed",
+      html: `<h2>New Order Details</h2>
+      <p><strong>User:</strong> ${user.name} (${user.email})</p>
+      <p><strong>Total:</strong> $${total}</p>
+      <p><strong>Delivery Address:</strong> ${deliveryAddress}</p>
+      <p><strong>Products:</strong></p>
+      <ul>
+        ${parsedProducts.map((p) => `<li>${p.name} - <a href="${p.imageUrl}">View Image</a></li>`).join("")}
+      </ul>
+      <p><strong>Payment Proof:</strong> <a href="${paymentProof}">View Image</a></p>`,
+    };
 
-    res.status(201).json({ message: "Order placed successfully", orderId: order._id })
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error("Email send error:", err);
+      } else {
+        console.log("Email sent successfully:", info.response);
+      }
+    });
+
+    res.status(201).json({ message: "Order placed successfully", orderId: order._id });
   } catch (error) {
-    console.error("Order Creation Error:", error)
-    res.status(500).json({ message: "Error placing order", error: error.message })
+    console.error("Order Creation Error:", error);
+    res.status(500).json({ message: "Error placing order", error: error.message });
   }
-})
+});
+
+
 
 // Get user orders
 app.get("/api/orders/:userId", async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.params.userId }).sort({ createdAt: -1 })
-    res.json(orders)
+    const orders = await Order.find({ user: req.params.userId }).sort({ createdAt: -1 });
+    res.json(orders);
   } catch (error) {
-    console.error("Error fetching orders:", error)
-    res.status(500).json({ message: "Error fetching orders", error: error.message })
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ message: "Error fetching orders", error: error.message });
   }
-})
+});
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-  console.log(`Connected to MongoDB: ${process.env.MONGODB_URI}`)
-})
-
+  console.log(`Server running on port ${PORT}`);
+});

@@ -13,7 +13,6 @@ const orderSchema = new mongoose.Schema({
   total: { type: Number, required: true },
   deliveryAddress: { type: String, required: true },
   paymentProof: { type: String, required: true },
-  status: { type: String, default: "Processing" },
   createdAt: { type: Date, default: Date.now },
 });
 

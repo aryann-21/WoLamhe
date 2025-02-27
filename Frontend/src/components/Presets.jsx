@@ -9,16 +9,16 @@ import green from "../PostcardsImg/green"
 import blue from "../PostcardsImg/blue"
 import red from "../PostcardsImg/red"
 import yellow from "../PostcardsImg/yellow"
-import vanGogh from "../PostcardsImg/vanGogh"
+import vangogh from "../PostcardsImg/vanGogh"
 import mountains from "../PolaroidsImg/mountains"
 import moons from "../PolaroidsImg/moon"
-import vangoghpol from "../PolaroidsImg/van-gogh"
+import vangoghh from "../PolaroidsImg/vangoghp"
 import india from "../PolaroidsImg/india"
 import girly from "../PolaroidsImg/girly"
 import flowers from "../PolaroidsImg/flowers"
 import dogs from "../PolaroidsImg/dogs"
 import diljit from "../PolaroidsImg/diljit"
-import famoussingers from "../PolaroidsImg/famoussingers"
+import singers from "../PolaroidsImg/singers"
 import cats from "../PolaroidsImg/cats"
 import cars from "../PolaroidsImg/cars"
 import birds from "../PolaroidsImg/birds"
@@ -43,7 +43,7 @@ const PresetsPage = () => {
       blue,
       red,
       yellow,
-      vangogh: vanGogh,
+      vangogh,
       mountains,
       moons,
       india,
@@ -51,11 +51,11 @@ const PresetsPage = () => {
       flowers,
       dogs,
       diljit,
-      "famous-singers": famoussingers,
+      singers,
       cats,
       cars,
       birds,
-      "van-gogh": vangoghpol,
+      vangoghh,
     }
     setUploadedImages(categoryMap[category] || null)
     setCurrentImageIndex(category === "Polaroids" ? 0 : currentImageIndex)

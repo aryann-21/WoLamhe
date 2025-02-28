@@ -1,9 +1,103 @@
-#root {
+/* #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+} */
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
 }
+
+/* Existing styles above, new styles below */
+
+:root {
+  --background: #fdf6f0;
+  --foreground: #2e2210;
+  --primary: #c4a381;
+  --primary-foreground: #ffffff;
+  --secondary: #97784c;
+  --secondary-foreground: #ffffff;
+  --accent: #ebe1d2;
+  --accent-foreground: #2e2210;
+  --muted: #eee1cf;
+  --muted-foreground: #6c5a3d;
+  --card: #ffffff;
+  --card-foreground: #2e2210;
+  --border: #e2d5c3;
+  --input: #e2d5c3;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Custom scrollbar for thumbnails */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
+}
+
+/* For Firefox */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--muted);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Styles for order-page, presets-page, and upload-page */
+.order-page,
+.presets-page,
+.upload-page {
+  min-height: 100vh;
+  padding-top: 120px;
+}
+
+@media (max-width: 768px) {
+  .order-page,
+  .presets-page,
+  .upload-page {
+    padding-top: 108px;
+  }
+}
+
+/* Add any additional specific styles for the three pages here */
+
+
 
 .logo {
   height: 6em;
@@ -46,3 +140,4 @@
   font-weight: 400;
   font-style: normal;
 }
+

@@ -140,27 +140,37 @@ const PresetsPage = () => {
   }
 
   const getDescription = (type) => {
+    const freeDeliveryNote = "Free delivery for non-NITJ customers on orders over ₹300!"
+    let description = ""
+
     switch (type) {
       case "Polaroids":
-        return "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: 5.6 cm x 8.4 cm (Including white space)"
+        description =
+          "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: 5.6 cm x 8.4 cm (Including white space)"
+        break
       case "Wall Posters":
-        return "Print your retro instant style Wall Posters online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: A4 (Including white space)"
+        description =
+          "Print your retro instant style Wall Posters online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: A4 (Including white space)"
+        break
       case "Postcards":
-        return "Print your retro instant style PostCards online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 240 GSM Photo paper\nPaper Finish: Matte\nSize: 4 x 6 inch"
+        description =
+          "Print your retro instant style Postcards online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 240 GSM Photo paper\nPaper Finish: Matte\nSize: 4 x 6 inch"
+        break
       default:
-        return "Select your photos, upload and purchase to create beautiful prints of your memories."
+        description = "Select your photos, upload and purchase to create beautiful prints of your memories."
     }
+
+    return `${freeDeliveryNote}\n\n${description}`
   }
 
   const getHeading = () => {
-    const formattedCategory = category.charAt(0).toUpperCase() + category.slice(1);
+    const formattedCategory = category.charAt(0).toUpperCase() + category.slice(1)
     if (state?.fromPage === "Polaroids") {
-      return `${formattedCategory} Polaroids Set Of 9`;
+      return `${formattedCategory} Polaroids Set Of 9`
     } else {
-      return `${formattedCategory} Themed`;
+      return `${formattedCategory} Themed`
     }
-  };
-  
+  }
 
   const descriptionText = getDescription(state?.fromPage)
 

@@ -231,16 +231,27 @@ const UploadPage = () => {
   }
 
   const getDescription = (type) => {
+    const freeDeliveryNote = "Free delivery for non-NITJ customers on orders over ₹300!"
+    let description = ""
+
     switch (type) {
       case "Polaroids":
-        return "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: 5.6 cm x 8.4 cm (Including white space)"
+        description =
+          "Print your retro instant style Polaroids online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: 5.6 cm x 8.4 cm (Including white space)"
+        break
       case "Wall Posters":
-        return "Print your retro instant style Wall Posters online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: A4 (Including white space)"
+        description =
+          "Print your retro instant style Wall Posters online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 260 GSM Photo paper\nPaper Finish: Matte\nSize: A4 (Including white space)"
+        break
       case "Postcards":
-        return "Print your retro instant style Postcards online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 240 GSM Photo paper\nPaper Finish: Matte\nSize: 4 x 6 inch"
+        description =
+          "Print your retro instant style Postcards online from your mobile or computer. Just select your photos, upload and purchase.\nPaper Quality: 240 GSM Photo paper\nPaper Finish: Matte\nSize: 4 x 6 inch"
+        break
       default:
-        return "Select your photos, upload and purchase to create beautiful prints of your memories."
+        description = "Select your photos, upload and purchase to create beautiful prints of your memories."
     }
+
+    return `${freeDeliveryNote}\n\n${description}`
   }
 
   return (
@@ -316,7 +327,7 @@ const UploadPage = () => {
                   onDrop={handleDrop}
                 >
                   <Upload className="h-12 w-12 text-[#C4A381] mb-4" />
-                  <p className="text-center text-gray-600 text-lg mb-2">Drag & drop images here</p>
+                  <p className="text-center text-gray-600 text-lg mb-2">Drag and drop images here</p>
                   <p className="text-center text-gray-500 text-sm">or</p>
                   <label
                     htmlFor="upload"

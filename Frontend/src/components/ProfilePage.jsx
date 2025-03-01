@@ -217,7 +217,7 @@ const ProfilePage = () => {
 
                           <div className="space-y-2">
                             <p className="text-gray-700 flex items-center">
-                              <DollarSign className="w-4 h-4 mr-2 text-[#6b543d]" />
+                              {/* <DollarSign className="w-4 h-4 mr-2 text-[#6b543d]" /> */}
                               <span className="font-medium">Total:</span>
                               <span className="ml-1 font-semibold text-[#2E2210]">₹{order.total.toFixed(2)}</span>
                             </p>

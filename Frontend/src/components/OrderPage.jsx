@@ -13,7 +13,7 @@ const OrderPage = () => {
   const { user } = useUser()
   const { cartItems, removeFromCart, clearCart } = useCart()
   const [address, setAddress] = useState("")
-  const [savedAddresses, setSavedAddresses] = useState(["Mega Boys Hostel", "Mega Girls Hostel"])
+  const [savedAddresses, setSavedAddresses] = useState(["NITJ"])
   const [selectedAddress, setSelectedAddress] = useState("")
   const [paymentScreenshot, setPaymentScreenshot] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -128,6 +128,7 @@ const OrderPage = () => {
         return
       }
 
+      // Upload payment proof first
       const paymentProofUrl = await uploadToCloudinary(paymentScreenshot.file)
       if (!paymentProofUrl) {
         toast.error("Failed to upload payment proof.")
@@ -135,14 +136,23 @@ const OrderPage = () => {
         return
       }
 
+      // Upload all product images
       const productImageUrls = await Promise.all(
         cartItems.map(async (item) => {
           if (item.imageFile) {
+            // Upload the stored File object
             return await uploadToCloudinary(item.imageFile)
           }
-          return item.image || null
+          return item.image || null // Fallback to existing URL if no file to upload
         }),
       )
+
+      // Check if any uploads failed
+      if (productImageUrls.some((url) => !url)) {
+        toast.error("Failed to upload some product images")
+        setIsProcessing(false)
+        return
+      }
 
       const orderData = {
         userId: user.id,
@@ -250,7 +260,7 @@ const OrderPage = () => {
                         {item.type === "preset" ? "Preset Image" : "Custom Upload"}
                       </p>
                       <p className="text-sm text-gray-700 line-clamp-2 h-8">
-                        {(item.text ? `Text: "${item.text}"` : "No custom text")}
+                        {item.text ? `Text: "${item.text}"` : "No custom text"}
                       </p>
                       <p className="text-sm font-medium text-[#2E2210]">₹{item.price}</p>
                     </div>
@@ -446,3 +456,4 @@ const OrderPage = () => {
 }
 
 export default OrderPage
+

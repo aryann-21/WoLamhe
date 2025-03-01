@@ -1,6 +1,4 @@
 "use client"
-
-import React from "react"
 import { useState, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
@@ -131,7 +129,7 @@ const UploadPage = () => {
     return quantity * getPriceForType(state?.fromPage, quantity)
   }
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (uploadedImages.length > 0) {
       if (state?.fromPage === "Polaroids" && uploadedImages.length < 5) {
         toast.error("Minimum order of 5 Polaroids required!", {
@@ -153,44 +151,56 @@ const UploadPage = () => {
         return
       }
 
-      const quantity = uploadedImages.length
-      const totalPrice = calculateTotalPrice(quantity)
-      const pricePerItem = totalPrice / quantity
+      try {
+        const quantity = uploadedImages.length
+        const totalPrice = calculateTotalPrice(quantity)
+        const pricePerItem = totalPrice / quantity
 
-      uploadedImages.forEach((image, index) => {
-        const selectedImage = {
-          name: `Uploaded Image ${index + 1}`,
-          image: image,
-          text: addedText[index] || "",
-          type: "uploaded",
-          price: pricePerItem,
-          productType: state?.fromPage,
-        }
-        addToCart(selectedImage)
-      })
+        // Add items to cart with blob URLs
+        uploadedImages.forEach(async (image, index) => {
+          // Convert blob URL to File object for later upload
+          const response = await fetch(image)
+          const blob = await response.blob()
+          const file = new File([blob], `image-${index}.jpg`, { type: blob.type })
 
-      const freeItems = state?.fromPage === "Polaroids" ? Math.floor(quantity / 6) : 0
-      toast.success(
-        `${quantity} items added to cart! Total price: ₹${totalPrice}${
-          freeItems > 0 ? ` (Includes ${freeItems} free Polaroid${freeItems > 1 ? "s" : ""})` : ""
-        }`,
-        {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          theme: "light",
-          style: {
-            backgroundColor: "#ebe1d2",
-            color: "#2E2210",
-            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
-            borderRadius: "8px",
-            padding: "12px",
+          const selectedImage = {
+            name: `Uploaded Image ${index + 1}`,
+            image: image, // Store blob URL
+            imageFile: file, // Store File object for later upload
+            text: addedText[index] || "",
+            type: "uploaded",
+            price: pricePerItem,
+            productType: state?.fromPage,
+          }
+          addToCart(selectedImage)
+        })
+
+        const freeItems = state?.fromPage === "Polaroids" ? Math.floor(quantity / 6) : 0
+        toast.success(
+          `${quantity} items added to cart! Total price: ₹${totalPrice}${
+            freeItems > 0 ? ` (Includes ${freeItems} free Polaroid${freeItems > 1 ? "s" : ""})` : ""
+          }`,
+          {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "light",
+            style: {
+              backgroundColor: "#ebe1d2",
+              color: "#2E2210",
+              boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+              borderRadius: "8px",
+              padding: "12px",
+            },
           },
-        },
-      )
+        )
+      } catch (error) {
+        console.error("Error in handleAddToCart:", error)
+        toast.error("An error occurred while adding items to cart")
+      }
     }
   }
 
@@ -314,6 +324,14 @@ const UploadPage = () => {
                   >
                     Browse Files
                   </label>
+                  <input
+                    type="file"
+                    id="upload"
+                    className="hidden"
+                    multiple
+                    onChange={handleFileChange}
+                    accept="image/*"
+                  />
                 </div>
               )}
 
@@ -467,3 +485,4 @@ const UploadPage = () => {
 }
 
 export default UploadPage
+

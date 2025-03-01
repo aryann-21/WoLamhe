@@ -23,3 +23,74 @@
   font-weight: 400;
   font-style: normal;
 }
+
+:root {
+  --color-background: #fdf6f0;
+  --color-text: #2e2210;
+  --color-primary: #d3b495;
+  --color-secondary: #4a3728;
+  --color-accent: #8b4513;
+  --color-light: #ede8e0;
+  --color-brown-100: #f6e7d8;
+  --color-brown-700: #654321;
+  --color-brown-800: #5a3e36;
+}
+
+/* Header offset utility */
+.pt-header {
+  padding-top: 108px;
+}
+
+@media (min-width: 768px) {
+  .pt-header {
+    padding-top: 120px;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .animate-fade-in-up {
+    animation-duration: 0.4s;
+  }
+}
+
+/* Existing styles above, new styles below */
+
+/* Tailwind-like utility classes */
+.bg-primary {
+  background-color: var(--color-primary);
+}
+.text-primary {
+  color: var(--color-primary);
+}
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+.text-secondary {
+  color: var(--color-secondary);
+}
+.bg-accent {
+  background-color: var(--color-accent);
+}
+.text-accent {
+  color: var(--color-accent);
+}
+
+/* Additional utility classes for the three pages */
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+.transition {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+.hover\:opacity-100:hover {
+  opacity: 1;
+}
+
+/* Add any additional utility classes needed for the three pages here */
+

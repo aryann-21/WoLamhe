@@ -1,162 +1,159 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useCart } from "../context/CartContext";
-import { useUser } from "../context/UserContext";
-import { Trash2, Copy } from "lucide-react";
-import { Toaster, toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { useCart } from "../context/CartContext"
+import { useUser } from "../context/UserContext"
+import { Trash2, Copy, ShoppingBag, CreditCard, MapPin, Check, Loader2 } from "lucide-react"
+import { Toaster, toast } from "react-hot-toast"
+import axios from "axios"
 
 const OrderPage = () => {
-  const navigate = useNavigate();
-  const { user } = useUser(); // Just use user from context, don't try to modify it here
-  const { cartItems, removeFromCart, clearCart } = useCart();
-  const [address, setAddress] = useState("");
-  const [savedAddresses, setSavedAddresses] = useState([
-    "Mega Boys Hostel",
-    "Mega Girls Hostel",
-  ]);
-  const [selectedAddress, setSelectedAddress] = useState("");
-  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const upiId = "dpsingh05656-1@okhdfcbank";
+  const navigate = useNavigate()
+  const { user } = useUser()
+  const { cartItems, removeFromCart, clearCart } = useCart()
+  const [address, setAddress] = useState("")
+  const [savedAddresses, setSavedAddresses] = useState(["NITJ"])
+  const [selectedAddress, setSelectedAddress] = useState("")
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const upiId = "dpsingh05656-1@okhdfcbank"
 
   useEffect(() => {
-    // Simply check if we have user data and set loading to false
-    const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token")
+    const storedUser = localStorage.getItem("user")
 
     if (token && storedUser) {
-      // Don't try to set user data here, just use what's in context
-      // Instead just finish loading
-      setLoading(false);
+      setLoading(false)
     } else {
-      setLoading(false);
+      setLoading(false)
     }
-  }, []);
+  }, [])
 
   const uploadToCloudinary = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "WoLamhePresets"); // Replace with your Cloudinary preset
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("upload_preset", "WoLamhePresets")
 
     try {
-      const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/duwjb0moz/image/upload", // Replace 'your_cloud_name'
-        formData
-      );
-      return response.data.secure_url; // Return the Cloudinary image URL
+      const response = await axios.post("https://api.cloudinary.com/v1_1/duwjb0moz/image/upload", formData)
+      return response.data.secure_url
     } catch (error) {
-      console.error("Error uploading image to Cloudinary:", error);
-      toast.error("Failed to upload image. Please try again.");
-      return null;
+      console.error("Error uploading image to Cloudinary:", error)
+      toast.error("Failed to upload image. Please try again.")
+      return null
     }
-  };
+  }
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0]
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("File size should be less than 5MB");
-        return;
+        toast.error("File size should be less than 5MB")
+        return
       }
 
-      const previewUrl = URL.createObjectURL(file);
+      const previewUrl = URL.createObjectURL(file)
 
-      // Revoke the previous object URL before setting a new one
       if (paymentScreenshot?.preview) {
-        URL.revokeObjectURL(paymentScreenshot.preview);
+        URL.revokeObjectURL(paymentScreenshot.preview)
       }
 
-      setPaymentScreenshot({ file, preview: previewUrl });
-      toast.success("Payment screenshot uploaded successfully");
+      setPaymentScreenshot({ file, preview: previewUrl })
+      toast.success("Payment screenshot uploaded successfully")
     }
-  };
+  }
 
   const handleRemoveItem = (index) => {
-    removeFromCart(index);
-    toast.success("Item removed from cart");
-  };
+    removeFromCart(index)
+    toast.success("Item removed from cart")
+  }
 
   const handleAddAddress = () => {
     if (address.trim()) {
-      setSavedAddresses([...savedAddresses, address.trim()]);
-      setSelectedAddress(address.trim());
-      setAddress("");
-      toast.success("New address added");
+      setSavedAddresses([...savedAddresses, address.trim()])
+      setSelectedAddress(address.trim())
+      setAddress("")
+      toast.success("New address added")
     }
-  };
+  }
 
   const calculateTotalPrice = () => {
-    let total = 0;
-    let polaroidCount = 0;
+    let total = 0
+    let polaroidCount = 0
 
     cartItems.forEach((item) => {
       if (item.type === "preset" && item.name.includes("Polaroids set")) {
-        total += item.price || 0;
-      } else if (item.type === "uploaded" && item.name.includes("Polaroid")) {
-        polaroidCount++;
+        total += item.price || 0
+      } else if (item.productType === "Polaroids") {
+        polaroidCount++
       } else {
-        total += item.price || 0;
+        total += item.price || 0
       }
-    });
+    })
 
-    // Apply discounts for uploaded Polaroids
     if (polaroidCount >= 25) {
-      total += polaroidCount * 16;
+      total += polaroidCount * 16
     } else if (polaroidCount >= 15) {
-      total += polaroidCount * 17;
+      total += polaroidCount * 17
     } else if (polaroidCount >= 6) {
-      total += polaroidCount * 19 - 19; // Buy 6 get 1 free
+      const freeItems = Math.floor(polaroidCount / 6)
+      total += (polaroidCount - freeItems) * 19
     } else {
-      total += polaroidCount * 19;
+      total += polaroidCount * 19
     }
 
-    return total;
-  };
+    return total
+  }
 
   const handlePlaceOrder = async () => {
     try {
-      setIsProcessing(true);
+      setIsProcessing(true)
 
       if (!user || !user.id) {
-        toast.error("Please login to place an order");
-        return;
+        toast.error("Please login to place an order")
+        return
       }
       if (cartItems.length === 0) {
-        toast.error("Your cart is empty.");
-        return;
+        toast.error("Your cart is empty.")
+        return
       }
       if (!selectedAddress) {
-        toast.error("Please select a delivery address.");
-        return;
+        toast.error("Please select a delivery address.")
+        return
       }
       if (!paymentScreenshot) {
-        toast.error("Please upload a payment screenshot.");
-        return;
+        toast.error("Please upload a payment screenshot.")
+        return
       }
 
-      // Upload payment screenshot
-      const paymentProofUrl = await uploadToCloudinary(paymentScreenshot.file);
+      // Upload payment proof first
+      const paymentProofUrl = await uploadToCloudinary(paymentScreenshot.file)
       if (!paymentProofUrl) {
-        toast.error("Failed to upload payment proof.");
-        setIsProcessing(false);
-        return;
+        toast.error("Failed to upload payment proof.")
+        setIsProcessing(false)
+        return
       }
 
-      // Upload product images
+      // Upload all product images
       const productImageUrls = await Promise.all(
         cartItems.map(async (item) => {
           if (item.imageFile) {
-            return await uploadToCloudinary(item.imageFile);
+            // Upload the stored File object
+            return await uploadToCloudinary(item.imageFile)
           }
-          return item.image || null;
-        })
-      );
+          return item.image || null // Fallback to existing URL if no file to upload
+        }),
+      )
 
-      // Order data
+      // Check if any uploads failed
+      if (productImageUrls.some((url) => !url)) {
+        toast.error("Failed to upload some product images")
+        setIsProcessing(false)
+        return
+      }
+
       const orderData = {
         userId: user.id,
         total: calculateTotalPrice(),
@@ -169,51 +166,47 @@ const OrderPage = () => {
           text: item.text || "",
           imageUrl: productImageUrls[index],
         })),
-      };
+      }
 
-      console.log("Payment Proof URL:", paymentProofUrl);
-      console.log("Product Image URLs:", productImageUrls);
-      console.log("Final Order Data:", orderData);
+      const response = await axios.post("http://localhost:5000/api/orders", orderData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
 
-      // Send order to backend
-      const response = await axios.post(
-        "http://localhost:5000/api/orders",
-        orderData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-
-      toast.success("Order placed successfully!");
-      clearCart();
-      setTimeout(() => navigate("/profile"), 1500);
+      toast.success("Order placed successfully!")
+      clearCart()
+      setTimeout(() => navigate("/profile"), 1500)
     } catch (error) {
-      console.error("Error placing order:", error);
-      toast.error("Failed to place order. Please try again.");
+      console.error("Error placing order:", error)
+      toast.error("Failed to place order. Please try again.")
     } finally {
-      setIsProcessing(false);
+      setIsProcessing(false)
     }
-  };
+  }
 
   const copyUpiId = () => {
     navigator.clipboard
       .writeText(upiId)
       .then(() => toast.success("UPI ID copied to clipboard!"))
-      .catch(() => toast.error("Failed to copy UPI ID"));
-  };
+      .catch(() => toast.error("Failed to copy UPI ID"))
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FDF6F0] p-6 mt-[108px] flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="min-h-screen bg-[#FDF6F0] p-6 pt-[120px] flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="h-8 w-8 text-[#C4A381] animate-spin mb-2" />
+          <p className="text-[#2E2210]">Loading your order...</p>
+        </div>
       </div>
-    );
+    )
   }
 
+  const totalPrice = calculateTotalPrice()
+
   return (
-    <div className="min-h-screen bg-[#FDF6F0] p-6 mt-[108px]">
+    <div className="min-h-screen bg-[#FDF6F0] p-4 md:p-6 pt-[120px] md:pt-[140px]">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -226,220 +219,241 @@ const OrderPage = () => {
         }}
       />
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-[#2E2210] mb-8">Your Order</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#2E2210] mb-6 md:mb-8">Your Order</h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Left Section: Order Summary */}
-          <div className="md:col-span-2 bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-[#2E2210] mb-4">
-              Order Summary
-            </h2>
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-md p-4 md:p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <ShoppingBag className="h-5 w-5 text-[#C4A381] mr-2" />
+                <h2 className="text-xl md:text-2xl font-semibold text-[#2E2210]">Order Summary</h2>
+              </div>
+              <span className="text-gray-600">Total Items: {cartItems.length}</span>
+              <div className="bg-[#ebe1d2] px-4 py-2 rounded-lg flex items-center">
+                <span className="text-sm text-gray-600 mr-2">Total Amount:</span>
+                <span className="text-lg font-semibold text-[#2E2210]">₹{totalPrice}</span>
+              </div>
+            </div>
+
             {cartItems.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {cartItems.map((item, index) => (
-                  <div
-                    key={index}
-                    className="bg-[#eee1cf] rounded-lg p-4 flex flex-col items-center"
-                  >
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      className="w-full h-40 object-cover rounded-md mb-2"
-                    />
-                    <div className="space-y-1 w-full">
-                      <p className="text-sm text-center text-[#2E2210] font-medium">
-                        {item.type === "preset" ? (
-                          <>
-                            <span className="block">Type: Preset Image</span>
-                            <span className="block text-xs mt-1">
-                              {item.name}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            <span className="block">Type: Custom Upload</span>
-                            <span className="block text-xs mt-1">
-                              {item.text || "No custom text added"}
-                            </span>
-                          </>
-                        )}
-                      </p>
-                      <p className="text-sm text-center text-[#2E2210]">
-                        Price: ₹{item.price}
-                      </p>
+                  <div key={index} className="bg-[#eee1cf] rounded-lg p-4 flex flex-col relative group">
+                    <div className="relative aspect-square mb-3">
+                      <img
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.name}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                      <button
+                        onClick={() => handleRemoveItem(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        aria-label="Remove item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleRemoveItem(index)}
-                      className="mt-3 flex items-center justify-center w-full bg-[#caac80] text-[#2E2210] rounded-md py-1 px-2 hover:bg-[#a58049] transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Remove
-                    </button>
+
+                    <div className="space-y-1 flex-1">
+                      <p className="text-sm font-medium text-[#2E2210]">
+                        {item.type === "preset" ? "Preset Image" : "Custom Upload"}
+                      </p>
+                      <p className="text-sm text-gray-700 line-clamp-2 h-8">
+                        {item.text ? `Text: "${item.text}"` : "No custom text"}
+                      </p>
+                      <p className="text-sm font-medium text-[#2E2210]">₹{item.price}</p>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-8">
-                Your cart is empty.
-              </p>
+              <div className="bg-[#ebe1d2]/50 rounded-lg p-8 text-center">
+                <p className="text-gray-500">Your cart is empty.</p>
+                <button onClick={() => navigate("/")} className="mt-4 text-[#C4A381] hover:text-[#af8a6c] font-medium">
+                  Continue Shopping
+                </button>
+              </div>
             )}
-            <div className="mt-6 text-right">
-              <p className="text-xl font-semibold text-[#2E2210]">
-                Total: ₹{calculateTotalPrice()}
-              </p>
-            </div>
+
+            {/* <div className="mt-6 flex justify-between items-center border-t border-[#ebe1d2] pt-4">
+              <span className="text-gray-600">Total Items: {cartItems.length}</span>
+              <p className="text-xl font-semibold text-[#2E2210]">Total: ₹{totalPrice}</p>
+            </div> */}
           </div>
 
           {/* Right Section: Checkout Details */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-[#2E2210] mb-4">
-              Checkout
-            </h2>
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">
-                User Information
-              </h3>
-              <p className="text-gray-600">Name: {user?.name || "Guest"}</p>
-              <p className="text-gray-600">
-                Phone: {user?.phone || "Not provided"}
-              </p>
-              <p className="text-gray-600">
-                Email: {user?.email || "Not provided"}
-              </p>
+          <div className="bg-white rounded-lg shadow-md p-4 md:p-6">
+            <div className="flex items-center mb-4">
+              <CreditCard className="h-5 w-5 text-[#C4A381] mr-2" />
+              <h2 className="text-xl md:text-2xl font-semibold text-[#2E2210]">Checkout</h2>
             </div>
 
-            {/* Address Section */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">
-                Delivery Address
-              </h3>
-              {savedAddresses.map((addr, index) => (
-                <label key={index} className="flex items-center mb-2">
-                  <input
-                    type="radio"
-                    name="address"
-                    value={addr}
-                    checked={selectedAddress === addr}
-                    onChange={() => setSelectedAddress(addr)}
-                    className="mr-2"
-                  />
-                  <span className="text-gray-600">{addr}</span>
-                </label>
-              ))}
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  className="mt-2 flex-1 p-2 border border-gray-300 rounded"
-                  placeholder="Add new address"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleAddAddress()}
-                />
-                <button
-                  onClick={handleAddAddress}
-                  className="mt-2 px-4 py-2 bg-[#C4A381] text-white rounded hover:bg-[#af8a6c] transition-colors"
-                >
-                  Add
-                </button>
+            <div className="space-y-6">
+              {/* User Information */}
+              <div className="p-4 bg-[#ebe1d2]/50 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">User Information</h3>
+                <div className="space-y-1 text-gray-600">
+                  <p>
+                    Name: <span className="font-medium text-[#2E2210]">{user?.name || "Guest"}</span>
+                  </p>
+                  <p>
+                    Phone: <span className="font-medium text-[#2E2210]">{user?.phone || "Not provided"}</span>
+                  </p>
+                  <p>
+                    Email: <span className="font-medium text-[#2E2210]">{user?.email || "Not provided"}</span>
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Payment Section */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">
-                Payment
-              </h3>
-              <div className="bg-[#eee1cf] p-4 rounded-lg mb-4">
-                <p className="text-sm font-medium text-[#2E2210] mb-2">
-                  UPI ID for Payment:
-                </p>
-                <div className="flex items-center justify-between bg-white p-2 rounded">
-                  <span className="text-gray-700">{upiId}</span>
+              {/* Address Section */}
+              <div>
+                <div className="flex items-center mb-3">
+                  <MapPin className="h-4 w-4 text-[#C4A381] mr-2" />
+                  <h3 className="text-lg font-semibold text-[#2E2210]">Delivery Address</h3>
+                </div>
+
+                <div className="space-y-2 mb-3">
+                  {savedAddresses.map((addr, index) => (
+                    <label
+                      key={index}
+                      className="flex items-center p-2 rounded-md hover:bg-[#ebe1d2]/30 transition-colors cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="address"
+                        value={addr}
+                        checked={selectedAddress === addr}
+                        onChange={() => setSelectedAddress(addr)}
+                        className="mr-2 accent-[#C4A381]"
+                      />
+                      <span className="text-gray-700">{addr}</span>
+                    </label>
+                  ))}
+                </div>
+
+                <div className="flex gap-2 mt-3">
+                  <input
+                    type="text"
+                    className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C4A381]"
+                    placeholder="Add new address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAddAddress()}
+                  />
                   <button
-                    onClick={copyUpiId}
-                    className="text-[#C4A381] hover:text-[#a58049]"
+                    onClick={handleAddAddress}
+                    className="px-4 py-2 bg-[#C4A381] text-white rounded-md hover:bg-[#af8a6c] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C4A381] focus:ring-offset-2"
                   >
-                    <Copy className="w-4 h-4" />
+                    Add
                   </button>
                 </div>
               </div>
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
-                {paymentScreenshot ? (
-                  <div className="relative">
-                    <img
-                      src={paymentScreenshot?.preview || "/placeholder.svg"}
-                      alt="Payment Screenshot"
-                      className="max-w-full h-auto rounded-md"
-                    />
+
+              {/* Payment Section */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3 text-[#2E2210]">Payment</h3>
+                <div className="bg-[#eee1cf] p-4 rounded-lg mb-4">
+                  <p className="text-sm font-medium text-[#2E2210] mb-2">UPI ID for Payment:</p>
+                  <div className="flex items-center justify-between bg-white p-3 rounded-md">
+                    <span className="text-gray-700 font-mono">{upiId}</span>
                     <button
-                      onClick={() => setPaymentScreenshot(null)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      onClick={copyUpiId}
+                      className="text-[#C4A381] hover:text-[#a58049] p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-[#C4A381]"
+                      aria-label="Copy UPI ID"
                     >
-                      ×
+                      <Copy className="w-4 h-4" />
                     </button>
                   </div>
+                </div>
+
+                <div
+                  className={`border-2 border-dashed rounded-md p-4 text-center transition-colors ${paymentScreenshot ? "border-green-500 bg-green-50" : "border-gray-300 hover:border-[#C4A381]"}`}
+                >
+                  {paymentScreenshot ? (
+                    <div className="relative">
+                      <img
+                        src={paymentScreenshot.preview || "/placeholder.svg"}
+                        alt="Payment Screenshot"
+                        className="max-w-full h-auto rounded-md"
+                      />
+                      <div className="absolute top-2 right-2 flex space-x-2">
+                        <button
+                          onClick={() => setPaymentScreenshot(null)}
+                          className="bg-red-500 text-white rounded-full p-1 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                          aria-label="Remove screenshot"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <div className="bg-green-500 text-white rounded-full p-1">
+                          <Check className="w-4 h-4" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <input type="file" id="upload" className="hidden" onChange={handleFileChange} accept="image/*" />
+                      <label
+                        htmlFor="upload"
+                        className="cursor-pointer text-[#C4A381] hover:text-[#af8a6c] flex flex-col items-center"
+                      >
+                        <CreditCard className="h-8 w-8 mb-2" />
+                        <span>Click here to upload payment screenshot</span>
+                        <span className="text-xs text-gray-500 mt-1">(Max size: 5MB)</span>
+                      </label>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Order Summary Card */}
+              <div className="bg-[#ebe1d2]/50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">Order Total</h3>
+                <div className="flex justify-between items-center font-medium">
+                  <span className="text-gray-700">Total Amount:</span>
+                  <span className="text-xl font-bold text-[#2E2210]">₹{totalPrice}</span>
+                </div>
+              </div>
+
+              {/* Place Order Button */}
+              <button
+                onClick={handlePlaceOrder}
+                disabled={isProcessing || cartItems.length === 0 || !selectedAddress || !paymentScreenshot}
+                className={`w-full py-3 px-4 rounded-md transition-colors flex items-center justify-center ${
+                  isProcessing || cartItems.length === 0 || !selectedAddress || !paymentScreenshot
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-[#C4A381] hover:bg-[#af8a6c] text-white"
+                }`}
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                    Processing...
+                  </>
                 ) : (
                   <>
-                    <input
-                      type="file"
-                      id="upload"
-                      className="hidden"
-                      onChange={handleFileChange}
-                      accept="image/*"
-                    />
-                    <label
-                      htmlFor="upload"
-                      className="cursor-pointer text-[#C4A381] hover:text-[#af8a6c]"
-                    >
-                      Click here to upload payment screenshot
-                    </label>
+                    <ShoppingBag className="mr-2 h-5 w-5" />
+                    Place Order
                   </>
                 )}
-              </div>
-            </div>
+              </button>
 
-            {/* Place Order Button */}
-            <button
-              onClick={handlePlaceOrder}
-              disabled={isProcessing || cartItems.length === 0}
-              className={`w-full py-2 px-4 rounded-md transition-colors ${
-                isProcessing || cartItems.length === 0
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-[#C4A381] hover:bg-[#af8a6c] text-white"
-              }`}
-            >
-              {isProcessing ? (
-                <div className="flex items-center justify-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Processing...
-                </div>
-              ) : (
-                "Place Order"
+              {(cartItems.length === 0 || !selectedAddress || !paymentScreenshot) && !isProcessing && (
+                <p className="text-xs text-red-500 text-center mt-2">
+                  {cartItems.length === 0
+                    ? "Your cart is empty"
+                    : !selectedAddress
+                      ? "Please select a delivery address"
+                      : "Please upload payment screenshot"}
+                </p>
               )}
-            </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default OrderPage;
+export default OrderPage
+

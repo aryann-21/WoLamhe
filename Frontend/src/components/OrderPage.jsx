@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
 import { useUser } from "../context/UserContext"
-import { Trash2, Copy, ShoppingBag, CreditCard, MapPin, Check, Loader2 } from "lucide-react"
+import { Trash2, Copy, ShoppingBag, CreditCard, MapPin, Check, Loader2, Truck } from "lucide-react"
 import { Toaster, toast } from "react-hot-toast"
 import axios from "axios"
 
@@ -107,6 +107,19 @@ const OrderPage = () => {
     return total
   }
 
+  const calculateDeliveryCharge = (subtotal) => {
+    if (selectedAddress === "NITJ" || subtotal >= 300) {
+      return 0
+    }
+    return 50
+  }
+
+  const calculateGrandTotal = () => {
+    const subtotal = calculateTotalPrice()
+    const deliveryCharge = calculateDeliveryCharge(subtotal)
+    return subtotal + deliveryCharge
+  }
+
   const handlePlaceOrder = async () => {
     try {
       setIsProcessing(true)
@@ -203,7 +216,9 @@ const OrderPage = () => {
     )
   }
 
-  const totalPrice = calculateTotalPrice()
+  const subtotal = calculateTotalPrice()
+  const deliveryCharge = calculateDeliveryCharge(subtotal)
+  const grandTotal = calculateGrandTotal()
 
   return (
     <div className="min-h-screen bg-[#FDF6F0] p-4 md:p-6 pt-[120px] md:pt-[140px]">
@@ -230,10 +245,6 @@ const OrderPage = () => {
                 <h2 className="text-xl md:text-2xl font-semibold text-[#2E2210]">Order Summary</h2>
               </div>
               <span className="text-gray-600">Total Items: {cartItems.length}</span>
-              <div className="bg-[#ebe1d2] px-4 py-2 rounded-lg flex items-center">
-                <span className="text-sm text-gray-600 mr-2">Total Amount:</span>
-                <span className="text-lg font-semibold text-[#2E2210]">₹{totalPrice}</span>
-              </div>
             </div>
 
             {cartItems.length > 0 ? (
@@ -408,10 +419,29 @@ const OrderPage = () => {
 
               {/* Order Summary Card */}
               <div className="bg-[#ebe1d2]/50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">Order Total</h3>
-                <div className="flex justify-between items-center font-medium">
-                  <span className="text-gray-700">Total Amount:</span>
-                  <span className="text-xl font-bold text-[#2E2210]">₹{totalPrice}</span>
+                <h3 className="text-lg font-semibold mb-2 text-[#2E2210]">Order Summary</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700">Subtotal:</span>
+                    <span className="font-medium text-[#2E2210]">₹{subtotal}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700">Delivery Charge:</span>
+                    <span className="font-medium text-[#2E2210]">
+                      {deliveryCharge === 0 ? <span className="text-green-600">Free</span> : `₹${deliveryCharge}`}
+                    </span>
+                  </div>
+                  {deliveryCharge === 0 && (
+                    <div className="text-sm text-green-600 flex items-center">
+                      <Truck className="w-4 h-4 mr-1" />
+                      {selectedAddress === "NITJ" ? "Free delivery for NITJ" : "Free delivery on orders over ₹300"}
+                    </div>
+                  )}
+                  <div className="border-t border-gray-300 my-2"></div>
+                  <div className="flex justify-between items-center font-bold">
+                    <span className="text-[#2E2210]">Total:</span>
+                    <span className="text-xl text-[#2E2210]">₹{grandTotal}</span>
+                  </div>
                 </div>
               </div>
 

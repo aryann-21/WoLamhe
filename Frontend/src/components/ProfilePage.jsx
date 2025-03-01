@@ -13,7 +13,6 @@ const ProfilePage = () => {
   const [editMode, setEditMode] = useState({
     name: false,
     phone: false,
-    email: false,
   })
   const [editedUser, setEditedUser] = useState({ ...user })
   const [orders, setOrders] = useState([])
@@ -21,7 +20,6 @@ const ProfilePage = () => {
   const [updating, setUpdating] = useState({
     name: false,
     phone: false,
-    email: false,
   })
 
   useEffect(() => {
@@ -50,7 +48,10 @@ const ProfilePage = () => {
   }
 
   const handleEdit = (field) => {
-    setEditMode({ ...editMode, [field]: true })
+    // Only allow editing for name and phone
+    if (field !== "email") {
+      setEditMode({ ...editMode, [field]: true })
+    }
   }
 
   const handleSave = async (field) => {
@@ -135,24 +136,26 @@ const ProfilePage = () => {
                         <span className="text-lg text-gray-700 py-1">{user[field]}</span>
                       )}
 
-                      <button
-                        onClick={() => (editMode[field] ? handleSave(field) : handleEdit(field))}
-                        disabled={updating[field]}
-                        className={`ml-2 px-3 py-1.5 rounded-md flex items-center transition-all duration-200 ${
-                          editMode[field]
-                            ? "bg-[#2E2210] text-white hover:bg-[#5c4421]"
-                            : "text-[#2E2210] hover:bg-[#ebe1d2]"
-                        } ${updating[field] ? "opacity-70 cursor-not-allowed" : ""}`}
-                      >
-                        {updating[field] ? (
-                          <Loader className="w-4 h-4 mr-1 animate-spin" />
-                        ) : editMode[field] ? (
-                          <Save className="w-4 h-4 mr-1" />
-                        ) : (
-                          <Edit2 className="w-4 h-4 mr-1" />
-                        )}
-                        <span className="text-sm">{editMode[field] ? "Save" : "Edit"}</span>
-                      </button>
+                      {field !== "email" && (
+                        <button
+                          onClick={() => (editMode[field] ? handleSave(field) : handleEdit(field))}
+                          disabled={updating[field]}
+                          className={`ml-2 px-3 py-1.5 rounded-md flex items-center transition-all duration-200 ${
+                            editMode[field]
+                              ? "bg-[#2E2210] text-white hover:bg-[#5c4421]"
+                              : "text-[#2E2210] hover:bg-[#ebe1d2]"
+                          } ${updating[field] ? "opacity-70 cursor-not-allowed" : ""}`}
+                        >
+                          {updating[field] ? (
+                            <Loader className="w-4 h-4 mr-1 animate-spin" />
+                          ) : editMode[field] ? (
+                            <Save className="w-4 h-4 mr-1" />
+                          ) : (
+                            <Edit2 className="w-4 h-4 mr-1" />
+                          )}
+                          <span className="text-sm">{editMode[field] ? "Save" : "Edit"}</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -182,8 +185,8 @@ const ProfilePage = () => {
                         className="bg-[#FDF6F0] p-5 rounded-lg shadow-sm border border-[#ebe1d2] hover:border-[#C4A381] transition-all duration-200 hover:shadow-md"
                       >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
-                          <h3 className="text-lg font-medium text-[#2E2210] flex items-center">
-                            <Package className="w-5 h-5 mr-2 text-[#C4A381]" />
+                          <h3 className="text-lg font-semibold text-[#2E2210] flex items-center">
+                            <Package className="w-5 h-5 mr-2 text-[#C4A381] " />
                             Order #{order._id.substring(order._id.length - 8)}
                           </h3>
                           <span
@@ -197,14 +200,14 @@ const ProfilePage = () => {
                           <div className="space-y-2">
                             <p className="text-gray-700 flex items-center">
                               <ShoppingBag className="w-4 h-4 mr-2 text-[#6b543d]" />
-                              <span className="font-medium">Products:</span>
+                              <span className="font-semibold">Products:</span>
                               <span className="ml-1 line-clamp-1">
-                                {order.products.map((product) => product.name).join(", ")}
+                                {order.products.map((product) => product.name).join(", ").substring(0, 30)}
                               </span>
                             </p>
                             <p className="text-gray-700 flex items-center">
                               <Calendar className="w-4 h-4 mr-2 text-[#6b543d]" />
-                              <span className="font-medium">Date:</span>
+                              <span className="font-semibold">Date:</span>
                               <span className="ml-1">
                                 {new Date(order.createdAt).toLocaleDateString("en-US", {
                                   year: "numeric",
@@ -254,4 +257,3 @@ const ProfilePage = () => {
 }
 
 export default ProfilePage
-

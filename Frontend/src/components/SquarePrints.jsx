@@ -1,14 +1,32 @@
-import React, { forwardRef, useState } from "react"
+"use client"
+
+import { forwardRef, useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import Square from "../assets/square.jpg"
 import cameraPhoto from "../assets/camera.png"
 
 const SquarePrints = forwardRef((props, ref) => {
   const [isHovered, setIsHovered] = useState(false)
+  const [isTouched, setIsTouched] = useState(false)
+  const overlayRef = useRef(null)
   const navigate = useNavigate()
 
   const handleClick = () => {
     navigate("/upload", { state: { fromPage: "Square Prints" } })
+  }
+
+  const handleTouchStart = (e) => {
+    e.preventDefault()
+    setIsTouched(true)
+  }
+
+  const handleTouchEnd = () => {
+    // Keep the overlay visible on mobile after touch
+  }
+
+  const handleOverlayTouch = (e) => {
+    // Prevent touch events from propagating to parent elements
+    e.stopPropagation()
   }
 
   return (
@@ -17,6 +35,8 @@ const SquarePrints = forwardRef((props, ref) => {
       className="relative group bg-[#D3B495] text-[#2E2210] overflow-hidden min-h-[300px] md:min-h-[400px]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Background Image */}
       <img
@@ -29,21 +49,26 @@ const SquarePrints = forwardRef((props, ref) => {
       <div className="absolute top-0 right-0 z-10 p-4">
         <h3
           className={`text-2xl md:text-3xl text-[#2E2210] transition-opacity duration-700 ${
-            isHovered ? "opacity-0" : "opacity-100"
+            isHovered || isTouched ? "opacity-0" : "opacity-100"
           }`}
         >
           Square Prints
         </h3>
       </div>
 
-      {/* Hover Overlay */}
+      {/* Hover/Touch Overlay */}
       <div
-        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white text-sm transition-all duration-700 ease-in-out ${
-          isHovered ? "opacity-100" : "opacity-0"
+        ref={overlayRef}
+        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white text-sm transition-all duration-700 ease-in-out overflow-y-auto ${
+          isHovered || isTouched ? "opacity-100" : "opacity-0"
         }`}
+        onTouchStart={handleOverlayTouch}
+        onTouchMove={handleOverlayTouch}
+        onTouchEnd={handleOverlayTouch}
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Section */}
-        <div className="w-full flex flex-col items-center justify-center p-4">
+        {/* Content Section */}
+        <div className="w-full flex flex-col items-center justify-center p-4 min-h-[300px]">
           <h3 className="text-xl font-bold mb-3 text-center z-40">Square Prints</h3>
 
           {/* Divider Line */}
@@ -63,4 +88,3 @@ const SquarePrints = forwardRef((props, ref) => {
 })
 
 export default SquarePrints
-

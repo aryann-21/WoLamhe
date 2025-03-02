@@ -5,7 +5,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-import { ChevronLeft, ChevronRight, ShoppingCart, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, ShoppingCart, Plus } from 'lucide-react'
 
 // Import image categories
 import general from "../PostcardsImg/general"
@@ -26,6 +26,29 @@ import singers from "../PolaroidsImg/singers"
 import cats from "../PolaroidsImg/cats"
 import cars from "../PolaroidsImg/cars"
 import birds from "../PolaroidsImg/birds"
+
+// Add this CSS
+const styles = `
+  @media (max-width: 640px) {
+    body {
+      overflow-x: hidden;
+    }
+    .thumbnails-container {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+      max-height: 100px;
+      touch-action: pan-x;
+      padding-bottom: 1rem;
+    }
+    .thumbnails-inner {
+      display: flex;
+      gap: 0.5rem;
+      min-width: max-content;
+    }
+  }
+`
 
 const PresetsPage = () => {
   const { category } = useParams()
@@ -73,6 +96,39 @@ const PresetsPage = () => {
     setCurrentImageIndex(0)
     setIsLoading(false)
   }, [category])
+
+  useEffect(() => {
+    // Add the styles to the document
+    const styleElement = document.createElement("style")
+    styleElement.textContent = styles
+    document.head.appendChild(styleElement)
+
+    // Clean up function
+    return () => {
+      document.head.removeChild(styleElement)
+    }
+  }, [])
+
+  useEffect(() => {
+    // Function to handle touch events on thumbnails container
+    const handleTouchInContainer = (e) => {
+      e.stopPropagation()
+    }
+
+    // Get the thumbnails container
+    const thumbnailsContainer = document.querySelector(".thumbnails-container")
+
+    if (thumbnailsContainer) {
+      thumbnailsContainer.addEventListener("touchstart", handleTouchInContainer, { passive: false })
+      thumbnailsContainer.addEventListener("touchmove", handleTouchInContainer, { passive: false })
+
+      // Clean up
+      return () => {
+        thumbnailsContainer.removeEventListener("touchstart", handleTouchInContainer)
+        thumbnailsContainer.removeEventListener("touchmove", handleTouchInContainer)
+      }
+    }
+  }, [])
 
   const handleNext = () => {
     if (Array.isArray(uploadedImages) && uploadedImages.length > 0) {
@@ -140,7 +196,6 @@ const PresetsPage = () => {
   }
 
   const getDescription = (type) => {
-    const freeDeliveryNote = "Free delivery for non-NITJ customers on orders over ₹300!"
     let description = ""
 
     switch (type) {
@@ -160,7 +215,11 @@ const PresetsPage = () => {
         description = "Select your photos, upload and purchase to create beautiful prints of your memories."
     }
 
-    return `${freeDeliveryNote}\n\n${description}`
+    return description
+  }
+
+  const getDeliveryInfo = () => {
+    return "Free delivery for people in NITJ campus. For customers outside NITJ campus, delivery is free for orders above ₹300. For orders below ₹300, minimal delivery charges will be applicable based on your location. We will contact you to inform you about the delivery charges."
   }
 
   const getHeading = () => {
@@ -173,15 +232,16 @@ const PresetsPage = () => {
   }
 
   const descriptionText = getDescription(state?.fromPage)
+  const deliveryInfo = getDeliveryInfo()
 
   return (
-    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 pt-[120px] md:pt-[140px]">
+    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 pt-[150px] md:pt-[180px]">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
-          {/* Image Section */}
+          {/* Left Section: Thumbnails and Main Image */}
           <div className="flex flex-col md:flex-row">
-            {/* Thumbnails */}
-            <div className="flex md:flex-col order-2 md:order-1 mb-4 md:mb-0 md:mr-4 overflow-x-auto md:overflow-y-auto md:max-h-[450px] md:w-20 scrollbar-thin scrollbar-thumb-[#C4A381] scrollbar-track-[#ebe1d2]">
+            {/* Thumbnail Images */}
+            <div className="flex md:flex-col order-2 md:order-1 mb-4 md:mb-0 md:mr-4 overflow-x-auto md:overflow-y-auto md:max-h-[500px] md:w-24 scrollbar-thin scrollbar-thumb-[#C4A381] scrollbar-track-[#ebe1d2]">
               {isLoading ? (
                 <div className="flex justify-center items-center w-full h-20">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#C4A381]"></div>
@@ -190,7 +250,7 @@ const PresetsPage = () => {
                 uploadedImages.map((image, index) => (
                   <div
                     key={index}
-                    className={`relative min-w-16 h-16 m-1 md:m-0 md:mb-2 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
+                    className={`relative min-w-20 h-20 m-1 md:m-0 md:mb-2 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
                       currentImageIndex === index ? "border-[#C4A381] shadow-md" : "border-transparent"
                     }`}
                     onClick={() => setCurrentImageIndex(index)}
@@ -220,24 +280,33 @@ const PresetsPage = () => {
                   <img
                     src={uploadedImages[currentImageIndex] || "/placeholder.svg"}
                     alt="Main Polaroid"
-                    className="rounded-lg shadow-lg w-full h-auto max-h-[300px] md:max-h-[400px] object-contain bg-[#ebe1d2] p-2"
+                    className="rounded-lg shadow-lg w-full h-auto max-h-[350px] md:max-h-[500px] object-contain bg-[#ebe1d2] p-2"
                   />
 
                   {/* Navigation Buttons */}
-                  <button
-                    onClick={handleBack}
-                    aria-label="Previous image"
-                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-[#C4A381]/80 text-white p-2 rounded-full hover:bg-[#af8a6c] transition opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C4A381]"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={handleNext}
-                    aria-label="Next image"
-                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-[#C4A381]/80 text-white p-2 rounded-full hover:bg-[#af8a6c] transition opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C4A381]"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
+                  {uploadedImages.length > 1 && (
+                    <>
+                      <button
+                        onClick={handleBack}
+                        aria-label="Previous image"
+                        className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-[#C4A381]/80 text-white p-2 rounded-full hover:bg-[#af8a6c] transition opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C4A381]"
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={handleNext}
+                        aria-label="Next image"
+                        className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-[#C4A381]/80 text-white p-2 rounded-full hover:bg-[#af8a6c] transition opacity-70 hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-[#C4A381]"
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </button>
+                    </>
+                  )}
+                  <div className="absolute bottom-2 left-0 right-0 flex justify-center">
+                    <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      {currentImageIndex + 1} / {uploadedImages.length}
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-[300px] md:h-[400px] bg-[#ebe1d2] rounded-lg p-4">
@@ -247,7 +316,7 @@ const PresetsPage = () => {
             </div>
           </div>
 
-          {/* Details Section */}
+          {/* Right Section: Details and Actions */}
           <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
             <h1 className="text-2xl md:text-3xl font-semibold mb-3 text-[#2E2210]">{getHeading()}</h1>
             <p className="text-lg md:text-xl text-gray-700 mb-6 border-b border-[#ebe1d2] pb-4">
@@ -264,18 +333,21 @@ const PresetsPage = () => {
                 <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Description:</h2>
                 <p className="text-gray-700 whitespace-pre-line">{descriptionText}</p>
               </div>
-
+              <div>
+                <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Delivery:</h2>
+                <p className="text-gray-700 whitespace-pre-line">{deliveryInfo}</p>
+              </div>
               <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-[#ebe1d2]">
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 bg-[#C4A381] text-white py-3 px-4 rounded-md hover:bg-[#af8a6c] transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#C4A381] focus:ring-offset-2"
+                  className="flex-1 bg-[#C4A381] text-white py-3 px-4 rounded-md transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#C4A381] focus:ring-offset-2"
                 >
                   <Plus className="h-5 w-5" />
                   <span>Add to Cart</span>
                 </button>
                 <button
                   onClick={handleViewCart}
-                  className="flex-1 bg-[#97784c] text-white py-3 px-4 rounded-md hover:bg-[#2E2210] transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#97784c] focus:ring-offset-2"
+                  className="flex-1 bg-[#97784c] text-white py-3 px-4 rounded-md transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#97784c] focus:ring-offset-2"
                 >
                   <ShoppingCart className="h-5 w-5" />
                   <span>View Cart</span>
@@ -293,4 +365,3 @@ const PresetsPage = () => {
 }
 
 export default PresetsPage
-

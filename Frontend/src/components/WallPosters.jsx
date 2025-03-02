@@ -1,10 +1,14 @@
-import React, { forwardRef, useState } from "react"
+"use client"
+
+import { forwardRef, useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import wall from "../assets/wall.jpg"
 import cameraPhoto from "../assets/camera.png"
 
 const WallPosters = forwardRef((props, ref) => {
   const [isHovered, setIsHovered] = useState(false)
+  const [isTouched, setIsTouched] = useState(false)
+  const overlayRef = useRef(null)
   const navigate = useNavigate()
 
   const categories = ["General", "VanGogh", "Blue", "Yellow", "Red", "Green"]
@@ -16,18 +20,34 @@ const WallPosters = forwardRef((props, ref) => {
     })
   }
 
+  const handleTouchStart = (e) => {
+    e.preventDefault()
+    setIsTouched(true)
+  }
+
+  const handleTouchEnd = () => {
+    // Keep the overlay visible on mobile after touch
+  }
+
+  const handleOverlayTouch = (e) => {
+    // Prevent touch events from propagating to parent elements
+    e.stopPropagation()
+  }
+
   return (
     <div
       ref={ref}
       className="relative group bg-[#EDE8E0] text-[#2E2210] overflow-hidden min-h-[300px] md:min-h-[400px]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Title */}
       <div className="absolute right-0 top-0 z-10 p-4">
         <h3
           className={`text-3xl md:text-6xl text-[#2E2210] transition-opacity duration-700 ${
-            isHovered ? "opacity-0" : "opacity-100"
+            isHovered || isTouched ? "opacity-0" : "opacity-100"
           }`}
         >
           Wall Posters
@@ -41,14 +61,19 @@ const WallPosters = forwardRef((props, ref) => {
         className="absolute bottom-0 left-0 w-full md:w-[80%] h-[70%] object-cover"
       />
 
-      {/* Hover Overlay */}
+      {/* Hover/Touch Overlay */}
       <div
-        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col md:flex-row text-white text-lg transition-all duration-700 ease-in-out ${
-          isHovered ? "opacity-100" : "opacity-0"
+        ref={overlayRef}
+        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col md:flex-row text-white text-lg transition-all duration-700 ease-in-out overflow-y-auto ${
+          isHovered || isTouched ? "opacity-100" : "opacity-0"
         }`}
+        onTouchStart={handleOverlayTouch}
+        onTouchMove={handleOverlayTouch}
+        onTouchEnd={handleOverlayTouch}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Left Section */}
-        <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6">
+        <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 min-h-[200px]">
           <img
             src={cameraPhoto || "/placeholder.svg"}
             alt="Upload"
@@ -59,22 +84,24 @@ const WallPosters = forwardRef((props, ref) => {
         </div>
 
         {/* Divider Line */}
-        <div className="hidden md:block w-px bg-white self-center h-3/4 mx-4" />
+        <div className="hidden md:block w-px bg-white self-stretch mx-4" />
 
         {/* Right Section */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center p-6">
-          <h3 className="text-2xl font-bold mb-8 md:mb-12 text-center z-40">Wall Posters</h3>
-          <ul className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {categories.map((category, index) => (
-              <li
-                key={index}
-                className="text-center z-40 cursor-pointer hover:bg-slate-300 hover:bg-opacity-20 p-2"
-                onClick={() => handleCategoryClick(category)}
-              >
-                {category}
-              </li>
-            ))}
-          </ul>
+        <div className="w-full md:w-1/2 flex flex-col justify-start p-6">
+          <h3 className="text-2xl font-bold mb-4 md:mb-8 text-center z-40">Wall Posters</h3>
+          <div className="pb-4">
+            <ul className="grid grid-cols-2 md:grid-cols-2 gap-4 pb-4">
+              {categories.map((category, index) => (
+                <li
+                  key={index}
+                  className="text-center z-40 cursor-pointer hover:bg-slate-300 hover:bg-opacity-20 p-2 rounded"
+                  onClick={() => handleCategoryClick(category)}
+                >
+                  {category}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>

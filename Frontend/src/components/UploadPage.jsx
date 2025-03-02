@@ -1,4 +1,5 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useCart } from "../context/CartContext"
@@ -254,18 +255,22 @@ const UploadPage = () => {
     return `${freeDeliveryNote}\n\n${description}`
   }
 
+  const getDeliveryInfo = () => {
+    return "Delivery time varies depending on your location. Standard delivery is typically 3-5 business days. Express delivery options are available at checkout."
+  }
+
   return (
-    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 pt-[120px] md:pt-[140px]">
+    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 pt-[150px] md:pt-[180px]">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
           {/* Left Section: Thumbnails and Main Image */}
           <div className="flex flex-col md:flex-row">
             {/* Thumbnail Images */}
-            <div className="flex md:flex-col order-2 md:order-1 mb-4 md:mb-0 md:mr-4 overflow-x-auto md:overflow-y-auto md:max-h-[450px] md:w-20 scrollbar-thin scrollbar-thumb-[#C4A381] scrollbar-track-[#ebe1d2]">
+            <div className="flex md:flex-col order-2 md:order-1 mb-4 md:mb-0 md:mr-4 overflow-x-auto md:overflow-y-auto md:max-h-[500px] md:w-24 scrollbar-thin scrollbar-thumb-[#C4A381] scrollbar-track-[#ebe1d2]">
               {uploadedImages.map((image, index) => (
                 <div
                   key={index}
-                  className={`relative min-w-16 h-16 m-1 md:m-0 md:mb-2 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
+                  className={`relative min-w-20 h-20 m-1 md:m-0 md:mb-2 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${
                     currentImageIndex === index ? "border-[#C4A381] shadow-md" : "border-transparent"
                   }`}
                   onClick={() => setCurrentImageIndex(index)}
@@ -296,7 +301,7 @@ const UploadPage = () => {
                   <img
                     src={uploadedImages[currentImageIndex] || "/placeholder.svg"}
                     alt="Main Upload"
-                    className="rounded-lg shadow-lg w-full h-auto max-h-[300px] md:max-h-[400px] object-contain bg-[#ebe1d2] p-2"
+                    className="rounded-lg shadow-lg w-full h-auto max-h-[350px] md:max-h-[500px] object-contain bg-[#ebe1d2] p-2"
                   />
 
                   {/* Navigation Buttons */}
@@ -321,7 +326,7 @@ const UploadPage = () => {
                 </div>
               ) : (
                 <div
-                  className={`flex flex-col items-center justify-center h-[300px] md:h-[400px] bg-[#ebe1d2] rounded-lg p-4 border-2 border-dashed ${isDragging ? "border-[#C4A381] bg-[#ebe1d2]/70" : "border-gray-300"} transition-colors`}
+                  className={`flex flex-col items-center justify-center h-[350px] md:h-[500px] bg-[#ebe1d2] rounded-lg p-4 border-2 border-dashed ${isDragging ? "border-[#C4A381] bg-[#ebe1d2]/70" : "border-gray-300"} transition-colors`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
@@ -463,6 +468,10 @@ const UploadPage = () => {
               <div>
                 <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Description:</h2>
                 <p className="text-gray-700 mb-4 whitespace-pre-line">{getDescription(state?.fromPage)}</p>
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Delivery:</h2>
+                <p className="text-gray-700 mb-4 whitespace-pre-line">{getDeliveryInfo()}</p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-[#ebe1d2]">

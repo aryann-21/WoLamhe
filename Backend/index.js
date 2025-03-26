@@ -13,7 +13,7 @@ const Order = require("./models/order")
 require("dotenv").config()
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5001
 
 // Cloudinary configuration
 cloudinary.config({

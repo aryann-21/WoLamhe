@@ -6,7 +6,7 @@ import { Edit2, Save, Package, Calendar, DollarSign, ShoppingBag, Loader, UserIc
 import axios from "axios"
 
 // Create a consistent base URL
-const API_BASE_URL = "http://localhost:5000"
+const API_BASE_URL = "https://wolamhe-3.onrender.com"
 
 const ProfilePage = () => {
   const { user, updateUser } = useUser()

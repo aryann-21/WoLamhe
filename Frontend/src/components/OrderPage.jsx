@@ -181,7 +181,7 @@ const OrderPage = () => {
         })),
       }
 
-      const response = await axios.post("http://localhost:5000/api/orders", orderData, {
+      const response = await axios.post("https://wolamhe-3.onrender.com/api/orders", orderData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

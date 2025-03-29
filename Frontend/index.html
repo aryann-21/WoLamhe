@@ -15,6 +15,20 @@
       background-color: #faf5f0;
     }
   </style>
+  <!-- Add this script to handle SPA routing -->
+  <script>
+    // Redirect single page apps back to index.html if they hit a 404
+    (function() {
+      if (window.location.pathname !== '/' && !window.location.pathname.includes('.')) {
+        sessionStorage.setItem('redirect', window.location.pathname);
+        window.location.href = '/';
+      } else if (sessionStorage.getItem('redirect')) {
+        const redirect = sessionStorage.getItem('redirect');
+        sessionStorage.removeItem('redirect');
+        window.history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
 </head>
 
 <body>

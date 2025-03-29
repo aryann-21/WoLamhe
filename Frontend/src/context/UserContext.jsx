@@ -92,9 +92,11 @@ export const UserProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("token")
-    localStorage.removeItem("user")  // Ensure user data is removed
+    localStorage.removeItem("user")  
+    localStorage.removeItem("cartItems") 
     setUser(null)
   }
+  
 
   const updateUser = async (updatedData) => {
     try {

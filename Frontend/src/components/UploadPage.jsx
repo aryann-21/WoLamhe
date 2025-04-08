@@ -260,7 +260,7 @@ const UploadPage = () => {
   }
 
   return (
-    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 pt-[150px] md:pt-[180px]">
+    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 pt-[150px] md:pt-[180px] -mt-10">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
           {/* Left Section: Thumbnails and Main Image */}
@@ -386,6 +386,28 @@ const UploadPage = () => {
                   )}
                 </div>
               )}
+              {/* Buttons below the image */}
+              <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={uploadedImages.length === 0}
+                  className={`flex-1 py-3 px-4 rounded-md transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                    uploadedImages.length === 0
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-[#C4A381] text-white hover:bg-[#af8a6c] focus:ring-[#C4A381]"
+                  }`}
+                >
+                  <Plus className="h-5 w-5" />
+                  <span>Add to Cart</span>
+                </button>
+                <button
+                  onClick={handleViewCart}
+                  className="flex-1 bg-[#97784c] text-white py-3 px-4 rounded-md hover:bg-[#2E2210] transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#97784c] focus:ring-offset-2"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  <span>View Cart</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -473,28 +495,6 @@ const UploadPage = () => {
                 <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Delivery:</h2>
                 <p className="text-gray-700 mb-4 whitespace-pre-line">{getDeliveryInfo()}</p>
               </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-[#ebe1d2]">
-                <button
-                  onClick={handleAddToCart}
-                  disabled={uploadedImages.length === 0}
-                  className={`flex-1 py-3 px-4 rounded-md transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                    uploadedImages.length === 0
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-[#C4A381] text-white hover:bg-[#af8a6c] focus:ring-[#C4A381]"
-                  }`}
-                >
-                  <Plus className="h-5 w-5" />
-                  <span>Add to Cart</span>
-                </button>
-                <button
-                  onClick={handleViewCart}
-                  className="flex-1 bg-[#97784c] text-white py-3 px-4 rounded-md hover:bg-[#2E2210] transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#97784c] focus:ring-offset-2"
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  <span>View Cart</span>
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -505,4 +505,3 @@ const UploadPage = () => {
 }
 
 export default UploadPage
-

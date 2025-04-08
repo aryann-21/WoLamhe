@@ -21,13 +21,13 @@ const Footer = () => {
                   Home
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href="#" className="hover:underline">
                   About
                 </a>
-              </li>
+              </li> */}
               <li>
-                <a href="#" className="hover:underline">
+                <a href="https://www.instagram.com/wo._.lamhe/profilecard/?igsh=MTJmeDdjcmZkbDM5aw==" target="_blank" className="hover:underline">
                   <svg
                     width="24"
                     height="24"
@@ -52,7 +52,7 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="https://wa.me/919781705656" target="_blank" className="hover:underline">
                   <svg
                     width="24"
                     height="24"

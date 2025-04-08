@@ -81,7 +81,7 @@ const PostCards = forwardRef((props, ref) => {
 
         <div className="hidden md:block w-px bg-white self-stretch mx-4" />
 
-        <div className="w-full md:w-1/2 flex flex-col justify-start p-6">
+        <div className="w-full md:w-1/2 flex flex-col justify-center p-6">
           <h3 className="text-2xl font-bold mb-4 md:mb-8 text-center z-40">Postcards</h3>
           <div className="pb-4">
             <ul className="grid grid-cols-2 md:grid-cols-2 gap-4 pb-4">

@@ -235,7 +235,7 @@ const PresetsPage = () => {
   const deliveryInfo = getDeliveryInfo()
 
   return (
-    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 pt-[150px] md:pt-[180px]">
+    <main className="bg-[#FDF6F0] min-h-screen py-8 md:py-16 pt-[150px] md:pt-[180px] -mt-10">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
           {/* Left Section: Thumbnails and Main Image */}
@@ -313,6 +313,24 @@ const PresetsPage = () => {
                   <p className="text-center text-gray-500 text-lg md:text-xl">No images available for this category.</p>
                 </div>
               )}
+              
+              {/* Cart Buttons - Moved from the right to below the main image */}
+              <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 bg-[#C4A381] text-white py-3 px-4 rounded-md transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#C4A381] focus:ring-offset-2"
+                >
+                  <Plus className="h-5 w-5" />
+                  <span>Add to Cart</span>
+                </button>
+                <button
+                  onClick={handleViewCart}
+                  className="flex-1 bg-[#97784c] text-white py-3 px-4 rounded-md hover:bg-[#2E2210] transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#97784c] focus:ring-offset-2"
+                >
+                  <ShoppingCart className="h-5 w-5" />
+                  <span>View Cart</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -337,22 +355,7 @@ const PresetsPage = () => {
                 <h2 className="text-lg font-semibold mb-2 text-[#2E2210]">Delivery:</h2>
                 <p className="text-gray-700 whitespace-pre-line">{deliveryInfo}</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-[#ebe1d2]">
-                <button
-                  onClick={handleAddToCart}
-                  className="flex-1 bg-[#C4A381] text-white py-3 px-4 rounded-md transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#C4A381] focus:ring-offset-2"
-                >
-                  <Plus className="h-5 w-5" />
-                  <span>Add to Cart</span>
-                </button>
-                <button
-                  onClick={handleViewCart}
-                  className="flex-1 bg-[#97784c] text-white py-3 px-4 rounded-md transition flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#97784c] focus:ring-offset-2"
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  <span>View Cart</span>
-                </button>
-              </div>
+              {/* Cart buttons removed from here and moved under the main image */}
             </div>
           </div>
         </div>

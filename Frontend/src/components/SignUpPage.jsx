@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import SignupPhoto from "../assets/login.jpg";
+import UserIcon from "../assets/user.png";
+import EmailIcon from "../assets/email.png";  
+import PhoneIcon from "../assets/phone.png";
+import PasswordIcon from "../assets/password.png";
 
 const SignUpPage = () => {
   const [name, setName] = useState("");
@@ -49,7 +54,7 @@ const SignUpPage = () => {
           <form onSubmit={handleSignUp} className="w-full max-w-sm">
             <div className="mb-3 relative">
               <span className="absolute left-3 top-[11px]">
-                <img src="/src/assets/user.png" alt="User Icon" className="w-4" />
+                <img src={UserIcon} alt="User Icon" className="w-4" />
               </span>
               <input
                 type="text"
@@ -62,7 +67,7 @@ const SignUpPage = () => {
             </div>
             <div className="mb-3 relative">
               <span className="absolute left-2 top-2">
-                <img src="/src/assets/email.png" alt="Email Icon" className="w-6" />
+                <img src={EmailIcon} alt="Email Icon" className="w-6" />
               </span>
               <input
                 type="email"
@@ -75,7 +80,7 @@ const SignUpPage = () => {
             </div>
             <div className="mb-3 relative">
               <span className="absolute left-3 top-[12px]">
-                <img src="/src/assets/phone.png" alt="Phone Icon" className="w-4" />
+                <img src={PhoneIcon} alt="Phone Icon" className="w-4" />
               </span>
               <input
                 type="tel"
@@ -88,7 +93,7 @@ const SignUpPage = () => {
             </div>
             <div className="mb-3 relative">
               <span className="absolute left-[10px] top-[8px]">
-                <img src="/src/assets/password.png" alt="Password Icon" className="w-5" />
+                <img src={PasswordIcon} alt="Password Icon" className="w-5" />
               </span>
               <input
                 type="password"
@@ -101,7 +106,7 @@ const SignUpPage = () => {
             </div>
             <div className="mb-5 relative">
               <span className="absolute left-[9px] top-[10px]">
-                <img src="/src/assets/confirm.png" alt="Confirm Password Icon" className="w-6" />
+                <img src={PasswordIcon} alt="Confirm Password Icon" className="w-6" />
               </span>
               <input
                 type="password"
@@ -128,7 +133,7 @@ const SignUpPage = () => {
           </p>
         </div>
         <div className="w-full md:w-1/2 h-48 md:h-auto">
-          <img src="/src/assets/login.jpg" alt="Photographer" className="w-full h-full object-cover" />
+          <img src={SignupPhoto} alt="Photographer" className="w-full h-full object-cover" />
         </div>
       </div>
     </div>

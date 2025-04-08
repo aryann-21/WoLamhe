@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import LoginPhoto from "../assets/login.jpg";
+import EmailIcon from "../assets/email.png";
+import PasswordIcon from "../assets/password.png";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -35,7 +38,7 @@ const LoginPage = () => {
           <form onSubmit={handleLogin} className="w-full max-w-sm">
             <div className="mb-4 md:mb-5 relative">
               <span className="absolute left-2 top-2">
-                <img src="/src/assets/email.png" alt="Email Icon" className="w-5 md:w-6" />
+                <img src={EmailIcon} alt="Email Icon" className="w-5 md:w-6" />
               </span>
               <input
                 type="email"
@@ -48,7 +51,7 @@ const LoginPage = () => {
             </div>
             <div className="mb-6 md:mb-8 relative">
               <span className="absolute left-[11px] top-2">
-                <img src="/src/assets/password.png" alt="Password Icon" className="w-4 md:w-5" />
+                <img src={PasswordIcon} alt="Password Icon" className="w-4 md:w-5" />
               </span>
               <input
                 type="password"
@@ -75,7 +78,7 @@ const LoginPage = () => {
           </p>
         </div>
         <div className="w-full md:w-1/2 h-48 md:h-auto">
-          <img src="/src/assets/login.jpg" alt="Photographer" className="w-full h-full object-cover" />
+          <img src={LoginPhoto} alt="Photographer" className="w-full h-full object-cover" />
         </div>
       </div>
     </div>

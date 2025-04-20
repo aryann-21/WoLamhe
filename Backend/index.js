@@ -26,10 +26,12 @@ cloudinary.config({
 // SendGrid configuration
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
-// Enhanced CORS configuration
+// CORS configuration - UPDATED to be more permissive
 app.use(
   cors({
-    origin: "https://wolamhe-4.onrender.com",
+    origin: ["https://wolamhe-4.onrender.com", "http://localhost:3000"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 )
@@ -71,7 +73,87 @@ const uploadToCloudinary = (fileBuffer, folder) => {
   })
 }
 
-// Use auth routes
+// IMPORTANT: Move these routes from auth.js to index.js
+// User registration route
+app.post("/signup", async (req, res) => {
+  try {
+    const { name, email, phone, password } = req.body
+
+    const existingUser = await User.findOne({ email })
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    const user = new User({
+      name,
+      email,
+      phone,
+      password: hashedPassword,
+      isVerified: false,
+    })
+
+    await user.save()
+
+    // Send verification email (commented out until SendGrid is fully set up)
+     const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+     const emailResult = await sendVerificationEmail(user, baseUrl)
+
+    res.status(201).json({
+      message: "User registered successfully. Please check your email to verify your account.",
+    })
+  } catch (error) {
+    console.error("Registration Error:", error)
+    res.status(500).json({ message: "Error registering user", error: error.message })
+  }
+})
+
+// User login route - updated to check verification
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" })
+    }
+
+    const user = await User.findOne({ email })
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Temporarily disable email verification check for testing
+     if (!user.isVerified) {
+       return res.status(401).json({
+         message: "Please verify your email before logging in",
+         needsVerification: true,
+       })
+     }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" })
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" })
+
+    res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+      },
+    })
+  } catch (error) {
+    console.error("Login Error:", error)
+    res.status(500).json({ message: "Internal server error", error: error.message })
+  }
+})
+
+// Use other auth routes
 app.use("/", authRoutes)
 
 // Get user data route
@@ -208,7 +290,12 @@ app.post("/api/orders", async (req, res) => {
 <p><strong>Payment Proof:</strong> <a href="${paymentProof}">View Image</a></p>`,
     }
 
-    await sgMail.send(mailOptions)
+    try {
+      await sgMail.send(mailOptions)
+    } catch (emailError) {
+      console.error("Email sending error:", emailError)
+      // Continue with the order process even if email fails
+    }
 
     res.status(201).json({ message: "Order placed successfully", orderId: order._id })
   } catch (error) {
@@ -226,6 +313,11 @@ app.get("/api/orders/:userId", async (req, res) => {
     console.error("Error fetching orders:", error)
     res.status(500).json({ message: "Error fetching orders", error: error.message })
   }
+})
+
+// Add a test route to verify the server is running
+app.get("/", (req, res) => {
+  res.send("Server is running correctly!")
 })
 
 // Start server

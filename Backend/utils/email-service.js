@@ -2,9 +2,6 @@ const sgMail = require("@sendgrid/mail")
 const crypto = require("crypto")
 const Token = require("../models/token")
 
-// Configure SendGrid
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-
 // Generate a random token
 const generateToken = () => {
   return crypto.randomBytes(32).toString("hex")

@@ -1,50 +1,10 @@
 const express = require("express")
-const bcrypt = require("bcryptjs")
-const jwt = require("jsonwebtoken")
+const crypto = require("crypto")
 const User = require("../models/user")
 const Token = require("../models/token")
 const { sendVerificationEmail } = require("../utils/email-service")
 
 const router = express.Router()
-
-// User registration route
-router.post("/signup", async (req, res) => {
-  try {
-    const { name, email, phone, password } = req.body
-
-    const existingUser = await User.findOne({ email })
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" })
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    const user = new User({
-      name,
-      email,
-      phone,
-      password: hashedPassword,
-      isVerified: false,
-    })
-
-    await user.save()
-
-    // Send verification email
-    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
-    const emailResult = await sendVerificationEmail(user, baseUrl)
-
-    if (!emailResult.success) {
-      console.error("Failed to send verification email:", emailResult.error)
-    }
-
-    res.status(201).json({
-      message: "User registered successfully. Please check your email to verify your account.",
-    })
-  } catch (error) {
-    console.error("Registration Error:", error)
-    res.status(500).json({ message: "Error registering user", error: error.message })
-  }
-})
 
 // Email verification route
 router.get("/verify-email", async (req, res) => {
@@ -126,50 +86,6 @@ router.post("/resend-verification", async (req, res) => {
   } catch (error) {
     console.error("Resend Verification Error:", error)
     res.status(500).json({ message: "Error resending verification email", error: error.message })
-  }
-})
-
-// User login route - updated to check verification
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" })
-    }
-
-    const user = await User.findOne({ email })
-    if (!user) {
-      return res.status(404).json({ message: "User not found" })
-    }
-
-    // Check if email is verified
-    if (!user.isVerified) {
-      return res.status(401).json({
-        message: "Please verify your email before logging in",
-        needsVerification: true,
-      })
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" })
-    }
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" })
-
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-      },
-    })
-  } catch (error) {
-    console.error("Login Error:", error)
-    res.status(500).json({ message: "Internal server error", error: error.message })
   }
 })
 

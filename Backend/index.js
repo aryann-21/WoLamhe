@@ -5,9 +5,10 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const multer = require("multer")
 const cloudinary = require("cloudinary").v2
-const nodemailer = require("nodemailer")
+const sgMail = require("@sendgrid/mail")
 const User = require("./models/user")
 const Order = require("./models/order")
+const authRoutes = require("./routes/auth")
 
 // Load environment variables
 require("dotenv").config()
@@ -22,14 +23,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-// Nodemailer transporter setup
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-})
+// SendGrid configuration
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 // Enhanced CORS configuration
 app.use(
@@ -76,68 +71,8 @@ const uploadToCloudinary = (fileBuffer, folder) => {
   })
 }
 
-// User registration route
-app.post("/signup", async (req, res) => {
-  try {
-    const { name, email, phone, password } = req.body
-
-    const existingUser = await User.findOne({ email })
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" })
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    const user = new User({
-      name,
-      email,
-      phone,
-      password: hashedPassword,
-    })
-
-    await user.save()
-    res.status(201).json({ message: "User registered successfully" })
-  } catch (error) {
-    console.error("Registration Error:", error)
-    res.status(500).json({ message: "Error registering user", error: error.message })
-  }
-})
-
-// User login route
-app.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body
-
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" })
-    }
-
-    const user = await User.findOne({ email })
-    if (!user) {
-      return res.status(404).json({ message: "User not found" })
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" })
-    }
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" })
-
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-      },
-    })
-  } catch (error) {
-    console.error("Login Error:", error)
-    res.status(500).json({ message: "Internal server error", error: error.message })
-  }
-})
+// Use auth routes
+app.use("/", authRoutes)
 
 // Get user data route
 app.get("/api/user", async (req, res) => {
@@ -160,8 +95,6 @@ app.get("/api/user", async (req, res) => {
     res.status(401).json({ message: "Invalid token" })
   }
 })
-
-// Add this route after the "Get user data route" and before the "Create order" route
 
 // Update user information
 app.put("/api/users/:id", async (req, res) => {
@@ -252,7 +185,7 @@ app.post("/api/orders", async (req, res) => {
     // Send admin email notification
     console.log("Sending email notification...")
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.EMAIL_FROM || "noreply@yourdomain.com",
       to: process.env.ADMIN_EMAIL,
       subject: "New Order Placed",
       html: `<h2>New Order Details</h2>
@@ -275,13 +208,7 @@ app.post("/api/orders", async (req, res) => {
 <p><strong>Payment Proof:</strong> <a href="${paymentProof}">View Image</a></p>`,
     }
 
-    transporter.sendMail(mailOptions, (err, info) => {
-      if (err) {
-        console.error("Email send error:", err)
-      } else {
-        console.log("Email sent successfully:", info.response)
-      }
-    })
+    await sgMail.send(mailOptions)
 
     res.status(201).json({ message: "Order placed successfully", orderId: order._id })
   } catch (error) {
@@ -305,4 +232,3 @@ app.get("/api/orders/:userId", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
-

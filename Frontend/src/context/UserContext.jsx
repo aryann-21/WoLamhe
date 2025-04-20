@@ -30,12 +30,12 @@ export const UserProvider = ({ children }) => {
   const fetchUser = async (token) => {
     try {
       setLoading(true)
-      
+
       const response = await axios.get(`${API_BASE_URL}/api/user`, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       })
 
       setUser(response.data)
@@ -53,91 +53,93 @@ export const UserProvider = ({ children }) => {
   const signup = async (userData) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/signup`, userData)
-      
+
       return {
         success: true,
-        message: "Signup successful! Please login."
+        message: "Signup successful! Please check your email to verify your account.",
       }
     } catch (error) {
       console.error("Signup Error:", error)
       return {
         success: false,
-        message: error.response?.data?.message || "Signup failed. Please try again."
+        message: error.response?.data?.message || "Signup failed. Please try again.",
       }
     }
   }
 
   const login = async (email, password) => {
     try {
-      setLoading(true);
-      
-      const response = await axios.post(`${API_BASE_URL}/login`, { email, password });
-      const { token, user } = response.data;
-  
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user)); // Store user in localStorage
-      setUser(user);
-  
-      return { success: true, user };
+      setLoading(true)
+
+      const response = await axios.post(`${API_BASE_URL}/login`, { email, password })
+      const { token, user } = response.data
+
+      localStorage.setItem("token", token)
+      localStorage.setItem("user", JSON.stringify(user)) // Store user in localStorage
+      setUser(user)
+
+      return { success: true, user }
     } catch (error) {
-      console.error("Login Error:", error);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || "An unexpected error occurred. Please try again."
-      };
+      console.error("Login Error:", error)
+      return {
+        success: false,
+        message: error.response?.data?.message || "An unexpected error occurred. Please try again.",
+        needsVerification: error.response?.data?.needsVerification || false,
+      }
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const logout = () => {
     localStorage.removeItem("token")
-    localStorage.removeItem("user")  
-    localStorage.removeItem("cartItems") 
+    localStorage.removeItem("user")
+    localStorage.removeItem("cartItems")
     setUser(null)
   }
-  
 
   const updateUser = async (updatedData) => {
     try {
       const token = localStorage.getItem("token")
       if (!token || !user?.id) {
-        throw new Error('No authentication token or user ID found')
+        throw new Error("No authentication token or user ID found")
       }
 
       const response = await axios.put(`${API_BASE_URL}/api/users/${user.id}`, updatedData, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       })
 
       setUser(response.data)
       localStorage.setItem("user", JSON.stringify(response.data)) // Sync updated user to localStorage
       return {
         success: true,
-        user: response.data
+        user: response.data,
       }
     } catch (error) {
       console.error("Error updating user:", error)
       return {
         success: false,
-        message: error.response?.data?.message || "Failed to update user information"
+        message: error.response?.data?.message || "Failed to update user information",
       }
     }
   }
 
   return (
-    <UserContext.Provider value={{ 
-      user, 
-      loading, 
-      login, 
-      logout, 
-      signup,
-      updateUser,
-      fetchUser,
-      isAuthenticated: !!user
-    }}>
+    <UserContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        signup,
+        updateUser,
+        fetchUser,
+        isAuthenticated: !!user,
+      }}
+    >
       {children}
     </UserContext.Provider>
   )

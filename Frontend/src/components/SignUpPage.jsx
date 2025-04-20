@@ -1,29 +1,33 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
-import SignupPhoto from "../assets/login.jpg";
-import UserIcon from "../assets/user.png";
-import EmailIcon from "../assets/email.png";  
-import PhoneIcon from "../assets/phone.png";
-import PasswordIcon from "../assets/password.png";
+"use client"
+
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { useUser } from "../context/UserContext"
+import SignupPhoto from "../assets/login.jpg"
+import UserIcon from "../assets/user.png"
+import EmailIcon from "../assets/email.png"
+import PhoneIcon from "../assets/phone.png"
+import PasswordIcon from "../assets/password.png"
 
 const SignUpPage = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const { signup, loading } = useUser();
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  const navigate = useNavigate()
+  const { signup, loading } = useUser()
 
   const handleSignUp = async (e) => {
-    e.preventDefault();
-    setError("");
+    e.preventDefault()
+    setError("")
+    setSuccess("")
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match!");
-      return;
+      setError("Passwords do not match!")
+      return
     }
 
     try {
@@ -32,29 +36,37 @@ const SignUpPage = () => {
         email,
         phone,
         password,
-      });
+      })
 
       if (result.success) {
-        navigate("/login");
+        setSuccess("Registration successful! Please check your email to verify your account.")
+        // Don't navigate immediately, let the user see the success message
+        setTimeout(() => {
+          navigate("/login")
+        }, 5000)
       } else {
-        setError(result.message);
+        setError(result.message)
       }
     } catch (error) {
-      console.error("Sign Up failed:", error);
-      setError("An unexpected error occurred. Please try again.");
+      console.error("Sign Up failed:", error)
+      setError("An unexpected error occurred. Please try again.")
     }
-  };
+  }
 
   return (
     <div className="bg-[#faf5f0] flex justify-center p-4 mt-[108px]">
       <div className="flex flex-col md:flex-row bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-full max-w-4xl">
         <div className="w-full md:w-1/2 bg-[#e4ccb4] p-6 flex flex-col items-center justify-start text-center pt-8 md:pt-12">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4 md:mb-6 text-black">Sign Up</h2>
-          {error && <p className="text-red-500 mb-4">{error}</p>}
+
+          {error && <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 w-full max-w-sm">{error}</div>}
+
+          {success && <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4 w-full max-w-sm">{success}</div>}
+
           <form onSubmit={handleSignUp} className="w-full max-w-sm">
             <div className="mb-3 relative">
               <span className="absolute left-3 top-[11px]">
-                <img src={UserIcon} alt="User Icon" className="w-4" />
+                <img src={UserIcon || "/placeholder.svg"} alt="User Icon" className="w-4" />
               </span>
               <input
                 type="text"
@@ -67,7 +79,7 @@ const SignUpPage = () => {
             </div>
             <div className="mb-3 relative">
               <span className="absolute left-2 top-2">
-                <img src={EmailIcon} alt="Email Icon" className="w-6" />
+                <img src={EmailIcon || "/placeholder.svg"} alt="Email Icon" className="w-6" />
               </span>
               <input
                 type="email"
@@ -80,7 +92,7 @@ const SignUpPage = () => {
             </div>
             <div className="mb-3 relative">
               <span className="absolute left-3 top-[12px]">
-                <img src={PhoneIcon} alt="Phone Icon" className="w-4" />
+                <img src={PhoneIcon || "/placeholder.svg"} alt="Phone Icon" className="w-4" />
               </span>
               <input
                 type="tel"
@@ -93,7 +105,7 @@ const SignUpPage = () => {
             </div>
             <div className="mb-3 relative">
               <span className="absolute left-[10px] top-[8px]">
-                <img src={PasswordIcon} alt="Password Icon" className="w-5" />
+                <img src={PasswordIcon || "/placeholder.svg"} alt="Password Icon" className="w-5" />
               </span>
               <input
                 type="password"
@@ -106,7 +118,7 @@ const SignUpPage = () => {
             </div>
             <div className="mb-5 relative">
               <span className="absolute left-[9px] top-[10px]">
-                <img src={PasswordIcon} alt="Confirm Password Icon" className="w-6" />
+                <img src={PasswordIcon || "/placeholder.svg"} alt="Confirm Password Icon" className="w-6" />
               </span>
               <input
                 type="password"
@@ -133,11 +145,11 @@ const SignUpPage = () => {
           </p>
         </div>
         <div className="w-full md:w-1/2 h-48 md:h-auto">
-          <img src={SignupPhoto} alt="Photographer" className="w-full h-full object-cover" />
+          <img src={SignupPhoto || "/placeholder.svg"} alt="Photographer" className="w-full h-full object-cover" />
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default SignUpPage;
+export default SignUpPage

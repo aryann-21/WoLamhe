@@ -1,4 +1,6 @@
-import React, { useRef } from "react"
+"use client"
+
+import { useRef } from "react"
 import { Routes, Route } from "react-router-dom"
 import { UserProvider } from "./context/UserContext"
 import { CartProvider } from "./context/CartContext"
@@ -16,6 +18,7 @@ import Presets from "./components/Presets"
 import UploadPage from "./components/UploadPage"
 import OrderPage from "./components/OrderPage"
 import ProfilePage from "./components/ProfilePage"
+import VerifyEmail from "./components/VerifyEmail"
 
 const App = () => {
   const polaroidsRef = useRef(null)
@@ -81,6 +84,7 @@ const App = () => {
             <Route path="/strips" element={<PhotoStrips />} />
             <Route path="/squareprints" element={<SquarePrints />} />
             <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/presets/:category" element={<Presets />} />
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/order" element={<OrderPage />} />
@@ -94,4 +98,3 @@ const App = () => {
 }
 
 export default App
-

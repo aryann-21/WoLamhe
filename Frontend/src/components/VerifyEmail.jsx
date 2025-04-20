@@ -1,4 +1,4 @@
-"use client"
+/*"use client"
 
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
@@ -140,6 +140,62 @@ const VerifyEmail = () => {
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+export default VerifyEmail
+*/
+
+"use client"
+
+import { useState, useEffect } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import axios from "axios"
+import { API_BASE_URL } from "../config"
+
+const VerifyEmail = () => {
+  const [status, setStatus] = useState("verifying")
+  const [message, setMessage] = useState("")
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search)
+    const token = query.get("token")
+
+    if (token) {
+      verifyEmail(token)
+    } else {
+      setStatus("error")
+      setMessage("Invalid verification link. No token provided.")
+    }
+  }, [location])
+
+  const verifyEmail = async (token) => {
+    try {
+      console.log("Verifying email with token:", token)
+      // Make sure to explicitly include the token in the URL
+      const response = await axios.get(`${API_BASE_URL}/verify-email?token=${token}`)
+      console.log("Verification response:", response)
+      setStatus("success")
+      setTimeout(() => {
+        navigate("/login?verified=true")
+      }, 3000)
+    } catch (error) {
+      console.error("Verification error:", error)
+      setStatus("error")
+      setMessage(
+        error.response?.data?.message || "Failed to verify your email. The link may have expired or is invalid.",
+      )
+    }
+  }
+
+  return (
+    <div className="container mt-5">
+      {status === "verifying" && <p>Verifying your email...</p>}
+      {status === "success" && <p>Email verified successfully! Redirecting to login...</p>}
+      {status === "error" && <p className="text-danger">{message}</p>}
     </div>
   )
 }

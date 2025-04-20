@@ -1,13 +1,12 @@
 const sgMail = require("@sendgrid/mail")
-const crypto = require("crypto")
 const Token = require("../models/token")
+const crypto = require("crypto")
 
-// Generate a random token
+// Helper function to generate a random token
 const generateToken = () => {
-  return crypto.randomBytes(32).toString("hex")
+  return crypto.randomBytes(20).toString("hex")
 }
 
-// Send verification email
 const sendVerificationEmail = async (user, baseUrl) => {
   try {
     // Check if SendGrid API key is configured
@@ -28,8 +27,10 @@ const sendVerificationEmail = async (user, baseUrl) => {
       type: "verification",
     }).save()
 
-    // Create verification URL
+    // IMPORTANT: Make sure the verification URL points to your frontend route
+    // and includes the token parameter
     const verificationUrl = `${baseUrl}/verify-email?token=${token}`
+    console.log("Generated verification URL:", verificationUrl)
 
     // Email content
     const msg = {
@@ -66,5 +67,4 @@ const sendVerificationEmail = async (user, baseUrl) => {
 
 module.exports = {
   sendVerificationEmail,
-  generateToken,
 }

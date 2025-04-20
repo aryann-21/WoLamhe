@@ -131,6 +131,7 @@ app.post("/signup", async (req, res) => {
 app.get("/verify-email", async (req, res) => {
   try {
     const { token } = req.query
+    console.log("Received verification request with token:", token)
 
     if (!token) {
       return res.status(400).json({ message: "Verification token is required" })
@@ -143,32 +144,36 @@ app.get("/verify-email", async (req, res) => {
     })
 
     if (!tokenDoc) {
+      console.log("Token not found in database:", token)
       return res.status(400).json({
         message: "Invalid or expired verification token. Please request a new verification email.",
       })
     }
 
-    // Find and update the user
-    const user = await User.findById(tokenDoc.userId)
+// Find and update the user
+const user = await User.findById(tokenDoc.userId)
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" })
-    }
+if (!user) {
+  return res.status(404).json({ message: "User not found" })
+}
 
-    // Update user verification status
-    user.isVerified = true
-    await user.save()
+// Update user verification status
+user.isVerified = true
+await user.save()
+console.log("User verified successfully:", user.email)
 
-    // Delete the used token
-    await Token.deleteOne({ _id: tokenDoc._id })
+// Delete the used token
+await Token.deleteOne({ _id: tokenDoc._id })
 
-    // Redirect to frontend with success message
-    res.redirect(`${process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"}/login?verified=true`)
-  } catch (error) {
-    console.error("Verification Error:", error)
-    res.status(500).json({ message: "Error verifying email", error: error.message })
-  }
+// Redirect to frontend with success message
+const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+res.redirect(`${frontendUrl}/login?verified=true`)
+} catch (error) {
+console.error("Verification Error:", error)
+res.status(500).json({ message: "Error verifying email", error: error.message })
+}
 })
+
 
 // Resend verification email
 app.post("/resend-verification", async (req, res) => {

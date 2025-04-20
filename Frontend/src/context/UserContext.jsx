@@ -52,11 +52,13 @@ export const UserProvider = ({ children }) => {
 
   const signup = async (userData) => {
     try {
+      console.log("Sending signup request with data:", userData)
       const response = await axios.post(`${API_BASE_URL}/signup`, userData)
+      console.log("Signup response:", response.data)
 
       return {
         success: true,
-        message: "Signup successful! Please check your email to verify your account.",
+        message: response.data.message || "Signup successful! Please check your email to verify your account.",
       }
     } catch (error) {
       console.error("Signup Error:", error)
@@ -71,7 +73,10 @@ export const UserProvider = ({ children }) => {
     try {
       setLoading(true)
 
+      console.log("Sending login request for:", email)
       const response = await axios.post(`${API_BASE_URL}/login`, { email, password })
+      console.log("Login response:", response.data)
+
       const { token, user } = response.data
 
       localStorage.setItem("token", token)
@@ -81,10 +86,19 @@ export const UserProvider = ({ children }) => {
       return { success: true, user }
     } catch (error) {
       console.error("Login Error:", error)
+
+      // Check if this is a verification error
+      if (error.response?.status === 401 && error.response?.data?.needsVerification) {
+        return {
+          success: false,
+          needsVerification: true,
+          message: error.response.data.message || "Please verify your email before logging in.",
+        }
+      }
+
       return {
         success: false,
         message: error.response?.data?.message || "An unexpected error occurred. Please try again.",
-        needsVerification: error.response?.data?.needsVerification || false,
       }
     } finally {
       setLoading(false)

@@ -17,6 +17,7 @@ const SignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
   const { signup, loading } = useUser()
 
@@ -24,13 +25,29 @@ const SignUpPage = () => {
     e.preventDefault()
     setError("")
     setSuccess("")
+    setIsSubmitting(true)
+
+    // Basic validation
+    if (!name || !email || !phone || !password) {
+      setError("All fields are required")
+      setIsSubmitting(false)
+      return
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match!")
+      setIsSubmitting(false)
+      return
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long")
+      setIsSubmitting(false)
       return
     }
 
     try {
+      console.log("Submitting signup form with data:", { name, email, phone })
       const result = await signup({
         name,
         email,
@@ -39,17 +56,26 @@ const SignUpPage = () => {
       })
 
       if (result.success) {
-        setSuccess("Registration successful! Please check your email to verify your account.")
+        setSuccess(result.message || "Registration successful! Please check your email to verify your account.")
+        // Clear form
+        setName("")
+        setEmail("")
+        setPhone("")
+        setPassword("")
+        setConfirmPassword("")
+
         // Don't navigate immediately, let the user see the success message
         setTimeout(() => {
           navigate("/login")
         }, 5000)
       } else {
-        setError(result.message)
+        setError(result.message || "Signup failed. Please try again.")
       }
     } catch (error) {
       console.error("Sign Up failed:", error)
       setError("An unexpected error occurred. Please try again.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -131,10 +157,10 @@ const SignUpPage = () => {
             </div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting || loading}
               className="bg-[#65350f] text-white px-6 py-2 rounded-full w-full hover:bg-[#875223] transition duration-300 disabled:opacity-50"
             >
-              {loading ? "Signing up..." : "Sign Up"}
+              {isSubmitting ? "Signing up..." : "Sign Up"}
             </button>
           </form>
           <p className="mt-6 md:mt-8 text-sm text-gray-700">

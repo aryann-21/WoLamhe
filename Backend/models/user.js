@@ -29,14 +29,6 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    verificationToken: {
-      type: String,
-      default: null,
-    },
-    verificationTokenExpires: {
-      type: Date,
-      default: null,
-    },
     createdAt: {
       type: Date,
       default: Date.now,
@@ -46,11 +38,5 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 )
-
-// Optional: Add a pre-save hook for additional validation
-userSchema.pre("save", (next) => {
-  // You can add custom validation logic here if needed
-  next()
-})
 
 module.exports = mongoose.model("User", userSchema)

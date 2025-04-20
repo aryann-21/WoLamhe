@@ -27,7 +27,9 @@ const VerifyEmail = () => {
 
   const verifyEmail = async (token) => {
     try {
+      console.log("Verifying email with token:", token)
       const response = await axios.get(`${API_BASE_URL}/verify-email?token=${token}`)
+      console.log("Verification response:", response)
       setStatus("success")
       setTimeout(() => {
         navigate("/login?verified=true")

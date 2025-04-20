@@ -10,6 +10,14 @@ const generateToken = () => {
 // Send verification email
 const sendVerificationEmail = async (user, baseUrl) => {
   try {
+    // Check if SendGrid API key is configured
+    if (!process.env.SENDGRID_API_KEY) {
+      console.error("SendGrid API key not configured")
+      return { success: false, error: "Email service not configured" }
+    }
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+
     // Create a verification token
     const token = generateToken()
 
@@ -26,7 +34,7 @@ const sendVerificationEmail = async (user, baseUrl) => {
     // Email content
     const msg = {
       to: user.email,
-      from: process.env.EMAIL_FROM || "noreply@yourdomain.com", // Use your verified sender
+      from: process.env.EMAIL_FROM || "noreply@yourdomain.com",
       subject: "Verify Your Email Address",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -48,10 +56,11 @@ const sendVerificationEmail = async (user, baseUrl) => {
 
     // Send email
     await sgMail.send(msg)
+    console.log("Verification email sent to:", user.email)
     return { success: true }
   } catch (error) {
     console.error("Error sending verification email:", error)
-    return { success: false, error }
+    return { success: false, error: error.message }
   }
 }
 

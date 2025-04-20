@@ -5,10 +5,11 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const multer = require("multer")
 const cloudinary = require("cloudinary").v2
-const sgMail = require("@sendgrid/mail")
 const User = require("./models/user")
 const Order = require("./models/order")
-const authRoutes = require("./routes/auth")
+const Token = require("./models/token")
+const { sendVerificationEmail } = require("./utils/email-service")
+const crypto = require("crypto")
 
 // Load environment variables
 require("dotenv").config()
@@ -16,20 +17,19 @@ require("dotenv").config()
 const app = express()
 const PORT = process.env.PORT || 5001
 
-// Cloudinary configuration
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
-
-// SendGrid configuration
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+// Cloudinary configuration (if available)
+if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  })
+}
 
 // CORS configuration - UPDATED to be more permissive
 app.use(
   cors({
-    origin: ["https://wolamhe-4.onrender.com", "http://localhost:3000"],
+    origin: "*", // Allow all origins for now (you can restrict this later)
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -73,11 +73,21 @@ const uploadToCloudinary = (fileBuffer, folder) => {
   })
 }
 
-// IMPORTANT: Move these routes from auth.js to index.js
-// User registration route
+// Test route to check if server is running
+app.get("/", (req, res) => {
+  res.send("Server is running correctly!")
+})
+
+// User registration route with email verification
 app.post("/signup", async (req, res) => {
   try {
+    console.log("Signup request received:", req.body)
+
     const { name, email, phone, password } = req.body
+
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({ message: "All fields are required" })
+    }
 
     const existingUser = await User.findOne({ email })
     if (existingUser) {
@@ -91,17 +101,25 @@ app.post("/signup", async (req, res) => {
       email,
       phone,
       password: hashedPassword,
-      isVerified: false,
+      isVerified: false, // User starts as unverified
     })
 
     await user.save()
+    console.log("User registered successfully:", user._id)
 
-    // Send verification email (commented out until SendGrid is fully set up)
-     const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
-     const emailResult = await sendVerificationEmail(user, baseUrl)
+    // Send verification email
+    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const emailResult = await sendVerificationEmail(user, baseUrl)
+
+    if (!emailResult.success) {
+      console.error("Failed to send verification email:", emailResult.error)
+      return res.status(201).json({
+        message: "User registered, but we couldn't send a verification email. Please contact support.",
+      })
+    }
 
     res.status(201).json({
-      message: "User registered successfully. Please check your email to verify your account.",
+      message: "User registered successfully! Please check your email to verify your account.",
     })
   } catch (error) {
     console.error("Registration Error:", error)
@@ -109,9 +127,94 @@ app.post("/signup", async (req, res) => {
   }
 })
 
-// User login route - updated to check verification
+// Email verification route
+app.get("/verify-email", async (req, res) => {
+  try {
+    const { token } = req.query
+
+    if (!token) {
+      return res.status(400).json({ message: "Verification token is required" })
+    }
+
+    // Find the token in the database
+    const tokenDoc = await Token.findOne({
+      token: token,
+      type: "verification",
+    })
+
+    if (!tokenDoc) {
+      return res.status(400).json({
+        message: "Invalid or expired verification token. Please request a new verification email.",
+      })
+    }
+
+    // Find and update the user
+    const user = await User.findById(tokenDoc.userId)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Update user verification status
+    user.isVerified = true
+    await user.save()
+
+    // Delete the used token
+    await Token.deleteOne({ _id: tokenDoc._id })
+
+    // Redirect to frontend with success message
+    res.redirect(`${process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"}/login?verified=true`)
+  } catch (error) {
+    console.error("Verification Error:", error)
+    res.status(500).json({ message: "Error verifying email", error: error.message })
+  }
+})
+
+// Resend verification email
+app.post("/resend-verification", async (req, res) => {
+  try {
+    const { email } = req.body
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" })
+    }
+
+    const user = await User.findOne({ email })
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: "Email is already verified" })
+    }
+
+    // Delete any existing verification tokens for this user
+    await Token.deleteMany({
+      userId: user._id,
+      type: "verification",
+    })
+
+    // Send new verification email
+    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const emailResult = await sendVerificationEmail(user, baseUrl)
+
+    if (!emailResult.success) {
+      return res.status(500).json({ message: "Failed to send verification email" })
+    }
+
+    res.status(200).json({ message: "Verification email sent successfully" })
+  } catch (error) {
+    console.error("Resend Verification Error:", error)
+    res.status(500).json({ message: "Error resending verification email", error: error.message })
+  }
+})
+
+// User login route with verification check
 app.post("/login", async (req, res) => {
   try {
+    console.log("Login request received:", req.body)
+
     const { email, password } = req.body
 
     if (!email || !password) {
@@ -123,20 +226,20 @@ app.post("/login", async (req, res) => {
       return res.status(404).json({ message: "User not found" })
     }
 
-    // Temporarily disable email verification check for testing
-     if (!user.isVerified) {
-       return res.status(401).json({
-         message: "Please verify your email before logging in",
-         needsVerification: true,
-       })
-     }
+    // Check if email is verified
+    if (!user.isVerified) {
+      return res.status(401).json({
+        message: "Please verify your email before logging in",
+        needsVerification: true,
+      })
+    }
 
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" })
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" })
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || "fallback_secret_key", { expiresIn: "1h" })
 
     res.json({
       token,
@@ -153,9 +256,6 @@ app.post("/login", async (req, res) => {
   }
 })
 
-// Use other auth routes
-app.use("/", authRoutes)
-
 // Get user data route
 app.get("/api/user", async (req, res) => {
   try {
@@ -164,7 +264,7 @@ app.get("/api/user", async (req, res) => {
       return res.status(401).json({ message: "No token provided" })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key")
     const user = await User.findById(decoded.userId).select("-password")
 
     if (!user) {
@@ -186,7 +286,7 @@ app.put("/api/users/:id", async (req, res) => {
       return res.status(401).json({ message: "No token provided" })
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key")
 
     // Ensure the user is updating their own profile
     if (decoded.userId !== req.params.id) {
@@ -254,48 +354,15 @@ app.post("/api/orders", async (req, res) => {
     // Save order to DB
     const order = new Order({
       user: userId,
-      products: parsedProducts, // No need to modify imageUrl, it's already provided by frontend
+      products: parsedProducts,
       total: Number.parseFloat(total),
       deliveryAddress,
-      paymentProof, // Directly use the URL sent from frontend
+      paymentProof,
       status: "Processing",
     })
 
     await order.save()
     console.log("Order saved successfully:", order._id)
-
-    // Send admin email notification
-    console.log("Sending email notification...")
-    const mailOptions = {
-      from: process.env.EMAIL_FROM || "noreply@yourdomain.com",
-      to: process.env.ADMIN_EMAIL,
-      subject: "New Order Placed",
-      html: `<h2>New Order Details</h2>
-<p><strong>User:</strong> ${user.name} ${user.phone} ${user.email}</p>
-<p><strong>Total:</strong> ₹${total}</p>
-<p><strong>Delivery Address:</strong> ${deliveryAddress}</p>
-<p><strong>Products:</strong></p>
-<ul>
-  ${parsedProducts
-    .map(
-      (p) => `
-    <li>
-      ${p.name} - <a href="${p.imageUrl}">View Image</a>
-      ${p.text ? `<p><strong>Custom Text:</strong> "${p.text}"</p>` : ""}
-    </li>
-  `,
-    )
-    .join("")}
-</ul>
-<p><strong>Payment Proof:</strong> <a href="${paymentProof}">View Image</a></p>`,
-    }
-
-    try {
-      await sgMail.send(mailOptions)
-    } catch (emailError) {
-      console.error("Email sending error:", emailError)
-      // Continue with the order process even if email fails
-    }
 
     res.status(201).json({ message: "Order placed successfully", orderId: order._id })
   } catch (error) {
@@ -313,11 +380,6 @@ app.get("/api/orders/:userId", async (req, res) => {
     console.error("Error fetching orders:", error)
     res.status(500).json({ message: "Error fetching orders", error: error.message })
   }
-})
-
-// Add a test route to verify the server is running
-app.get("/", (req, res) => {
-  res.send("Server is running correctly!")
 })
 
 // Start server

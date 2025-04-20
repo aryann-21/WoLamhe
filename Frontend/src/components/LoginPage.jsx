@@ -41,10 +41,11 @@ const LoginPage = () => {
       if (result.success) {
         navigate("/")
       } else {
-        if (result.message.includes("verify your email")) {
+        if (result.message && result.message.includes("verify your email")) {
           setNeedsVerification(true)
+        } else {
+          setError(result.message)
         }
-        setError(result.message)
       }
     } catch (error) {
       console.error("Login failed:", error)

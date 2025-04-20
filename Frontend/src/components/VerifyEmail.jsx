@@ -15,12 +15,21 @@ const VerifyEmail = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
+    console.log("VerifyEmail component mounted")
+    console.log("Current location:", location)
+
+    // Get the token from URL
     const query = new URLSearchParams(location.search)
     const token = query.get("token")
 
-    if (token) {
+    console.log("URL search params:", location.search)
+    console.log("Extracted token:", token)
+
+    // Check if we have a token
+    if (token && token.length > 0) {
       verifyEmail(token)
     } else {
+      console.error("No token found in URL")
       setStatus("error")
       setMessage("Invalid verification link. No token provided.")
     }
@@ -29,8 +38,12 @@ const VerifyEmail = () => {
   const verifyEmail = async (token) => {
     try {
       console.log("Verifying email with token:", token)
-      const response = await axios.get(`${API_BASE_URL}/verify-email?token=${token}`)
+      const verificationUrl = `${API_BASE_URL}/verify-email?token=${token}`
+      console.log("Making request to:", verificationUrl)
+
+      const response = await axios.get(verificationUrl)
       console.log("Verification response:", response)
+
       setStatus("success")
       setTimeout(() => {
         navigate("/login?verified=true")
@@ -38,9 +51,13 @@ const VerifyEmail = () => {
     } catch (error) {
       console.error("Verification error:", error)
       setStatus("error")
-      setMessage(
+
+      // Extract the error message
+      const errorMessage =
         error.response?.data?.message || "Failed to verify your email. The link may have expired or is invalid."
-      )
+
+      console.log("Error message:", errorMessage)
+      setMessage(errorMessage)
     }
   }
 
@@ -54,7 +71,9 @@ const VerifyEmail = () => {
 
     try {
       setStatus("sending")
+      console.log("Resending verification to:", email)
       const response = await axios.post(`${API_BASE_URL}/resend-verification`, { email })
+      console.log("Resend response:", response)
       setStatus("resent")
       setMessage("Verification email has been resent. Please check your inbox.")
     } catch (error) {

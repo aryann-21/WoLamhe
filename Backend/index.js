@@ -128,7 +128,7 @@ app.post("/signup", async (req, res) => {
 })
 
 // Email verification route
-a// Email verification route
+// Email verification route
 app.get("/verify-email", async (req, res) => {
   try {
     const { token } = req.query

@@ -21,9 +21,17 @@ const VerifyEmail = () => {
     // Get the token from URL
     const query = new URLSearchParams(location.search)
     const token = query.get("token")
+    const verified = query.get("verified")
 
     console.log("URL search params:", location.search)
     console.log("Extracted token:", token)
+    console.log("Verified status:", verified)
+
+    // If we're redirected back with verified=true, show success
+    if (verified === "true") {
+      setStatus("success")
+      return
+    }
 
     // Check if we have a token
     if (token && token.length > 0) {
@@ -79,6 +87,7 @@ const VerifyEmail = () => {
     } catch (error) {
       console.error("Resend verification error:", error)
       setMessage(error.response?.data?.message || "Failed to resend verification email. Please try again later.")
+      setStatus("error")
     }
   }
 

@@ -1,4 +1,4 @@
-const express = require("express")
+/*const express = require("express")
 const crypto = require("crypto")
 const User = require("../models/user")
 const Token = require("../models/token")
@@ -90,3 +90,4 @@ router.post("/resend-verification", async (req, res) => {
 })
 
 module.exports = router
+*/

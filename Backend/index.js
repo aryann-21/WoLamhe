@@ -150,30 +150,29 @@ app.get("/verify-email", async (req, res) => {
       })
     }
 
-// Find and update the user
-const user = await User.findById(tokenDoc.userId)
+    // Find and update the user
+    const user = await User.findById(tokenDoc.userId)
 
-if (!user) {
-  return res.status(404).json({ message: "User not found" })
-}
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
 
-// Update user verification status
-user.isVerified = true
-await user.save()
-console.log("User verified successfully:", user.email)
+    // Update user verification status
+    user.isVerified = true
+    await user.save()
+    console.log("User verified successfully:", user.email)
 
-// Delete the used token
-await Token.deleteOne({ _id: tokenDoc._id })
+    // Delete the used token
+    await Token.deleteOne({ _id: tokenDoc._id })
 
-// Redirect to frontend with success message
-const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
-res.redirect(`${frontendUrl}/login?verified=true`)
-} catch (error) {
-console.error("Verification Error:", error)
-res.status(500).json({ message: "Error verifying email", error: error.message })
-}
+    // Redirect to frontend with success message
+    const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    res.redirect(`${frontendUrl}/login?verified=true`)
+  } catch (error) {
+    console.error("Verification Error:", error)
+    res.status(500).json({ message: "Error verifying email", error: error.message })
+  }
 })
-
 
 // Resend verification email
 app.post("/resend-verification", async (req, res) => {

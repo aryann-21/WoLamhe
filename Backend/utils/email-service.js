@@ -27,8 +27,7 @@ const sendVerificationEmail = async (user, baseUrl) => {
       type: "verification",
     }).save()
 
-    // IMPORTANT: Make sure the verification URL points to your frontend route
-    // and includes the token parameter
+    // IMPORTANT: The verification URL should point to the frontend verification route with the token
     const verificationUrl = `${baseUrl}/verify-email?token=${token}`
     console.log("Generated verification URL:", verificationUrl)
 

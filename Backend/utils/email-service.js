@@ -27,7 +27,11 @@ const sendVerificationEmail = async (user, baseUrl) => {
       type: "verification",
     }).save()
 
-    // IMPORTANT: The verification URL should point to the frontend verification route with the token
+    // Create a verification URL that points to the backend API endpoint
+    const backendUrl = process.env.BACKEND_URL || "https://wolamhe-3.onrender.com"
+    const verificationLink = `${backendUrl}/verify-email?token=${token}`
+    
+    // URL to the frontend page that will show a verification message
     const verificationUrl = `${baseUrl}/verify-email?token=${token}`
     console.log("Generated verification URL:", verificationUrl)
 

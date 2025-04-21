@@ -37,19 +37,17 @@ const VerifyEmail = () => {
     if (token && token.length > 0) {
       verifyEmail(token)
     } else {
-      console.error("No token found in URL")
-      setStatus("error")
-      setMessage("Invalid verification link. No token provided.")
+      // For users who navigate directly to this page without a token
+      setStatus("needsToken")
+      setMessage("Please enter your email to receive a verification link.")
     }
   }, [location])
 
   const verifyEmail = async (token) => {
     try {
       console.log("Verifying email with token:", token)
-      const verificationUrl = `${API_BASE_URL}/verify-email?token=${token}`
-      console.log("Making request to:", verificationUrl)
-
-      const response = await axios.get(verificationUrl)
+      // Make request to backend verification endpoint
+      const response = await axios.get(`${API_BASE_URL}/verify-email?token=${token}`)
       console.log("Verification response:", response)
 
       setStatus("success")
@@ -64,7 +62,6 @@ const VerifyEmail = () => {
       const errorMessage =
         error.response?.data?.message || "Failed to verify your email. The link may have expired or is invalid."
 
-      console.log("Error message:", errorMessage)
       setMessage(errorMessage)
     }
   }
@@ -100,6 +97,35 @@ const VerifyEmail = () => {
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#65350f] mx-auto mb-4"></div>
             <p className="text-lg">Verifying your email address...</p>
+          </div>
+        )}
+
+        {status === "needsToken" && (
+          <div className="text-center">
+            <div className="bg-yellow-100 text-yellow-700 p-4 rounded-lg mb-6">
+              <p className="text-lg font-semibold">Verification Link Required</p>
+              <p className="mt-2">{message}</p>
+            </div>
+
+            <div className="mt-6">
+              <p className="mb-4">Need a verification link?</p>
+              <form onSubmit={handleResendVerification} className="space-y-4">
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full p-2 rounded-full bg-white border border-gray-300 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#65350f]"
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-[#65350f] text-white px-6 py-2 rounded-full w-full hover:bg-[#875223] transition duration-300"
+                >
+                  Send Verification Email
+                </button>
+              </form>
+            </div>
           </div>
         )}
 

@@ -45,13 +45,13 @@ const sendVerificationEmail = async (user, baseUrl) => {
           <h2 style="color: #65350f;">Welcome to Wolamhe!</h2>
           <p>Thank you for signing up. Please verify your email address to complete your registration.</p>
           <div style="margin: 30px 0;">
-            <a href="${verificationUrl}" 
+            <a href="${verificationLink}" 
                style="background-color: #65350f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
               Verify Email Address
             </a>
           </div>
           <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
-          <p>${verificationUrl}</p>
+          <p>${verificationLink}</p>
           <p>This link will expire in 12 hours.</p>
           <p>If you didn't create an account, you can safely ignore this email.</p>
         </div>

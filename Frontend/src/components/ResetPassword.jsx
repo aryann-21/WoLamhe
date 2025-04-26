@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import LoginPhoto from "../assets/login.jpg"
 import PasswordIcon from "../assets/password.png"
 import { useUser } from "../context/UserContext"
@@ -16,19 +16,19 @@ const ResetPassword = () => {
   const [tokenValid, setTokenValid] = useState(false)
   const [tokenChecked, setTokenChecked] = useState(false)
 
-  const location = useLocation()
   const navigate = useNavigate()
   const { resetPassword } = useUser()
 
   useEffect(() => {
-    // Get the token directly from the window location
-    // This is a more reliable way to get URL parameters
-    const urlParams = new URLSearchParams(window.location.search)
-    const tokenFromUrl = urlParams.get("token")
+    // Extract token directly from the full URL
+    const fullUrl = window.location.href
+    console.log("Full URL:", fullUrl)
 
-    console.log("Window location:", window.location.href)
-    console.log("Search params:", window.location.search)
-    console.log("Token from URL (window):", tokenFromUrl)
+    // Try to extract token using regex to handle various URL formats
+    const tokenMatch = fullUrl.match(/[?&]token=([^&]+)/)
+    const tokenFromUrl = tokenMatch ? tokenMatch[1] : null
+
+    console.log("Token extracted from full URL:", tokenFromUrl)
 
     if (tokenFromUrl) {
       setToken(tokenFromUrl)

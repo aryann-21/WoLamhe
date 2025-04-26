@@ -891,9 +891,10 @@ app.post("/forgot-password", async (req, res) => {
 app.get("/verify-reset-token", async (req, res) => {
   try {
     const { token } = req.query
+    console.log("Verifying reset token:", token)
 
     if (!token) {
-      return res.status(400).json({ message: "Token is required" })
+      return res.status(400).json({ message: "Token is required", valid: false })
     }
 
     // Find the token
@@ -903,13 +904,15 @@ app.get("/verify-reset-token", async (req, res) => {
     })
 
     if (!tokenDoc) {
-      return res.status(400).json({ message: "Invalid or expired token" })
+      console.log("Token not found:", token)
+      return res.status(400).json({ message: "Invalid or expired token", valid: false })
     }
 
+    console.log("Token found and valid:", tokenDoc)
     res.status(200).json({ valid: true })
   } catch (error) {
     console.error("Token verification error:", error)
-    res.status(500).json({ message: "Error verifying token", error: error.message })
+    res.status(500).json({ message: "Error verifying token", error: error.message, valid: false })
   }
 })
 
@@ -917,6 +920,7 @@ app.get("/verify-reset-token", async (req, res) => {
 app.post("/reset-password", async (req, res) => {
   try {
     const { token, password } = req.body
+    console.log("Reset password request received with token:", token)
 
     if (!token || !password) {
       return res.status(400).json({ message: "Token and password are required" })
@@ -929,6 +933,7 @@ app.post("/reset-password", async (req, res) => {
     })
 
     if (!tokenDoc) {
+      console.log("Token not found for reset:", token)
       return res.status(400).json({ message: "Invalid or expired token" })
     }
 
@@ -944,6 +949,7 @@ app.post("/reset-password", async (req, res) => {
     // Update user's password
     user.password = hashedPassword
     await user.save()
+    console.log("Password reset successful for user:", user.email)
 
     // Delete the used token
     await Token.deleteOne({ _id: tokenDoc._id })
@@ -1085,3 +1091,4 @@ app.get("/api/orders/:userId", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
+

@@ -24,7 +24,7 @@ const ResetPassword = () => {
     // Extract token from URL
     const params = new URLSearchParams(location.search)
     const tokenFromUrl = params.get("token")
-    
+
     console.log("Token from URL:", tokenFromUrl) // Debug log
 
     if (tokenFromUrl) {
@@ -42,7 +42,7 @@ const ResetPassword = () => {
       // Make API request to verify token
       const response = await fetch(`https://wolamhe-3.onrender.com/verify-reset-token?token=${tokenToVerify}`)
       const data = await response.json()
-      
+
       if (response.ok && data.valid) {
         setTokenValid(true)
       } else {
@@ -76,10 +76,10 @@ const ResetPassword = () => {
 
     try {
       const result = await resetPassword(token, password)
-      
+
       if (result.success) {
         setSuccess(result.message || "Password has been reset successfully!")
-        
+
         // Redirect to login after 3 seconds
         setTimeout(() => {
           navigate("/login")

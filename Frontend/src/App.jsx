@@ -19,6 +19,8 @@ import UploadPage from "./components/UploadPage"
 import OrderPage from "./components/OrderPage"
 import ProfilePage from "./components/ProfilePage"
 import VerifyEmail from "./components/VerifyEmail"
+import ForgotPassword from "./components/ForgotPassword"
+import ResetPassword from "./components/ResetPassword"
 
 const App = () => {
   const polaroidsRef = useRef(null)
@@ -89,6 +91,8 @@ const App = () => {
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/order" element={<OrderPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Routes>
           <Footer />
         </div>

@@ -96,9 +96,9 @@ const LoginPage = () => {
 
           <form onSubmit={handleLogin} className="w-full max-w-sm">
             <div className="mb-4 md:mb-5 relative">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                <img src={EmailIcon || "/placeholder.svg"} alt="Email Icon" className="w-5 md:w-6" />
-              </span>
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-5 h-5">
+                <img src={EmailIcon || "/placeholder.svg"} alt="Email Icon" className="w-5 h-5 object-contain" />
+              </div>
               <input
                 type="email"
                 placeholder="Email"
@@ -109,7 +109,7 @@ const LoginPage = () => {
               />
             </div>
             <div className="mb-6 md:mb-8 relative">
-              <div className="flex items-center">
+              <div className="flex items-center justify-between mb-1">
                 <label htmlFor="password" className="sr-only">
                   Password
                 </label>
@@ -117,17 +117,23 @@ const LoginPage = () => {
                   Forgot your password?
                 </Link>
               </div>
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                <img src={PasswordIcon || "/placeholder.svg"} alt="Password Icon" className="w-4 md:w-5" />
-              </span>
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
-                required
-              />
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-5 h-5">
+                  <img
+                    src={PasswordIcon || "/placeholder.svg"}
+                    alt="Password Icon"
+                    className="w-4 h-4 object-contain"
+                  />
+                </div>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-10 p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
+                  required
+                />
+              </div>
             </div>
             <button
               type="submit"

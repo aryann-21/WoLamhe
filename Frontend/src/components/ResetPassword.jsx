@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import LoginPhoto from "../assets/login.jpg"
 import PasswordIcon from "../assets/password.png"
-import { useUser } from "../context/UserContext" // Import useUser hook
+import { useUser } from "../context/UserContext"
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("")
@@ -18,14 +18,17 @@ const ResetPassword = () => {
 
   const location = useLocation()
   const navigate = useNavigate()
-  const { resetPassword } = useUser() // Use the context method
+  const { resetPassword } = useUser()
 
   useEffect(() => {
-    // Extract token from URL
-    const params = new URLSearchParams(location.search)
-    const tokenFromUrl = params.get("token")
+    // Get the token directly from the window location
+    // This is a more reliable way to get URL parameters
+    const urlParams = new URLSearchParams(window.location.search)
+    const tokenFromUrl = urlParams.get("token")
 
-    console.log("Token from URL:", tokenFromUrl) // Debug log
+    console.log("Window location:", window.location.href)
+    console.log("Search params:", window.location.search)
+    console.log("Token from URL (window):", tokenFromUrl)
 
     if (tokenFromUrl) {
       setToken(tokenFromUrl)
@@ -35,13 +38,15 @@ const ResetPassword = () => {
       setTokenChecked(true)
       setError("Reset token is missing. Please use the link from your email.")
     }
-  }, [location])
+  }, []) // Only run once on component mount
 
   const verifyToken = async (tokenToVerify) => {
     try {
+      console.log("Verifying token:", tokenToVerify)
       // Make API request to verify token
       const response = await fetch(`https://wolamhe-3.onrender.com/verify-reset-token?token=${tokenToVerify}`)
       const data = await response.json()
+      console.log("Token verification response:", data)
 
       if (response.ok && data.valid) {
         setTokenValid(true)
@@ -75,6 +80,7 @@ const ResetPassword = () => {
     setIsSubmitting(true)
 
     try {
+      console.log("Submitting reset with token:", token)
       const result = await resetPassword(token, password)
 
       if (result.success) {

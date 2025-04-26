@@ -56,7 +56,7 @@ const SignUpPage = () => {
       })
 
       if (result.success) {
-        setSuccess(result.message || "Registration successful! Please check your email to verify your account.")
+        setSuccess(result.message || "Registration successful! Please check your email (and spam folder) to verify your account.")
         // Clear form
         setName("")
         setEmail("")

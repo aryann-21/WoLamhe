@@ -96,7 +96,7 @@ const LoginPage = () => {
 
           <form onSubmit={handleLogin} className="w-full max-w-sm">
             <div className="mb-4 md:mb-5 relative">
-              <span className="absolute left-2 top-2">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
                 <img src={EmailIcon || "/placeholder.svg"} alt="Email Icon" className="w-5 md:w-6" />
               </span>
               <input
@@ -117,7 +117,7 @@ const LoginPage = () => {
                   Forgot your password?
                 </Link>
               </div>
-              <span className="absolute left-[11px] top-2">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
                 <img src={PasswordIcon || "/placeholder.svg"} alt="Password Icon" className="w-4 md:w-5" />
               </span>
               <input

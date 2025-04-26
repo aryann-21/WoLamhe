@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import LoginPhoto from "../assets/login.jpg"
 import PasswordIcon from "../assets/password.png"
-import { useUser } from "../UserContext" // Import useUser hook
+import { useUser } from "../context/UserContext" // Import useUser hook
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("")

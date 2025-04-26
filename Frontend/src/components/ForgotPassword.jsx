@@ -2,17 +2,16 @@
 
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import axios from "axios"
 import LoginPhoto from "../assets/login.jpg"
 import EmailIcon from "../assets/email.png"
-
-const API_BASE_URL = "https://wolamhe-3.onrender.com"
+import { useUser } from "../UserContext" // Import useUser hook
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const { forgotPassword } = useUser() // Use the context method
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -21,12 +20,17 @@ const ForgotPassword = () => {
     setIsSubmitting(true)
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/forgot-password`, { email })
-      setSuccess(response.data.message || "Password reset email sent! Please check your inbox.")
-      setEmail("")
+      const result = await forgotPassword(email)
+      
+      if (result.success) {
+        setSuccess(result.message || "Password reset email sent! Please check your inbox.")
+        setEmail("")
+      } else {
+        setError(result.message || "Failed to send reset email. Please try again or contact support.")
+      }
     } catch (error) {
       console.error("Forgot password error:", error)
-      setError(error.response?.data?.message || "Failed to send reset email. Please try again or contact support.")
+      setError("Failed to send reset email. Please try again or contact support.")
     } finally {
       setIsSubmitting(false)
     }

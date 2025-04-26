@@ -314,7 +314,7 @@ export const UserProvider = ({ children }) => {
     }
   }
 
-  // New method for requesting password reset
+  // Method for requesting password reset
   const forgotPassword = async (email) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/forgot-password`, { email })
@@ -332,7 +332,7 @@ export const UserProvider = ({ children }) => {
     }
   }
 
-  // New method for resetting password with token
+  // Method for resetting password with token
   const resetPassword = async (token, password) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/reset-password`, { token, password })

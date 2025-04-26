@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import axios from "axios"
 import LoginPhoto from "../assets/login.jpg"
 import PasswordIcon from "../assets/password.png"
-
-const API_BASE_URL = "https://wolamhe-3.onrender.com"
+import { useUser } from "../UserContext" // Import useUser hook
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("")
@@ -20,11 +18,14 @@ const ResetPassword = () => {
 
   const location = useLocation()
   const navigate = useNavigate()
+  const { resetPassword } = useUser() // Use the context method
 
   useEffect(() => {
     // Extract token from URL
-    const query = new URLSearchParams(location.search)
-    const tokenFromUrl = query.get("token")
+    const params = new URLSearchParams(location.search)
+    const tokenFromUrl = params.get("token")
+    
+    console.log("Token from URL:", tokenFromUrl) // Debug log
 
     if (tokenFromUrl) {
       setToken(tokenFromUrl)
@@ -38,11 +39,18 @@ const ResetPassword = () => {
 
   const verifyToken = async (tokenToVerify) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/verify-reset-token?token=${tokenToVerify}`)
-      setTokenValid(true)
+      // Make API request to verify token
+      const response = await fetch(`https://wolamhe-3.onrender.com/verify-reset-token?token=${tokenToVerify}`)
+      const data = await response.json()
+      
+      if (response.ok && data.valid) {
+        setTokenValid(true)
+      } else {
+        setError("This password reset link is invalid or has expired. Please request a new one.")
+      }
     } catch (error) {
       console.error("Token verification error:", error)
-      setError("This password reset link is invalid or has expired. Please request a new one.")
+      setError("Error verifying reset token. Please try again or request a new link.")
     } finally {
       setTokenChecked(true)
     }
@@ -67,22 +75,21 @@ const ResetPassword = () => {
     setIsSubmitting(true)
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/reset-password`, {
-        token,
-        password,
-      })
-
-      setSuccess(response.data.message || "Password has been reset successfully!")
-
-      // Redirect to login after 3 seconds
-      setTimeout(() => {
-        navigate("/login")
-      }, 3000)
+      const result = await resetPassword(token, password)
+      
+      if (result.success) {
+        setSuccess(result.message || "Password has been reset successfully!")
+        
+        // Redirect to login after 3 seconds
+        setTimeout(() => {
+          navigate("/login")
+        }, 3000)
+      } else {
+        setError(result.message || "Failed to reset password. Please try again or request a new reset link.")
+      }
     } catch (error) {
       console.error("Password reset error:", error)
-      setError(
-        error.response?.data?.message || "Failed to reset password. Please try again or request a new reset link.",
-      )
+      setError("An unexpected error occurred. Please try again later.")
     } finally {
       setIsSubmitting(false)
     }

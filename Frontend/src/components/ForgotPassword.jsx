@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import LoginPhoto from "../assets/login.jpg"
 import EmailIcon from "../assets/email.png"
-import { useUser } from "../UserContext" // Import useUser hook
+import { useUser } from "../context/UserContext" // Import useUser hook
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("")

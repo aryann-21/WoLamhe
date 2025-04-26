@@ -1,14 +1,14 @@
 const moon = [
-    "  https://imgur.com/G7vjnjF.jpg",
-    "https://imgur.com/Chvela6.jpg",
-    "https://imgur.com/50x6s8y.jpg",
-    "https://imgur.com/DEd2h1J.jpg",
-    "https://imgur.com/GLmrCit.jpg",
-    "https://imgur.com/4xFmdrj.jpg",
-    "https://imgur.com/bGK0aCA.jpg", 
-    "https://imgur.com/3vWE3pK.jpg",
-    "https://imgur.com/SmcKtl4.jpg",
-    "https://imgur.com/GBn7ICb.jpg",
+    "  https://i.imgur.com/kx1I7EB.jpg",
+    "https://i.imgur.com/22lI2Gi.jpg",
+    "https://i.imgur.com/htsJKxc.jpg",
+    "https://i.imgur.com/NUV3qk5.jpg",
+    "https://i.imgur.com/ITDna2W.jpg",
+    "https://i.imgur.com/gjSPNCD.jpg",
+    "https://i.imgur.com/XEkG6IZ.jpg", 
+    "https://i.imgur.com/mpRaObz.jpg",
+    "https://i.imgur.com/vi8Uo8J.jpg",
+    "https://i.imgur.com/1yFbQpx.jpg",
    
   ];
   

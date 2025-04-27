@@ -6,9 +6,8 @@ import LoginPhoto from "../assets/login.jpg";
 import PasswordIcon from "../assets/password.png";
 import { useUser } from "../context/UserContext";
 import axios from "axios";
-import { Eye, EyeOff } from "lucide-react"; // Import icons for password visibility toggle
+import { Eye, EyeOff } from "lucide-react";
 
-// Define API_BASE_URL directly to match VerifyEmail component
 const API_BASE_URL = "https://wolamhe-3.onrender.com";
 
 const ResetPassword = () => {
@@ -29,30 +28,30 @@ const ResetPassword = () => {
 
   useEffect(() => {
     console.log("ResetPassword component mounted");
+    
+    // Get token from URL search params (query string)
+    const searchParams = new URLSearchParams(location.search);
+    const tokenFromQuery = searchParams.get("token");
+    
+    // Get token from URL path parameter
+    const pathSegments = location.pathname.split("/");
+    const tokenFromPath = pathSegments.length > 2 ? pathSegments[pathSegments.length - 1] : null;
+    
+    console.log("Full URL:", window.location.href);
+    console.log("Token from query:", tokenFromQuery);
+    console.log("Token from path:", tokenFromPath);
 
-    // Try to get token from URL
-    const fullUrl = window.location.href;
-    console.log("Full URL:", fullUrl);
-
-    // Check if token exists in the URL (even before it might get stripped)
-    if (fullUrl.includes("token=")) {
-      // Extract token directly from the full URL string
-      const tokenMatch = fullUrl.match(/token=([^&]+)/);
-      if (tokenMatch && tokenMatch[1]) {
-        const extractedToken = tokenMatch[1];
-        console.log("Token extracted from full URL:", extractedToken);
-
-        // Save to localStorage immediately
-        localStorage.setItem("passwordResetToken", extractedToken);
-
-        // Use the token
-        setToken(extractedToken);
-        verifyToken(extractedToken);
-        return;
-      }
+    // Try to get token in priority order: query param, path param, localStorage
+    let extractedToken = tokenFromQuery || tokenFromPath;
+    
+    if (extractedToken) {
+      console.log("Token extracted from URL:", extractedToken);
+      localStorage.setItem("passwordResetToken", extractedToken);
+      setToken(extractedToken);
+      verifyToken(extractedToken);
+      return;
     }
 
-    // If we reach here, token wasn't in URL or got stripped
     // Try to get token from localStorage as fallback
     const savedToken = localStorage.getItem("passwordResetToken");
     if (savedToken) {
@@ -67,12 +66,11 @@ const ResetPassword = () => {
     setError(
       "Reset token is missing. Please use the link from your email or request a new reset link."
     );
-  }, []);
+  }, [location]);
 
   const verifyToken = async (tokenToVerify) => {
     try {
       console.log("Verifying token:", tokenToVerify);
-      // Use axios instead of fetch to match VerifyEmail component
       const response = await axios.get(
         `${API_BASE_URL}/verify-reset-token?token=${tokenToVerify}`
       );
@@ -87,7 +85,6 @@ const ResetPassword = () => {
       }
     } catch (error) {
       console.error("Token verification error:", error);
-      // Extract error message similar to VerifyEmail component
       const errorMessage =
         error.response?.data?.message ||
         "Failed to verify reset token. The link may have expired or is invalid.";
@@ -234,7 +231,6 @@ const ResetPassword = () => {
               </button>
             </form>
           )}
-          // Add this right after the "Reset token is missing" error message
           {!tokenValid && !success && (
             <div className="mt-4 w-full max-w-sm">
               <p className="text-sm mb-2">

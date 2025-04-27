@@ -28,40 +28,34 @@ const ResetPassword = () => {
   const { resetPassword } = useUser()
 
   useEffect(() => {
-    console.log("ResetPassword component mounted")
-    console.log("Current location:", location)
-
-    // Try multiple ways to get the token
-    // 1. First from the search params
+    // Only try to extract token from query params or hash
     const query = new URLSearchParams(location.search)
-    let token = query.get("token")
+    const token = query.get("token")
     
     console.log("URL search params:", location.search)
     console.log("Extracted token from search:", token)
     
-    // 2. If not found, try from the hash part
-    if (!token && location.hash) {
-      const hashParams = new URLSearchParams(location.hash.substring(1))
-      token = hashParams.get("token")
-      console.log("Extracted token from hash:", token)
-    }
-    
-    // 3. Check if token might be in the pathname (some frameworks handle routes differently)
-    if (!token && location.pathname) {
-      const pathParts = location.pathname.split('/')
-      const lastPart = pathParts[pathParts.length - 1]
-      if (lastPart && lastPart.length > 10) {  // Assuming token is reasonably long
-        token = lastPart
-        console.log("Extracted token from pathname:", token)
-      }
-    }
-
-    // Check if we have a token
+    // If token exists in URL params, verify it
     if (token && token.length > 0) {
       setToken(token)
       verifyToken(token)
+    } else if (location.hash) {
+      // Try extracting from hash if present
+      const hashParams = new URLSearchParams(location.hash.substring(1))
+      const hashToken = hashParams.get("token")
+      
+      console.log("Extracted token from hash:", hashToken)
+      
+      if (hashToken && hashToken.length > 0) {
+        setToken(hashToken)
+        verifyToken(hashToken)
+      } else {
+        // No valid token found
+        setTokenChecked(true)
+        setError("Reset token is missing. Please use the link from your email or request a new reset link.")
+      }
     } else {
-      // For users who navigate directly to this page without a token
+      // No token found in URL or hash
       setTokenChecked(true)
       setError("Reset token is missing. Please use the link from your email or request a new reset link.")
     }

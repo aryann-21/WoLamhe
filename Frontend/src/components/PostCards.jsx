@@ -20,9 +20,9 @@ const PostCards = forwardRef((props, ref) => {
     })
   }
 
-  const handleTouchStart = (e) => {
+  function handleTouchStart(e) {
     e.preventDefault()
-    setIsTouched(true)
+    setIsTouched(!isTouched)
   }
 
   const handleTouchEnd = () => {
@@ -32,6 +32,13 @@ const PostCards = forwardRef((props, ref) => {
   const handleOverlayTouch = (e) => {
     // Prevent touch events from propagating to parent elements
     e.stopPropagation()
+  }
+
+  function handleOverlayClick(e) {
+    // Only close if clicking the background (not the content)
+    if (e.target === overlayRef.current) {
+      setIsTouched(false)
+    }
   }
 
   return (
@@ -67,7 +74,7 @@ const PostCards = forwardRef((props, ref) => {
         onTouchStart={handleOverlayTouch}
         onTouchMove={handleOverlayTouch}
         onTouchEnd={handleOverlayTouch}
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleOverlayClick}
       >
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 min-h-[200px]">
           <img
@@ -103,4 +110,3 @@ const PostCards = forwardRef((props, ref) => {
 })
 
 export default PostCards
-

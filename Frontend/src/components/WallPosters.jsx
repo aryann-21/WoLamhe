@@ -20,9 +20,9 @@ const WallPosters = forwardRef((props, ref) => {
     })
   }
 
-  const handleTouchStart = (e) => {
+  function handleTouchStart(e) {
     e.preventDefault()
-    setIsTouched(true)
+    setIsTouched(!isTouched)
   }
 
   const handleTouchEnd = () => {
@@ -32,6 +32,13 @@ const WallPosters = forwardRef((props, ref) => {
   const handleOverlayTouch = (e) => {
     // Prevent touch events from propagating to parent elements
     e.stopPropagation()
+  }
+
+  function handleOverlayClick(e) {
+    // Only close if clicking the background (not the content)
+    if (e.target === overlayRef.current) {
+      setIsTouched(false)
+    }
   }
 
   return (
@@ -70,7 +77,7 @@ const WallPosters = forwardRef((props, ref) => {
         onTouchStart={handleOverlayTouch}
         onTouchMove={handleOverlayTouch}
         onTouchEnd={handleOverlayTouch}
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleOverlayClick}
       >
         {/* Left Section */}
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 min-h-[200px]">
@@ -109,4 +116,3 @@ const WallPosters = forwardRef((props, ref) => {
 })
 
 export default WallPosters
-

@@ -706,6 +706,83 @@ app.get("/api/orders/:userId", async (req, res) => {
   }
 })
 
+// Get user's cart
+app.get("/api/cart", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1]
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" })
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key")
+    const user = await User.findById(decoded.userId)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Get cart from user document
+    // If your User model doesn't have a cart field, you'll need to add it
+    // or create a separate Cart model
+    res.json({ items: user.cart || [] })
+  } catch (error) {
+    console.error("Cart Fetch Error:", error)
+    res.status(401).json({ message: "Invalid token" })
+  }
+})
+
+// Update user's cart
+app.post("/api/cart", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1]
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" })
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key")
+    const user = await User.findById(decoded.userId)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Update cart in user document
+    user.cart = req.body.items
+    await user.save()
+
+    res.status(200).json({ message: "Cart updated successfully" })
+  } catch (error) {
+    console.error("Cart Update Error:", error)
+    res.status(500).json({ message: "Error updating cart", error: error.message })
+  }
+})
+
+// Clear user's cart
+app.delete("/api/cart", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1]
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" })
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key")
+    const user = await User.findById(decoded.userId)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Clear cart in user document
+    user.cart = []
+    await user.save()
+
+    res.status(200).json({ message: "Cart cleared successfully" })
+  } catch (error) {
+    console.error("Cart Clear Error:", error)
+    res.status(500).json({ message: "Error clearing cart", error: error.message })
+  }
+})
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)

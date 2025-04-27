@@ -15,9 +15,9 @@ const SquarePrints = forwardRef((props, ref) => {
     navigate("/upload", { state: { fromPage: "Square Prints" } })
   }
 
-  const handleTouchStart = (e) => {
+  function handleTouchStart(e) {
     e.preventDefault()
-    setIsTouched(true)
+    setIsTouched(!isTouched)
   }
 
   const handleTouchEnd = () => {
@@ -27,6 +27,13 @@ const SquarePrints = forwardRef((props, ref) => {
   const handleOverlayTouch = (e) => {
     // Prevent touch events from propagating to parent elements
     e.stopPropagation()
+  }
+
+  function handleOverlayClick(e) {
+    // Only close if clicking the background (not the content)
+    if (e.target === overlayRef.current) {
+      setIsTouched(false)
+    }
   }
 
   return (
@@ -65,7 +72,7 @@ const SquarePrints = forwardRef((props, ref) => {
         onTouchStart={handleOverlayTouch}
         onTouchMove={handleOverlayTouch}
         onTouchEnd={handleOverlayTouch}
-        onClick={(e) => e.stopPropagation()}
+        onClick={handleOverlayClick}
       >
         {/* Content Section */}
         <div className="w-full flex flex-col items-center justify-center p-4 min-h-[300px]">

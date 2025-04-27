@@ -143,8 +143,8 @@ const SignUpPage = () => {
               />
             </div>
             <div className="mb-5 relative">
-              <span className="absolute left-[9px] top-[10px]">
-                <img src={PasswordIcon || "/placeholder.svg"} alt="Confirm Password Icon" className="w-6" />
+              <span className="absolute left-[10px] top-[8px]">
+                <img src={PasswordIcon || "/placeholder.svg"} alt="Confirm Password Icon" className="w-5" />
               </span>
               <input
                 type="password"

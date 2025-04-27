@@ -108,15 +108,7 @@ const LoginPage = () => {
                 required
               />
             </div>
-            <div className="mb-6 md:mb-8 relative">
-              <div className="flex items-center justify-between mb-1">
-                <label htmlFor="password" className="sr-only">
-                  Password
-                </label>
-                <Link to="/forgot-password" className="ml-auto inline-block text-sm underline text-[#2E2210]">
-                  Forgot your password?
-                </Link>
-              </div>
+            <div className="mb-2 relative">
               <div className="relative">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-5 h-5">
                   <img
@@ -135,6 +127,13 @@ const LoginPage = () => {
                 />
               </div>
             </div>
+            
+            <div className="flex justify-end mb-4">
+              <Link to="/forgot-password" className="text-sm text-[#2E2210] hover:underline">
+                Forgot your password?
+              </Link>
+            </div>
+            
             <button
               type="submit"
               disabled={loading}
@@ -143,6 +142,7 @@ const LoginPage = () => {
               {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
+          
           <p className="mt-6 md:mt-8 text-sm text-gray-700">
             Not already a user?{" "}
             <Link to="/signup" className="text-[#2E2210] font-semibold underline">

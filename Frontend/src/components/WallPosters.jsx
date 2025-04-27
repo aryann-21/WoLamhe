@@ -66,14 +66,18 @@ const WallPosters = forwardRef((props, ref) => {
       <div
         ref={overlayRef}
         className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col md:flex-row text-white text-lg transition-all duration-700 ease-in-out overflow-y-auto ${
-          isHovered || isTouched ? "opacity-100" : "opacity-0 pointer-events-none"
+          isHovered || isTouched ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onTouchStart={handleOverlayTouch}
       >
         {/* Close button for mobile */}
         <button
-          className="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2 md:hidden"
-          onClick={() => setIsTouched(false)}
+          className="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2 md:hidden z-50"
+          onClick={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            setIsTouched(false)
+          }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

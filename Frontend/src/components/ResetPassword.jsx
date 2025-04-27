@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import LoginPhoto from "../assets/login.jpg"
 import PasswordIcon from "../assets/password.png"
 import { useUser } from "../context/UserContext"
@@ -17,18 +17,19 @@ const ResetPassword = () => {
   const [tokenChecked, setTokenChecked] = useState(false)
 
   const navigate = useNavigate()
+  const location = useLocation()
   const { resetPassword } = useUser()
 
   useEffect(() => {
-    // Extract token directly from the full URL
-    const fullUrl = window.location.href
-    console.log("Full URL:", fullUrl)
+    console.log("ResetPassword component mounted")
+    console.log("Current location:", location)
 
-    // Try to extract token using regex to handle various URL formats
-    const tokenMatch = fullUrl.match(/[?&]token=([^&]+)/)
-    const tokenFromUrl = tokenMatch ? tokenMatch[1] : null
+    // Get the token from URL using URLSearchParams (same approach as VerifyEmail)
+    const query = new URLSearchParams(location.search)
+    const tokenFromUrl = query.get("token")
 
-    console.log("Token extracted from full URL:", tokenFromUrl)
+    console.log("URL search params:", location.search)
+    console.log("Extracted token:", tokenFromUrl)
 
     if (tokenFromUrl) {
       setToken(tokenFromUrl)
@@ -38,7 +39,7 @@ const ResetPassword = () => {
       setTokenChecked(true)
       setError("Reset token is missing. Please use the link from your email.")
     }
-  }, []) // Only run once on component mount
+  }, [location]) // React to location changes
 
   const verifyToken = async (tokenToVerify) => {
     try {
@@ -85,7 +86,6 @@ const ResetPassword = () => {
 
       if (result.success) {
         setSuccess(result.message || "Password has been reset successfully!")
-
         // Redirect to login after 3 seconds
         setTimeout(() => {
           navigate("/login")

@@ -314,23 +314,24 @@ export const UserProvider = ({ children }) => {
     }
   }
 
-  // Method for requesting password reset
-  const forgotPassword = async (email) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/forgot-password`, { email })
-      return {
-        success: true,
-        message:
-          response.data.message || "If your email is registered, you will receive a password reset link shortly.",
-      }
-    } catch (error) {
-      console.error("Forgot password error:", error)
-      return {
-        success: false,
-        message: error.response?.data?.message || "Failed to process your request. Please try again later.",
-      }
+// Method for requesting password reset
+const forgotPassword = async (email) => {
+  try {
+    // Send a normal POST request without any special headers
+    const response = await axios.post(`${API_BASE_URL}/forgot-password`, { email })
+    return {
+      success: true,
+      message:
+        response.data.message || "If your email is registered, you will receive a password reset link shortly.",
+    }
+  } catch (error) {
+    console.error("Forgot password error:", error)
+    return {
+      success: false,
+      message: error.response?.data?.message || "Failed to process your request. Please try again later.",
     }
   }
+}
 
   // Method for resetting password with token
   const resetPassword = async (token, password) => {

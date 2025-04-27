@@ -842,48 +842,32 @@ app.post("/forgot-password", async (req, res) => {
       expires: 3600,
     }).save()
 
-    // Send email with reset token
+    // Create reset URL
+    const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`
+
+    // Send email with reset link
     if (process.env.SENDGRID_API_KEY) {
       sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
       const msg = {
         to: user.email,
         from: process.env.EMAIL_FROM || "noreply@yourdomain.com",
-        subject: "Password Reset Code",
+        subject: "Password Reset Request",
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
-            <h2 style="color: #65350f;">Your Password Reset Code</h2>
-            <p>Here is your password reset code:</p>
-            
-            <div style="margin: 30px 0; background-color: #f5f5f5; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 18px; position: relative;">
-              <div id="token" style="user-select: all;">${resetToken}</div>
-              <button onclick="copyToken()" style="background-color: #65350f; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">
-                Copy This Code Yourself
-              </button>
-            </div>
-
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #65350f;">Reset Your Password</h2>
+            <p>You requested a password reset for your Wolamhe account. Click the button below to set a new password:</p>
             <div style="margin: 30px 0;">
               <a href="${resetUrl}" 
                  style="background-color: #65350f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
-                Reset Your Password
+                Reset Password
               </a>
             </div>
-            
-            <p style="font-size: 14px; color: #666;">This code will expire in 1 hour.</p>
-            <p style="font-size: 14px; color: #666;">If you didn't request this code, please ignore this email.</p>
-            
-            <script>
-              function copyToken() {
-                const tokenText = document.getElementById('token').innerText;
-                navigator.clipboard.writeText(tokenText)
-                  .then(() => {
-                    alert('Token copied to clipboard!');
-                  })
-                  .catch(err => {
-                    console.error('Failed to copy: ', err);
-                  });
-              }
-            </script>
+            <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
+            <p>${resetUrl}</p>
+            <p>This link will expire in 1 hour.</p>
+            <p>If you didn't request a password reset, you can safely ignore this email.</p>
           </div>
         `,
       }
@@ -895,7 +879,7 @@ app.post("/forgot-password", async (req, res) => {
     }
 
     res.status(200).json({
-      message: "If your email is registered, you will receive a password reset code shortly.",
+      message: "If your email is registered, you will receive a password reset link shortly.",
     })
   } catch (error) {
     console.error("Forgot password error:", error)

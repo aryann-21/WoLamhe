@@ -26,23 +26,46 @@ const ResetPassword = () => {
   const location = useLocation();
   const { resetPassword } = useUser();
 
+  // Helper function to sanitize token
+  const sanitizeToken = (token) => {
+    if (!token) return null;
+    // Remove any whitespace or common URL artifacts
+    return token.trim().replace(/['"]/g, '');
+  };
+
   useEffect(() => {
     console.log("ResetPassword component mounted");
     
-    // Get token from URL search params (query string)
-    const searchParams = new URLSearchParams(location.search);
-    const tokenFromQuery = searchParams.get("token");
+    // Extract token from URL using multiple methods
+    const extractTokenFromUrl = () => {
+      // Method 1: Get token from URL search params (query string)
+      const searchParams = new URLSearchParams(location.search);
+      let tokenFromQuery = searchParams.get("token");
+      
+      // Method 2: Get token from URL path parameter
+      const pathSegments = location.pathname.split("/");
+      let tokenFromPath = pathSegments.length > 2 ? pathSegments[pathSegments.length - 1] : null;
+      
+      // Method 3: Check if the full URL contains the token as part of a fragment
+      const fullUrl = window.location.href;
+      const fragmentMatch = fullUrl.match(/token=([^&]+)/);
+      const tokenFromFragment = fragmentMatch ? fragmentMatch[1] : null;
+      
+      console.log("Full URL:", fullUrl);
+      console.log("Token from query:", tokenFromQuery);
+      console.log("Token from path:", tokenFromPath);
+      console.log("Token from fragment:", tokenFromFragment);
+      
+      // Sanitize all potential tokens
+      tokenFromQuery = sanitizeToken(tokenFromQuery);
+      tokenFromPath = sanitizeToken(tokenFromPath);
+      const tokenFromUrl = tokenFromFragment || tokenFromQuery || tokenFromPath;
+      
+      return tokenFromUrl;
+    };
     
-    // Get token from URL path parameter
-    const pathSegments = location.pathname.split("/");
-    const tokenFromPath = pathSegments.length > 2 ? pathSegments[pathSegments.length - 1] : null;
-    
-    console.log("Full URL:", window.location.href);
-    console.log("Token from query:", tokenFromQuery);
-    console.log("Token from path:", tokenFromPath);
-
-    // Try to get token in priority order: query param, path param, localStorage
-    let extractedToken = tokenFromQuery || tokenFromPath;
+    // Try to get token from URL first
+    const extractedToken = extractTokenFromUrl();
     
     if (extractedToken) {
       console.log("Token extracted from URL:", extractedToken);
@@ -52,7 +75,7 @@ const ResetPassword = () => {
       return;
     }
 
-    // Try to get token from localStorage as fallback
+    // If no token in URL, try localStorage as fallback
     const savedToken = localStorage.getItem("passwordResetToken");
     if (savedToken) {
       console.log("Using token from localStorage:", savedToken);
@@ -69,15 +92,34 @@ const ResetPassword = () => {
   }, [location]);
 
   const verifyToken = async (tokenToVerify) => {
+    if (!tokenToVerify) {
+      setError("Invalid token format");
+      setTokenChecked(true);
+      return;
+    }
+
     try {
       console.log("Verifying token:", tokenToVerify);
+      
+      // Ensure the token is properly encoded for URL parameters
+      const encodedToken = encodeURIComponent(tokenToVerify);
+      
       const response = await axios.get(
-        `${API_BASE_URL}/verify-reset-token?token=${tokenToVerify}`
+        `${API_BASE_URL}/verify-reset-token?token=${encodedToken}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          timeout: 10000 // 10 seconds timeout
+        }
       );
+      
       console.log("Token verification response:", response);
 
       if (response.data.valid) {
         setTokenValid(true);
+        setError("");
       } else {
         setError(
           "This password reset link is invalid or has expired. Please request a new one."
@@ -85,10 +127,29 @@ const ResetPassword = () => {
       }
     } catch (error) {
       console.error("Token verification error:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to verify reset token. The link may have expired or is invalid.";
-      setError(errorMessage);
+      
+      // Handle different types of errors
+      if (error.code === "ECONNABORTED") {
+        setError("Connection timed out. Please check your internet connection and try again.");
+      } else if (error.response) {
+        // Server responded with an error status code
+        const statusCode = error.response.status;
+        const serverMessage = error.response?.data?.message || "";
+        
+        if (statusCode === 400) {
+          setError(`Invalid token format. ${serverMessage}`);
+        } else if (statusCode === 401 || statusCode === 403) {
+          setError(`Token is expired or invalid. ${serverMessage}`);
+        } else {
+          setError(`Server error (${statusCode}): ${serverMessage || "Please try again later."}`);
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        setError("No response from server. Please check your internet connection and try again.");
+      } else {
+        // Other error
+        setError("Failed to verify reset token. The link may have expired or is invalid.");
+      }
     } finally {
       setTokenChecked(true);
     }
@@ -241,13 +302,19 @@ const ResetPassword = () => {
                   type="text"
                   placeholder="Paste token here"
                   className="flex-1 pl-3 p-2 rounded-l-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
+                  value={token}
                   onChange={(e) => setToken(e.target.value)}
                 />
                 <button
                   onClick={() => {
                     if (token && token.length > 10) {
-                      localStorage.setItem("passwordResetToken", token);
-                      verifyToken(token);
+                      const sanitizedToken = sanitizeToken(token);
+                      if (sanitizedToken) {
+                        localStorage.setItem("passwordResetToken", sanitizedToken);
+                        verifyToken(sanitizedToken);
+                      } else {
+                        setError("Please enter a valid token");
+                      }
                     } else {
                       setError("Please enter a valid token");
                     }

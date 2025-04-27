@@ -1,6 +1,3 @@
-// Update your User model to include a cart field
-// Add this to your user.js schema
-
 const mongoose = require("mongoose")
 
 const userSchema = new mongoose.Schema(
@@ -45,3 +42,5 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   },
 )
+
+module.exports = mongoose.model("User", userSchema)

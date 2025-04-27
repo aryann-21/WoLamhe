@@ -24,12 +24,11 @@ const PhotoStrips = forwardRef((props, ref) => {
   }
 
   const handleOverlayTouch = (e) => {
-    // Check if the touch is directly on the overlay background (not its children)
     if (e.target === overlayRef.current) {
-      e.stopPropagation()
-      setIsTouched(false)
+      setIsTouched(false);
     }
-  }
+  };
+  
 
   return (
     <div
@@ -59,36 +58,39 @@ const PhotoStrips = forwardRef((props, ref) => {
 
       {/* Hover/Touch Overlay */}
       <div
-        ref={overlayRef}
-        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white text-sm transition-all duration-700 ease-in-out overflow-y-auto ${
-          isHovered || isTouched ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        onTouchStart={handleOverlayTouch}
-      >
+  ref={overlayRef}
+  onTouchStart={handleOverlayTouch}
+  className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white text-sm transition-all duration-700 ease-in-out overflow-y-auto ${
+    isHovered || isTouched ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+  }`}
+>
+  {/* Close button */}
+
         {/* Close button for mobile */}
         <button
-          className="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2 md:hidden z-50"
-          onClick={(e) => {
-            e.stopPropagation()
-            e.preventDefault()
-            setIsTouched(false)
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+  type="button"
+  className="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2 md:hidden z-50"
+  onClick={(e) => {
+    e.stopPropagation();
+    setIsTouched(false);
+  }}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+</button>
+
 
         {/* Content Section */}
         <div className="w-full flex flex-col items-center justify-center p-4 min-h-[300px]">

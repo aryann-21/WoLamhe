@@ -67,29 +67,7 @@ const PhotoStrips = forwardRef((props, ref) => {
   {/* Close button */}
 
         {/* Close button for mobile */}
-        <button
-  type="button"
-  className="absolute top-4 right-4 bg-white bg-opacity-20 rounded-full p-2 md:hidden z-50"
-  onClick={(e) => {
-    e.stopPropagation();
-    setIsTouched(false);
-  }}
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="18" y1="6" x2="6" y2="18" />
-    <line x1="6" y1="6" x2="18" y2="18" />
-  </svg>
-</button>
+        
 
 
         {/* Content Section */}

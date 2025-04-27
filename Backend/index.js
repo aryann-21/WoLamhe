@@ -858,8 +858,15 @@ app.post("/forgot-password", async (req, res) => {
             <div style="margin: 30px 0; background-color: #f5f5f5; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 18px; position: relative;">
               <div id="token" style="user-select: all;">${resetToken}</div>
               <button onclick="copyToken()" style="background-color: #65350f; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">
-                Copy Code
+                Copy This Code Yourself
               </button>
+            </div>
+
+            <div style="margin: 30px 0;">
+              <a href="${resetUrl}" 
+                 style="background-color: #65350f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
+                Reset Your Password
+              </a>
             </div>
             
             <p style="font-size: 14px; color: #666;">This code will expire in 1 hour.</p>

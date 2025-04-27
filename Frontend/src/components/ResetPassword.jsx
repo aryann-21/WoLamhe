@@ -26,71 +26,32 @@ const ResetPassword = () => {
   const location = useLocation();
   const { resetPassword } = useUser();
 
-  // Helper function to sanitize token
-  const sanitizeToken = (token) => {
-    if (!token) return null;
-    // Remove any whitespace or common URL artifacts
-    return token.trim().replace(/['"]/g, '');
-  };
-
   useEffect(() => {
     console.log("ResetPassword component mounted");
+    console.log("Current location:", location);
     
-    // Clear any existing token from localStorage on component mount
+    // Clear existing token from localStorage
     localStorage.removeItem("passwordResetToken");
     
-    // Extract token from URL using multiple methods
-    const extractTokenFromUrl = () => {
-      // Method 1: Get token from URL search params (query string)
-      const searchParams = new URLSearchParams(location.search);
-      let tokenFromQuery = searchParams.get("token");
-      
-      // Method 2: Get token from URL path parameter
-      const pathSegments = location.pathname.split("/");
-      let tokenFromPath = pathSegments.length > 2 ? pathSegments[pathSegments.length - 1] : null;
-      
-      // Method 3: Check if the full URL contains the token as part of a fragment
-      const fullUrl = window.location.href;
-      const fragmentMatch = fullUrl.match(/token=([^&]+)/);
-      const tokenFromFragment = fragmentMatch ? fragmentMatch[1] : null;
-      
-      // Method 4: Try to extract token from last path segment regardless of format
-      let lastSegment = pathSegments[pathSegments.length - 1];
-      // If the last segment looks like a token (at least 20 chars long and alphanumeric)
-      const tokenFromLastSegment = (lastSegment && lastSegment.length >= 20 && /^[a-zA-Z0-9]+$/.test(lastSegment)) 
-        ? lastSegment 
-        : null;
-      
-      console.log("Full URL:", fullUrl);
-      console.log("Token from query:", tokenFromQuery);
-      console.log("Token from path:", tokenFromPath);
-      console.log("Token from fragment:", tokenFromFragment);
-      console.log("Token from last segment:", tokenFromLastSegment);
-      
-      // Sanitize all potential tokens
-      tokenFromQuery = sanitizeToken(tokenFromQuery);
-      tokenFromPath = sanitizeToken(tokenFromPath);
-      const tokenFromUrl = tokenFromFragment || tokenFromQuery || tokenFromPath || tokenFromLastSegment;
-      
-      return tokenFromUrl;
-    };
+    // Get token from URL search params (query string) - SAME AS VERIFY EMAIL
+    const query = new URLSearchParams(location.search);
+    const tokenFromQuery = query.get("token");
     
-    // Try to get token from URL first
-    const extractedToken = extractTokenFromUrl();
-    
-    if (extractedToken) {
-      console.log("Token extracted from URL:", extractedToken);
-      setToken(extractedToken);
-      verifyToken(extractedToken);
-      return;
-    }
+    console.log("URL search params:", location.search);
+    console.log("Extracted token:", tokenFromQuery);
 
-    // If no token in URL, we don't use localStorage as fallback anymore
-    // Instead, we just set the error state and let the user paste a token manually
-    setTokenChecked(true);
-    setError(
-      "Reset token is missing. Please paste the token from your email reset link below."
-    );
+    // Check if we have a token in the query string
+    if (tokenFromQuery && tokenFromQuery.length > 0) {
+      console.log("Token found in query params:", tokenFromQuery);
+      setToken(tokenFromQuery);
+      verifyToken(tokenFromQuery);
+    } else {
+      // No token in URL, user needs to paste it manually
+      setTokenChecked(true);
+      setError(
+        "Reset token is missing. Please paste the token from your email reset link below."
+      );
+    }
   }, [location]);
 
   const verifyToken = async (tokenToVerify) => {
@@ -103,18 +64,9 @@ const ResetPassword = () => {
     try {
       console.log("Verifying token:", tokenToVerify);
       
-      // Ensure the token is properly encoded for URL parameters
-      const encodedToken = encodeURIComponent(tokenToVerify);
-      
+      // Make API call SIMILAR TO VERIFY EMAIL
       const response = await axios.get(
-        `${API_BASE_URL}/verify-reset-token?token=${encodedToken}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          timeout: 10000 // 10 seconds timeout
-        }
+        `${API_BASE_URL}/verify-reset-token?token=${tokenToVerify}`
       );
       
       console.log("Token verification response:", response);
@@ -122,43 +74,22 @@ const ResetPassword = () => {
       if (response.data && response.data.valid) {
         setTokenValid(true);
         setError("");
-        // Only store valid tokens in localStorage
+        // Store valid token for form submission
         localStorage.setItem("passwordResetToken", tokenToVerify);
       } else {
         setError(
           "This password reset link is invalid or has expired. Please request a new one."
         );
-        // Clear invalid token from localStorage
-        localStorage.removeItem("passwordResetToken");
       }
     } catch (error) {
       console.error("Token verification error:", error);
       
-      // Clear invalid token from localStorage
-      localStorage.removeItem("passwordResetToken");
+      // Handle error cases
+      const errorMessage =
+        error.response?.data?.message || 
+        "Failed to verify reset token. The link may have expired or is invalid.";
       
-      // Handle different types of errors
-      if (error.code === "ECONNABORTED") {
-        setError("Connection timed out. Please check your internet connection and try again.");
-      } else if (error.response) {
-        // Server responded with an error status code
-        const statusCode = error.response.status;
-        const serverMessage = error.response?.data?.message || "";
-        
-        if (statusCode === 400) {
-          setError(`Invalid token format. ${serverMessage}`);
-        } else if (statusCode === 401 || statusCode === 403) {
-          setError(`Token is expired or invalid. ${serverMessage}`);
-        } else {
-          setError(`Server error (${statusCode}): ${serverMessage || "Please try again later."}`);
-        }
-      } else if (error.request) {
-        // Request was made but no response received
-        setError("No response from server. Please check your internet connection and try again.");
-      } else {
-        // Other error
-        setError("Failed to verify reset token. The link may have expired or is invalid.");
-      }
+      setError(errorMessage);
     } finally {
       setTokenChecked(true);
     }
@@ -317,12 +248,7 @@ const ResetPassword = () => {
                 <button
                   onClick={() => {
                     if (token && token.length > 10) {
-                      const sanitizedToken = sanitizeToken(token);
-                      if (sanitizedToken) {
-                        verifyToken(sanitizedToken);
-                      } else {
-                        setError("Please enter a valid token");
-                      }
+                      verifyToken(token.trim());
                     } else {
                       setError("Please enter a valid token");
                     }

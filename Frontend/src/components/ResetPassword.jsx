@@ -5,6 +5,11 @@ import { Link, useNavigate, useLocation } from "react-router-dom"
 import LoginPhoto from "../assets/login.jpg"
 import PasswordIcon from "../assets/password.png"
 import { useUser } from "../context/UserContext"
+import axios from "axios"
+import { Eye, EyeOff } from "lucide-react" // Import icons for password visibility toggle
+
+// Define API_BASE_URL directly to match VerifyEmail component
+const API_BASE_URL = "https://wolamhe-3.onrender.com"
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("")
@@ -15,6 +20,8 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState("")
   const [tokenValid, setTokenValid] = useState(false)
   const [tokenChecked, setTokenChecked] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -24,39 +31,42 @@ const ResetPassword = () => {
     console.log("ResetPassword component mounted")
     console.log("Current location:", location)
 
-    // Get the token from URL using URLSearchParams (same approach as VerifyEmail)
+    // Get the token from URL - using the same approach as VerifyEmail
     const query = new URLSearchParams(location.search)
-    const tokenFromUrl = query.get("token")
+    const token = query.get("token")
 
     console.log("URL search params:", location.search)
-    console.log("Extracted token:", tokenFromUrl)
+    console.log("Extracted token:", token)
 
-    if (tokenFromUrl) {
-      setToken(tokenFromUrl)
-      // Verify token validity
-      verifyToken(tokenFromUrl)
+    // Check if we have a token
+    if (token && token.length > 0) {
+      setToken(token)
+      verifyToken(token)
     } else {
+      // For users who navigate directly to this page without a token
       setTokenChecked(true)
       setError("Reset token is missing. Please use the link from your email.")
     }
-  }, [location]) // React to location changes
+  }, [location])
 
   const verifyToken = async (tokenToVerify) => {
     try {
       console.log("Verifying token:", tokenToVerify)
-      // Make API request to verify token
-      const response = await fetch(`https://wolamhe-3.onrender.com/verify-reset-token?token=${tokenToVerify}`)
-      const data = await response.json()
-      console.log("Token verification response:", data)
+      // Use axios instead of fetch to match VerifyEmail component
+      const response = await axios.get(`${API_BASE_URL}/verify-reset-token?token=${tokenToVerify}`)
+      console.log("Token verification response:", response)
 
-      if (response.ok && data.valid) {
+      if (response.data.valid) {
         setTokenValid(true)
       } else {
         setError("This password reset link is invalid or has expired. Please request a new one.")
       }
     } catch (error) {
       console.error("Token verification error:", error)
-      setError("Error verifying reset token. Please try again or request a new link.")
+      // Extract error message similar to VerifyEmail component
+      const errorMessage =
+        error.response?.data?.message || "Failed to verify reset token. The link may have expired or is invalid."
+      setError(errorMessage)
     } finally {
       setTokenChecked(true)
     }
@@ -88,7 +98,7 @@ const ResetPassword = () => {
         setSuccess(result.message || "Password has been reset successfully!")
         // Redirect to login after 3 seconds
         setTimeout(() => {
-          navigate("/login")
+          navigate("/login?reset=success")
         }, 3000)
       } else {
         setError(result.message || "Failed to reset password. Please try again or request a new reset link.")
@@ -138,13 +148,20 @@ const ResetPassword = () => {
                   />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="New Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
+                  className="w-full pl-10 pr-10 p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
               <div className="mb-6 relative">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-5 h-5">
@@ -155,13 +172,20 @@ const ResetPassword = () => {
                   />
                 </div>
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm New Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full pl-10 p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
+                  className="w-full pl-10 pr-10 p-2 rounded-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
               <button
                 type="submit"

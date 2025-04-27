@@ -36,6 +36,9 @@ const ResetPassword = () => {
   useEffect(() => {
     console.log("ResetPassword component mounted");
     
+    // Clear any existing token from localStorage on component mount
+    localStorage.removeItem("passwordResetToken");
+    
     // Extract token from URL using multiple methods
     const extractTokenFromUrl = () => {
       // Method 1: Get token from URL search params (query string)
@@ -51,15 +54,23 @@ const ResetPassword = () => {
       const fragmentMatch = fullUrl.match(/token=([^&]+)/);
       const tokenFromFragment = fragmentMatch ? fragmentMatch[1] : null;
       
+      // Method 4: Try to extract token from last path segment regardless of format
+      let lastSegment = pathSegments[pathSegments.length - 1];
+      // If the last segment looks like a token (at least 20 chars long and alphanumeric)
+      const tokenFromLastSegment = (lastSegment && lastSegment.length >= 20 && /^[a-zA-Z0-9]+$/.test(lastSegment)) 
+        ? lastSegment 
+        : null;
+      
       console.log("Full URL:", fullUrl);
       console.log("Token from query:", tokenFromQuery);
       console.log("Token from path:", tokenFromPath);
       console.log("Token from fragment:", tokenFromFragment);
+      console.log("Token from last segment:", tokenFromLastSegment);
       
       // Sanitize all potential tokens
       tokenFromQuery = sanitizeToken(tokenFromQuery);
       tokenFromPath = sanitizeToken(tokenFromPath);
-      const tokenFromUrl = tokenFromFragment || tokenFromQuery || tokenFromPath;
+      const tokenFromUrl = tokenFromFragment || tokenFromQuery || tokenFromPath || tokenFromLastSegment;
       
       return tokenFromUrl;
     };
@@ -69,25 +80,16 @@ const ResetPassword = () => {
     
     if (extractedToken) {
       console.log("Token extracted from URL:", extractedToken);
-      localStorage.setItem("passwordResetToken", extractedToken);
       setToken(extractedToken);
       verifyToken(extractedToken);
       return;
     }
 
-    // If no token in URL, try localStorage as fallback
-    const savedToken = localStorage.getItem("passwordResetToken");
-    if (savedToken) {
-      console.log("Using token from localStorage:", savedToken);
-      setToken(savedToken);
-      verifyToken(savedToken);
-      return;
-    }
-
-    // No token found anywhere
+    // If no token in URL, we don't use localStorage as fallback anymore
+    // Instead, we just set the error state and let the user paste a token manually
     setTokenChecked(true);
     setError(
-      "Reset token is missing. Please use the link from your email or request a new reset link."
+      "Reset token is missing. Please paste the token from your email reset link below."
     );
   }, [location]);
 
@@ -117,16 +119,23 @@ const ResetPassword = () => {
       
       console.log("Token verification response:", response);
 
-      if (response.data.valid) {
+      if (response.data && response.data.valid) {
         setTokenValid(true);
         setError("");
+        // Only store valid tokens in localStorage
+        localStorage.setItem("passwordResetToken", tokenToVerify);
       } else {
         setError(
           "This password reset link is invalid or has expired. Please request a new one."
         );
+        // Clear invalid token from localStorage
+        localStorage.removeItem("passwordResetToken");
       }
     } catch (error) {
       console.error("Token verification error:", error);
+      
+      // Clear invalid token from localStorage
+      localStorage.removeItem("passwordResetToken");
       
       // Handle different types of errors
       if (error.code === "ECONNABORTED") {
@@ -295,7 +304,7 @@ const ResetPassword = () => {
           {!tokenValid && !success && (
             <div className="mt-4 w-full max-w-sm">
               <p className="text-sm mb-2">
-                Did you receive a reset link by email? Enter the token manually:
+                Paste the token from your reset email:
               </p>
               <div className="flex">
                 <input
@@ -310,7 +319,6 @@ const ResetPassword = () => {
                     if (token && token.length > 10) {
                       const sanitizedToken = sanitizeToken(token);
                       if (sanitizedToken) {
-                        localStorage.setItem("passwordResetToken", sanitizedToken);
                         verifyToken(sanitizedToken);
                       } else {
                         setError("Please enter a valid token");
@@ -328,6 +336,14 @@ const ResetPassword = () => {
                 The token is the long string after "token=" in the reset link
                 you received.
               </p>
+              <div className="mt-4 mb-2">
+                <p className="text-sm font-semibold">How to find your token:</p>
+                <ol className="text-xs text-left mt-1">
+                  <li className="mb-1">1. Check your email for the password reset link</li>
+                  <li className="mb-1">2. Look for a long code in the reset link (after "token=")</li>
+                  <li className="mb-1">3. Copy that code and paste it above</li>
+                </ol>
+              </div>
             </div>
           )}
           {!tokenValid && !success && (

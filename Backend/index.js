@@ -396,12 +396,12 @@ app.post("/forgot-password", async (req, res) => {
                 Reset Password
               </a>
             </div>
-            <p>If the button doesn't work, you can use this reset token:</p>
+            // <p>If the button doesn't work, you can use this reset token:</p>
             <div style="margin: 20px 0; padding: 15px; background-color: #f5f5f5; border: 1px dashed #ccc; border-radius: 4px;">
               <p style="font-weight: bold; margin-bottom: 5px;">Your Reset Token:</p>
               <p style="font-family: monospace; font-size: 14px; background: #fff; padding: 10px; border: 1px solid #ddd; word-break: break-all;">${resetToken}</p>
             </div>
-            <p>Copy this token and paste it on the reset password page.</p>
+            <h3>Copy this token and paste it on the reset password page.</h3>
             <p>This token will expire in 1 hour.</p>
             <p>If you didn't request a password reset, you can safely ignore this email.</p>
           </div>

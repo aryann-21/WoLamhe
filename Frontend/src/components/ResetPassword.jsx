@@ -6,7 +6,7 @@ import LoginPhoto from "../assets/login.jpg"
 import PasswordIcon from "../assets/password.png"
 import { useUser } from "../context/UserContext"
 import axios from "axios"
-import { Eye, EyeOff, Copy, Check } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 
 const API_BASE_URL = "https://wolamhe-3.onrender.com"
 
@@ -21,7 +21,6 @@ const ResetPassword = () => {
   const [tokenChecked, setTokenChecked] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [copied, setCopied] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation()
@@ -49,7 +48,6 @@ const ResetPassword = () => {
     } else {
       // No token in URL, user needs to paste it manually
       setTokenChecked(true)
-      setError("Reset token is missing. Please paste the token from your email reset link below.")
     }
   }, [location])
 
@@ -86,16 +84,6 @@ const ResetPassword = () => {
       setError(errorMessage)
     } finally {
       setTokenChecked(true)
-    }
-  }
-
-  const copyToClipboard = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error("Failed to copy text: ", err)
     }
   }
 
@@ -225,24 +213,15 @@ const ResetPassword = () => {
           )}
           {!tokenValid && !success && (
             <div className="mt-4 w-full max-w-sm">
-              <p className="text-sm mb-2">Paste the token from your reset email:</p>
-              <div className="flex relative">
+              <p className="text-sm mb-2">Enter your reset token:</p>
+              <div className="flex">
                 <input
                   type="text"
                   placeholder="Paste token here"
-                  className="flex-1 pl-3 pr-10 p-2 rounded-l-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
+                  className="flex-1 pl-3 p-2 rounded-l-full bg-[#2E2210] text-white placeholder-gray-400 focus:outline-none"
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
                 />
-                {token && (
-                  <button
-                    onClick={() => copyToClipboard(token)}
-                    className="absolute right-16 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none p-1"
-                    title="Copy token"
-                  >
-                    {copied ? <Check size={18} /> : <Copy size={18} />}
-                  </button>
-                )}
                 <button
                   onClick={() => {
                     if (token && token.length > 10) {
@@ -255,17 +234,6 @@ const ResetPassword = () => {
                 >
                   Verify
                 </button>
-              </div>
-              <p className="text-xs text-gray-600 mt-1">
-                The token is the long string after "token=" in the reset link you received.
-              </p>
-              <div className="mt-4 mb-2">
-                <p className="text-sm font-semibold">How to find your token:</p>
-                <ol className="text-xs text-left mt-1">
-                  <li className="mb-1">1. Check your email for the password reset link</li>
-                  <li className="mb-1">2. Look for a long code in the reset link (after "token=")</li>
-                  <li className="mb-1">3. Copy that code and paste it above</li>
-                </ol>
               </div>
             </div>
           )}

@@ -26,33 +26,33 @@ const ResetPassword = () => {
   const location = useLocation();
   const { resetPassword } = useUser();
 
-  // useEffect(() => {
-  //   console.log("ResetPassword component mounted");
-  //   console.log("Current location:", location);
+  useEffect(() => {
+    console.log("ResetPassword component mounted");
+    console.log("Current location:", location);
     
-  //   // Clear existing token from localStorage
-  //   localStorage.removeItem("passwordResetToken");
+    // Clear existing token from localStorage
+    localStorage.removeItem("passwordResetToken");
     
-  //   // Get token from URL search params (query string) - SAME AS VERIFY EMAIL
-  //   const query = new URLSearchParams(location.search);
-  //   const tokenFromQuery = query.get("token");
+    // Get token from URL search params (query string) - SAME AS VERIFY EMAIL
+    const query = new URLSearchParams(location.search);
+    const tokenFromQuery = query.get("token");
     
-  //   console.log("URL search params:", location.search);
-  //   console.log("Extracted token:", tokenFromQuery);
+    console.log("URL search params:", location.search);
+    console.log("Extracted token:", tokenFromQuery);
 
-  //   // Check if we have a token in the query string
-  //   if (tokenFromQuery && tokenFromQuery.length > 0) {
-  //     console.log("Token found in query params:", tokenFromQuery);
-  //     setToken(tokenFromQuery);
-  //     verifyToken(tokenFromQuery);
-  //   } else {
-  //     // No token in URL, user needs to paste it manually
-  //     setTokenChecked(true);
-  //     setError(
-  //       "Reset token is missing. Please paste the token from your email reset link below."
-  //     );
-  //   }
-  // }, [location]);
+    // Check if we have a token in the query string
+    if (tokenFromQuery && tokenFromQuery.length > 0) {
+      console.log("Token found in query params:", tokenFromQuery);
+      setToken(tokenFromQuery);
+      verifyToken(tokenFromQuery);
+    } else {
+      // No token in URL, user needs to paste it manually
+      setTokenChecked(true);
+      setError(
+        "Reset token is missing. Please paste the token from your email reset link below."
+      );
+    }
+  }, [location]);
 
   const verifyToken = async (tokenToVerify) => {
     if (!tokenToVerify) {
@@ -258,18 +258,18 @@ const ResetPassword = () => {
                   Verify
                 </button>
               </div>
-              {/* <p className="text-xs text-gray-600 mt-1">
+              <p className="text-xs text-gray-600 mt-1">
                 The token is the long string after "token=" in the reset link
                 you received.
-              </p> */}
-              {/* <div className="mt-4 mb-2">
+              </p>
+              <div className="mt-4 mb-2">
                 <p className="text-sm font-semibold">How to find your token:</p>
                 <ol className="text-xs text-left mt-1">
                   <li className="mb-1">1. Check your email for the password reset link</li>
                   <li className="mb-1">2. Look for a long code in the reset link (after "token=")</li>
                   <li className="mb-1">3. Copy that code and paste it above</li>
                 </ol>
-              </div> */}
+              </div>
             </div>
           )}
           {!tokenValid && !success && (

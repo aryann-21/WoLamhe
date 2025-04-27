@@ -1069,6 +1069,90 @@ app.post("/api/orders", async (req, res) => {
     await order.save()
     console.log("Order saved successfully:", order._id)
 
+    // Send email notification to admin
+    try {
+      const nodemailer = require("nodemailer")
+
+      // Create transporter
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      })
+
+      // Get user details
+      const userDetails = await User.findById(userId).select("name email phone")
+
+      // Format products list with links
+      const productsList = parsedProducts
+        .map((product) => {
+          return `
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #ddd;">${product.name}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #ddd;">₹${product.price}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #ddd;">
+              ${product.imageUrl ? `<a href="${product.imageUrl}" target="_blank">View Image</a>` : "No image"}
+            </td>
+          </tr>
+        `
+        })
+        .join("")
+
+      // Email content
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: process.env.ADMIN_EMAIL,
+        subject: `New Order Placed - Order #${order._id}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+            <h2 style="color: #65350f; text-align: center;">New Order Notification</h2>
+            <p>A new order has been placed on your website.</p>
+            
+            <h3 style="margin-top: 20px; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px;">Order Details</h3>
+            <p><strong>Order ID:</strong> ${order._id}</p>
+            <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+            <p><strong>Total Amount:</strong> ₹${total}</p>
+            
+            <h3 style="margin-top: 20px; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px;">Customer Information</h3>
+            <p><strong>Name:</strong> ${userDetails.name}</p>
+            <p><strong>Email:</strong> ${userDetails.email}</p>
+            <p><strong>Phone:</strong> ${userDetails.phone}</p>
+            <p><strong>Delivery Address:</strong> ${deliveryAddress}</p>
+            
+            <h3 style="margin-top: 20px; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px;">Products Ordered</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background-color: #f5f5f5;">
+                  <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Product</th>
+                  <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Price</th>
+                  <th style="padding: 10px; text-align: left; border-bottom: 1px solid #ddd;">Image Link</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${productsList}
+              </tbody>
+            </table>
+            
+            <h3 style="margin-top: 20px; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px;">Payment Proof</h3>
+            <p><a href="${paymentProof}" target="_blank">View Payment Screenshot</a></p>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #777;">
+              <p>This is an automated email notification from your e-commerce system.</p>
+            </div>
+          </div>
+        `,
+      }
+
+      // Send email
+      await transporter.sendMail(mailOptions)
+      console.log("Admin notification email sent successfully")
+    } catch (emailError) {
+      // Log error but don't fail the order process
+      console.error("Error sending admin notification email:", emailError)
+    }
+
     res.status(201).json({ message: "Order placed successfully", orderId: order._id })
   } catch (error) {
     console.error("Order Creation Error:", error)
@@ -1091,4 +1175,3 @@ app.get("/api/orders/:userId", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
-

@@ -57,7 +57,7 @@ const SignUpPage = () => {
 
       if (result.success) {
         setSuccess(
-          "Yay! 🎉 Your email’s on its way! 🚀 Check your spam folder if it’s playing hide and seek! ✨",
+          "Yay! 🎉 Your email’s on its way! 🚀 Give it a moment, and check your spam folder if it’s playing hide and seek! ✨",
         )
         // Clear form
         setName("")
@@ -91,8 +91,7 @@ const SignUpPage = () => {
 
           {success && (
             <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4 w-full max-w-sm">
-              Woohoo! Email verification on its way! 🚀 It might be taking a coffee break in your spam folder, so peek
-              there too if you don't see it soon. The internet can be a maze sometimes! ✉️
+              Yay! 🎉 Your email’s on its way! 🚀 Give it a moment, and check your spam folder if it’s playing hide and seek! ✨
             </div>
           )}
 

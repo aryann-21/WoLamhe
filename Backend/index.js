@@ -79,65 +79,55 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  // Fix: Use your actual backend URL
-  callbackURL: "https://wolamhe-3.onrender.com/auth/google/callback",
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://wolamhe-3.onrender.com/auth/google/callback",
 }, async (accessToken, refreshToken, profile, done) => {
   try {
+    console.log("[GOOGLE OAUTH] Google profile:", profile);
     let user = await User.findOne({ googleId: profile.id })
+    console.log("[GOOGLE OAUTH] User found in DB:", user);
     if (!user) {
-      // Check if user exists with same email
-      user = await User.findOne({ email: profile.emails[0].value })
-      if (user) {
-        // Link Google account to existing user
-        user.googleId = profile.id
-        user.isVerified = true
-        await user.save()
-      } else {
-        // Create new user
-        user = new User({
-          name: profile.displayName,
-          email: profile.emails[0].value,
-          googleId: profile.id,
-          isVerified: true,
-          phone: '', // Optional for Google users
-          password: '' // Not needed for Google users
-        })
-        await user.save()
-      }
+      // Create new user
+      user = new User({
+        name: profile.displayName,
+        email: profile.emails[0].value,
+        googleId: profile.id,
+        isVerified: true,
+      })
+      await user.save()
+      console.log("[GOOGLE OAUTH] New user created:", user);
     }
     return done(null, user)
   } catch (err) {
-    console.error('Google OAuth Error:', err)
+    console.error("[GOOGLE OAUTH] Error in strategy:", err);
     return done(err, null)
   }
 }))
 
 // Google OAuth routes
-app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }))
+app.get("/auth/google", (req, res, next) => {
+  console.log("[GOOGLE OAUTH] /auth/google called");
+  next();
+}, passport.authenticate("google", { scope: ["profile", "email"] }))
 
-app.get("/auth/google/callback", 
-  passport.authenticate("google", { failureRedirect: "https://wolamhe-4.onrender.com/login?error=oauth_failed" }), 
-  (req, res) => {
-    try {
-      if (!req.user) {
-        return res.redirect("https://wolamhe-4.onrender.com/login?error=no_user")
-      }
-      
-      const token = jwt.sign(
-        { userId: req.user._id }, 
-        process.env.JWT_SECRET || "fallback_secret_key", 
-        { expiresIn: "24h" }
-      )
-      
-      // Use your actual frontend URL
-      const frontendUrl = "https://wolamhe-4.onrender.com"
-      res.redirect(`${frontendUrl}/google-auth-success?token=${token}`)
-    } catch (error) {
-      console.error('OAuth callback error:', error)
-      res.redirect("https://wolamhe-4.onrender.com/login?error=oauth_callback_failed")
+app.get("/auth/google/callback", (req, res, next) => {
+  console.log("[GOOGLE OAUTH] /auth/google/callback called");
+  next();
+}, passport.authenticate("google", { failureRedirect: "/login" }), (req, res) => {
+  try {
+    if (!req.user) {
+      console.log("[GOOGLE OAUTH] No user after callback");
+      return res.status(500).send("No user found after Google OAuth")
     }
+    console.log("[GOOGLE OAUTH] User after callback:", req.user);
+    const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET || "fallback_secret_key", { expiresIn: "1h" })
+    console.log("[GOOGLE OAUTH] JWT token generated:", token);
+    const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    res.redirect(`${frontendUrl}/google-auth-success?token=${token}`)
+  } catch (error) {
+    console.error('[GOOGLE OAUTH] Error in callback handler:', error);
+    res.status(500).send("OAuth callback error")
   }
-)
+})
 
 // Middleware
 app.use(express.json())
@@ -584,12 +574,16 @@ app.post("/reset-password", async (req, res) => {
 app.get("/api/user", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1]
+    console.log("[API USER] Received token:", token);
     if (!token) {
+      console.log("[API USER] No token provided");
       return res.status(401).json({ message: "No token provided" })
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key")
+    console.log("[API USER] Decoded JWT:", decoded);
     const user = await User.findById(decoded.userId).select("-password")
+    console.log("[API USER] User found:", user);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" })
@@ -602,6 +596,7 @@ app.get("/api/user", async (req, res) => {
 
     res.json(userObj)
   } catch (error) {
+    console.error("[API USER] Error:", error)
     res.status(401).json({ message: "Invalid token" })
   }
 })

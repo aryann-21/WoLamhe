@@ -189,10 +189,10 @@ app.post("/signup", async (req, res) => {
     console.log("Registration data stored with token:", registrationToken)
 
     // Send verification email
-    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173"
 
     // Use the token directly for verification
-    const backendUrl = process.env.BACKEND_URL || "https://wolamhe-3.onrender.com"
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:5001"
     const verificationLink = `${backendUrl}/verify-email?token=${registrationToken}`
 
     // Send email with the verification link
@@ -279,7 +279,7 @@ app.get("/verify-email", async (req, res) => {
       await Token.deleteOne({ _id: tokenDoc._id })
 
       // Redirect to frontend with success message
-      const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
       res.redirect(`${frontendUrl}/login?verified=true`)
       return
     }
@@ -302,7 +302,7 @@ app.get("/verify-email", async (req, res) => {
       await Token.deleteOne({ _id: tokenDoc._id })
 
       // Redirect to frontend with success message
-      const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
       res.redirect(`${frontendUrl}/login?verified=true`)
       return
     }
@@ -343,7 +343,7 @@ app.post("/resend-verification", async (req, res) => {
     })
 
     // Send new verification email
-    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173"
     const emailResult = await sendVerificationEmail(user, baseUrl)
 
     if (!emailResult.success) {
@@ -441,7 +441,7 @@ app.post("/forgot-password", async (req, res) => {
     }).save()
 
     // Create reset URL
-    const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
     const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`
 
     // Send email with reset link

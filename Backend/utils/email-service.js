@@ -28,7 +28,7 @@ const sendVerificationEmail = async (user, baseUrl) => {
     }).save()
 
     // Create a verification URL that points to the backend API endpoint
-    const backendUrl = process.env.BACKEND_URL || "https://wolamhe-3.onrender.com"
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:5001"
     const verificationLink = `${backendUrl}/verify-email?token=${token}`
     
     // URL to the frontend page that will show a verification message
@@ -103,7 +103,7 @@ const sendVerificationEmail = async (user, baseUrl) => {
     }).save()
 
     // Create a verification URL that points to the backend API endpoint
-    const backendUrl = process.env.BACKEND_URL || "https://wolamhe-3.onrender.com"
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:5001"
     const verificationLink = `${backendUrl}/verify-email?token=${token}`
 
     // URL to the frontend page that will show a verification message

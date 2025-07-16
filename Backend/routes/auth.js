@@ -42,7 +42,7 @@ router.get("/verify-email", async (req, res) => {
     await Token.deleteOne({ _id: tokenDoc._id })
 
     // Redirect to frontend with success message
-    res.redirect(`${process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"}/login?verified=true`)
+    res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/login?verified=true`)
   } catch (error) {
     console.error("Verification Error:", error)
     res.status(500).json({ message: "Error verifying email", error: error.message })
@@ -75,7 +75,7 @@ router.post("/resend-verification", async (req, res) => {
     })
 
     // Send new verification email
-    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173"
     const emailResult = await sendVerificationEmail(user, baseUrl)
 
     if (!emailResult.success) {

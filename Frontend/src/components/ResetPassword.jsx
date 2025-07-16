@@ -8,7 +8,7 @@ import { useUser } from "../context/UserContext";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 
-const API_BASE_URL = "https://wolamhe-3.onrender.com";
+const API_BASE_URL = "http://localhost:5001";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");

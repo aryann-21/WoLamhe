@@ -7,7 +7,7 @@ import EmailIcon from "../assets/email.png";
 import PasswordIcon from "../assets/password.png";
 import axios from "axios";
 
-const API_BASE_URL = "https://wolamhe-4.onrender.com";
+const API_BASE_URL = "https://wolamhe-3.onrender.com";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");

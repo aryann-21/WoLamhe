@@ -35,7 +35,7 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
 // CORS configuration - restrict to frontend deployment URL
 app.use(cors({
   origin: [
-    'https://wolamhe-4.onrender.com',  // Your frontend (correct)
+    'https://www.wolamhe.in',  // Your frontend (correct)
     'https://wolamhe-3.onrender.com',  // Your backend (fixed)
     'https://accounts.google.com',     // Google OAuth
     'https://oauth2.googleapis.com'    // Google OAuth
@@ -121,7 +121,7 @@ app.get("/auth/google/callback", (req, res, next) => {
     console.log("[GOOGLE OAUTH] User after callback:", req.user);
     const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET || "fallback_secret_key", { expiresIn: "1h" })
     console.log("[GOOGLE OAUTH] JWT token generated:", token);
-    const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const frontendUrl = process.env.FRONTEND_URL || "https://www.wolamhe.in"
     res.redirect(`${frontendUrl}/google-auth-success?token=${token}`)
   } catch (error) {
     console.error('[GOOGLE OAUTH] Error in callback handler:', error);
@@ -209,10 +209,10 @@ app.post("/signup", async (req, res) => {
     await tokenDoc.save()
 
     // Send verification email
-    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const baseUrl = process.env.FRONTEND_URL || "https://www.wolamhe.in"
 
     // Use the token directly for verification
-    const backendUrl = process.env.BACKEND_URL || "https://wolamhe-4.onrender.com"
+    const backendUrl = process.env.BACKEND_URL || "https://www.wolamhe.in"
     const verificationLink = `${backendUrl}/verify-email?token=${registrationToken}`
 
     // Send email with the verification link
@@ -295,7 +295,7 @@ app.get("/verify-email", async (req, res) => {
       await Token.deleteOne({ _id: tokenDoc._id })
 
       // Redirect to frontend with success message
-      const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+      const frontendUrl = process.env.FRONTEND_URL || "https://www.wolamhe.in"
       res.redirect(`${frontendUrl}/login?verified=true`)
       return
     }
@@ -317,7 +317,7 @@ app.get("/verify-email", async (req, res) => {
       await Token.deleteOne({ _id: tokenDoc._id })
 
       // Redirect to frontend with success message
-      const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+      const frontendUrl = process.env.FRONTEND_URL || "https://www.wolamhe.in"
       res.redirect(`${frontendUrl}/login?verified=true`)
       return
     }
@@ -358,7 +358,7 @@ app.post("/resend-verification", async (req, res) => {
     })
 
     // Send new verification email
-    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const baseUrl = process.env.FRONTEND_URL || "https://www.wolamhe.in"
     const emailResult = await sendVerificationEmail(user, baseUrl)
 
     if (!emailResult.success) {
@@ -455,7 +455,7 @@ app.post("/forgot-password", async (req, res) => {
     }).save()
 
     // Create reset URL
-    const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+    const frontendUrl = process.env.FRONTEND_URL || "https://www.wolamhe.in"
     const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`
 
     // Send email with reset link

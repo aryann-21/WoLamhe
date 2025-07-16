@@ -17,7 +17,7 @@ import {
 import axios from "axios";
 
 // Create a consistent base URL
-const API_BASE_URL = "https://wolamhe-4.onrender.com";
+const API_BASE_URL = "https://wolamhe-3.onrender.com";
 
 const ProfilePage = () => {
   const { user, updateUser } = useUser();

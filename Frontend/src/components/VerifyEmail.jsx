@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Define API_BASE_URL directly instead of importing from config
-const API_BASE_URL = "https://wolamhe-4.onrender.com";
+const API_BASE_URL = "https://wolamhe-3.onrender.com";
 
 const VerifyEmail = () => {
   const [status, setStatus] = useState("verifying");

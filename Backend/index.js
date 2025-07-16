@@ -35,7 +35,8 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
 // CORS configuration - restrict to frontend deployment URL
 app.use(cors({
   origin: [
-    'https://wolamhe-4.onrender.com',  // Your frontend
+    'https://wolamhe-4.onrender.com',  // Your frontend (correct)
+    'https://wolamhe-3.onrender.com',  // Your backend (fixed)
     'https://accounts.google.com',     // Google OAuth
     'https://oauth2.googleapis.com'    // Google OAuth
   ],
@@ -45,6 +46,7 @@ app.use(cors({
   preflightContinue: false,
   optionsSuccessStatus: 204
 }))
+
 
 app.options('*', cors())
 
@@ -77,7 +79,8 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://wolamhe-3.onrender.com/auth/google/callback",
+  // Fix: Use your actual backend URL
+  callbackURL: "https://wolamhe-3.onrender.com/auth/google/callback",
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ googleId: profile.id })
@@ -126,7 +129,8 @@ app.get("/auth/google/callback",
         { expiresIn: "24h" }
       )
       
-      const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+      // Use your actual frontend URL
+      const frontendUrl = "https://wolamhe-4.onrender.com"
       res.redirect(`${frontendUrl}/google-auth-success?token=${token}`)
     } catch (error) {
       console.error('OAuth callback error:', error)

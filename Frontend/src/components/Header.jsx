@@ -221,16 +221,16 @@ const Header = ({ polaroidsRef, postcardsRef, wallPostersRef, squarePrintsRef, p
             <div className="space-x-2 md:space-x-4">
               <Link
                 to="/login"
-                className="px-3 py-1.5 text-sm md:text-base text-[#2E2210] hover:bg-[#d6cbb9] rounded-md transition-colors"
+                className="px-5 py-1.5 text-sm md:text-base bg-[#2E2210] text-[#EDE8E0] hover:bg-[#5c4421] rounded-md transition-colors"
               >
                 Login
               </Link>
-              <Link
+              {/* <Link
                 to="/signup"
                 className="px-3 py-1.5 text-sm md:text-base bg-[#2E2210] text-[#EDE8E0] hover:bg-[#5c4421] rounded-md transition-colors"
               >
                 Sign Up
-              </Link>
+              </Link> */}
             </div>
           )}
         </div>

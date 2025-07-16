@@ -124,6 +124,10 @@ const OrderPage = () => {
     try {
       setIsProcessing(true)
 
+      // Debug log
+      console.log('OrderPage: user object before placing order:', user)
+      console.log('OrderPage: user.id before placing order:', user && user.id)
+
       if (!user || !user.id) {
         toast.error("Please login to place an order")
         return

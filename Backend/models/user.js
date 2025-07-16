@@ -17,17 +17,22 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: [true, "Phone number is required"],
+      required: false, // Made optional for Google OAuth
       trim: true,
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: false, // Made optional for Google OAuth
       minlength: [6, "Password must be at least 6 characters long"],
     },
     isVerified: {
       type: Boolean,
       default: false,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
     createdAt: {
       type: Date,

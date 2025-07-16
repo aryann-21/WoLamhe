@@ -21,6 +21,7 @@ import ProfilePage from "./components/ProfilePage";
 import VerifyEmail from "./components/VerifyEmail";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
+import GoogleAuthSuccess from "./components/GoogleAuthSuccess"
 
 const App = () => {
   const polaroidsRef = useRef(null);
@@ -101,6 +102,7 @@ const App = () => {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/google-auth-success" element={<GoogleAuthSuccess />} />
           </Routes>
           <Footer />
         </div>

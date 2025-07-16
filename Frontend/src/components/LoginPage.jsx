@@ -67,6 +67,11 @@ const LoginPage = () => {
     }
   }
 
+  const handleGoogleLogin = () => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5001"
+    window.location.href = `${backendUrl}/auth/google`
+  }
+
   return (
     <div className="bg-[#faf5f0] flex justify-center p-4 mt-[108px]">
       <div className="flex flex-col md:flex-row bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-full max-w-4xl">
@@ -143,6 +148,14 @@ const LoginPage = () => {
               {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
+          <button
+            onClick={handleGoogleLogin}
+            className="bg-white text-[#65350f] border border-[#65350f] px-6 py-2 rounded-full w-full mt-4 hover:bg-[#f6e7d8] transition duration-150 flex items-center justify-center gap-2"
+            type="button"
+          >
+            <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><g clipPath="url(#clip0_17_40)"><path d="M47.532 24.552c0-1.636-.146-3.2-.418-4.704H24.48v9.12h12.98c-.56 3.008-2.24 5.552-4.768 7.264v6.032h7.712c4.52-4.168 7.128-10.304 7.128-17.712z" fill="#4285F4"/><path d="M24.48 48c6.48 0 11.92-2.144 15.888-5.824l-7.712-6.032c-2.144 1.44-4.88 2.288-8.176 2.288-6.288 0-11.616-4.248-13.528-9.968H2.56v6.208C6.512 43.888 14.624 48 24.48 48z" fill="#34A853"/><path d="M10.952 28.464A14.98 14.98 0 0 1 9.12 24c0-1.552.272-3.056.768-4.464v-6.208H2.56A23.98 23.98 0 0 0 0 24c0 3.872.928 7.52 2.56 10.672l8.392-6.208z" fill="#FBBC05"/><path d="M24.48 9.52c3.528 0 6.656 1.216 9.136 3.584l6.832-6.832C36.392 2.144 30.96 0 24.48 0 14.624 0 6.512 4.112 2.56 13.328l8.392 6.208c1.912-5.72 7.24-9.968 13.528-9.968z" fill="#EA4335"/></g><defs><clipPath id="clip0_17_40"><path fill="#fff" d="M0 0h48v48H0z"/></clipPath></defs></svg>
+            Sign in with Google
+          </button>
           <p className="mt-6 md:mt-8 text-sm text-gray-700">
             Not already a user?{" "}
             <Link to="/signup" className="text-[#2E2210] font-semibold underline">

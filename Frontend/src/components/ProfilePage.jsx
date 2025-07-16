@@ -1,91 +1,105 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useUser } from "../context/UserContext"
-import { Edit2, Save, Package, Calendar, DollarSign, ShoppingBag, Loader, UserIcon, Phone, Mail } from "lucide-react"
-import axios from "axios"
+import { useState, useEffect } from "react";
+import { useUser } from "../context/UserContext";
+import {
+  Edit2,
+  Save,
+  Package,
+  Calendar,
+  DollarSign,
+  ShoppingBag,
+  Loader,
+  UserIcon,
+  Phone,
+  Mail,
+} from "lucide-react";
+import axios from "axios";
 
 // Create a consistent base URL
-const API_BASE_URL = "http://localhost:5001"
+const API_BASE_URL = "https://wolamhe-4.onrender.com";
 
 const ProfilePage = () => {
-  const { user, updateUser } = useUser()
+  const { user, updateUser } = useUser();
   const [editMode, setEditMode] = useState({
     name: false,
     phone: false,
-  })
-  const [editedUser, setEditedUser] = useState({ ...user })
-  const [orders, setOrders] = useState([])
-  const [loading, setLoading] = useState(true)
+  });
+  const [editedUser, setEditedUser] = useState({ ...user });
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState({
     name: false,
     phone: false,
-  })
+  });
 
   useEffect(() => {
     if (user) {
-      setEditedUser({ ...user })
-      fetchOrders()
+      setEditedUser({ ...user });
+      fetchOrders();
     }
-  }, [user])
+  }, [user]);
 
   const fetchOrders = async () => {
     try {
-      setLoading(true)
-      const token = localStorage.getItem("token")
-      if (!token || !user?.id) return
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      if (!token || !user?.id) return;
 
-      const response = await axios.get(`${API_BASE_URL}/api/orders/${user.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await axios.get(
+        `${API_BASE_URL}/api/orders/${user.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      setOrders(response.data)
+      setOrders(response.data);
     } catch (error) {
-      console.error("Error fetching orders:", error)
+      console.error("Error fetching orders:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleEdit = (field) => {
     // Only allow editing for name and phone
     if (field !== "email") {
-      setEditMode({ ...editMode, [field]: true })
+      setEditMode({ ...editMode, [field]: true });
     }
-  }
+  };
 
   const handleSave = async (field) => {
     try {
-      setUpdating({ ...updating, [field]: true })
+      setUpdating({ ...updating, [field]: true });
       // Use the updateUser function from UserContext
-      const result = await updateUser({ [field]: editedUser[field] })
+      const result = await updateUser({ [field]: editedUser[field] });
 
       if (result.success) {
-        setEditMode({ ...editMode, [field]: false })
+        setEditMode({ ...editMode, [field]: false });
       }
     } catch (error) {
-      console.error("Error updating user:", error)
+      console.error("Error updating user:", error);
     } finally {
-      setUpdating({ ...updating, [field]: false })
+      setUpdating({ ...updating, [field]: false });
     }
-  }
+  };
 
   const handleChange = (e, field) => {
-    setEditedUser({ ...editedUser, [field]: e.target.value })
-  }
+    setEditedUser({ ...editedUser, [field]: e.target.value });
+  };
 
   const getFieldIcon = (field) => {
     switch (field) {
       case "name":
-        return <UserIcon className="w-5 h-5 text-[#6b543d]" />
+        return <UserIcon className="w-5 h-5 text-[#6b543d]" />;
       case "phone":
-        return <Phone className="w-5 h-5 text-[#6b543d]" />
+        return <Phone className="w-5 h-5 text-[#6b543d]" />;
       case "email":
-        return <Mail className="w-5 h-5 text-[#6b543d]" />
+        return <Mail className="w-5 h-5 text-[#6b543d]" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   if (!user) {
     return (
@@ -95,7 +109,7 @@ const ProfilePage = () => {
           <p className="text-[#2E2210] font-medium">Loading your profile...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -133,18 +147,28 @@ const ProfilePage = () => {
                           autoFocus
                         />
                       ) : (
-                        <span className="text-lg text-gray-700 py-1">{user[field]}</span>
+                        <span className="text-lg text-gray-700 py-1">
+                          {user[field]}
+                        </span>
                       )}
 
                       {field !== "email" && (
                         <button
-                          onClick={() => (editMode[field] ? handleSave(field) : handleEdit(field))}
+                          onClick={() =>
+                            editMode[field]
+                              ? handleSave(field)
+                              : handleEdit(field)
+                          }
                           disabled={updating[field]}
                           className={`ml-2 px-3 py-1.5 rounded-md flex items-center transition-all duration-200 ${
                             editMode[field]
                               ? "bg-[#2E2210] text-white hover:bg-[#5c4421]"
                               : "text-[#2E2210] hover:bg-[#ebe1d2]"
-                          } ${updating[field] ? "opacity-70 cursor-not-allowed" : ""}`}
+                          } ${
+                            updating[field]
+                              ? "opacity-70 cursor-not-allowed"
+                              : ""
+                          }`}
                         >
                           {updating[field] ? (
                             <Loader className="w-4 h-4 mr-1 animate-spin" />
@@ -153,7 +177,9 @@ const ProfilePage = () => {
                           ) : (
                             <Edit2 className="w-4 h-4 mr-1" />
                           )}
-                          <span className="text-sm">{editMode[field] ? "Save" : "Edit"}</span>
+                          <span className="text-sm">
+                            {editMode[field] ? "Save" : "Edit"}
+                          </span>
                         </button>
                       )}
                     </div>
@@ -202,18 +228,24 @@ const ProfilePage = () => {
                               <ShoppingBag className="w-4 h-4 mr-2 text-[#6b543d]" />
                               <span className="font-semibold">Products:</span>
                               <span className="ml-1 line-clamp-1">
-                                {order.products.map((product) => product.name).join(", ").substring(0, 30)}
+                                {order.products
+                                  .map((product) => product.name)
+                                  .join(", ")
+                                  .substring(0, 30)}
                               </span>
                             </p>
                             <p className="text-gray-700 flex items-center">
                               <Calendar className="w-4 h-4 mr-2 text-[#6b543d]" />
                               <span className="font-semibold">Date:</span>
                               <span className="ml-1">
-                                {new Date(order.createdAt).toLocaleDateString("en-US", {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                })}
+                                {new Date(order.createdAt).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  }
+                                )}
                               </span>
                             </p>
                           </div>
@@ -222,7 +254,9 @@ const ProfilePage = () => {
                             <p className="text-gray-700 flex items-center">
                               {/* <DollarSign className="w-4 h-4 mr-2 text-[#6b543d]" /> */}
                               <span className="font-medium">Total:</span>
-                              <span className="ml-1 font-semibold text-[#2E2210]">₹{order.total.toFixed(2)}</span>
+                              <span className="ml-1 font-semibold text-[#2E2210]">
+                                ₹{order.total.toFixed(2)}
+                              </span>
                             </p>
                             {/* <button className="text-[#2E2210] hover:text-[#C4A381] transition-colors text-sm font-medium underline">
                               View Details
@@ -234,9 +268,12 @@ const ProfilePage = () => {
                   ) : (
                     <div className="text-center py-12 bg-[#FDF6F0] rounded-lg border border-dashed border-[#C4A381]">
                       <Package className="w-16 h-16 text-[#C4A381] mx-auto mb-4 opacity-70" />
-                      <h3 className="text-xl font-medium text-[#2E2210] mb-2">No Orders Yet</h3>
+                      <h3 className="text-xl font-medium text-[#2E2210] mb-2">
+                        No Orders Yet
+                      </h3>
                       <p className="text-[#6b543d] max-w-md mx-auto mb-4">
-                        Your order history will appear here once you make a purchase.
+                        Your order history will appear here once you make a
+                        purchase.
                       </p>
                       <button
                         className="px-4 py-2 bg-[#2E2210] text-white rounded-md hover:bg-[#5c4421] transition-colors"
@@ -253,7 +290,7 @@ const ProfilePage = () => {
         </div>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default ProfilePage
+export default ProfilePage;

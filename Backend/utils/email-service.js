@@ -19,7 +19,7 @@ const sendVerificationEmail = async (user, baseUrl) => {
       token: token,
       type: "verification",
     }).save()
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:5001"
+    const backendUrl = process.env.BACKEND_URL || "https://wolamhe-4.onrender.com"
     const verificationLink = `${backendUrl}/verify-email?token=${token}`
     const verificationUrl = `${baseUrl}/verify-email?token=${token}`
     const msg = {

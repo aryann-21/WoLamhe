@@ -73,7 +73,7 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL || "http://localhost:5001/auth/google/callback",
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://wolamhe-4.onrender.com/auth/google/callback",
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ googleId: profile.id })
@@ -102,7 +102,7 @@ app.get("/auth/google/callback", passport.authenticate("google", { failureRedire
     return res.status(500).send("No user found after Google OAuth")
   }
   const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET || "fallback_secret_key", { expiresIn: "1h" })
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+  const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
   res.redirect(`${frontendUrl}/google-auth-success?token=${token}`)
 })
 
@@ -186,10 +186,10 @@ app.post("/signup", async (req, res) => {
     await tokenDoc.save()
 
     // Send verification email
-    const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
 
     // Use the token directly for verification
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:5001"
+    const backendUrl = process.env.BACKEND_URL || "https://wolamhe-4.onrender.com"
     const verificationLink = `${backendUrl}/verify-email?token=${registrationToken}`
 
     // Send email with the verification link
@@ -272,7 +272,7 @@ app.get("/verify-email", async (req, res) => {
       await Token.deleteOne({ _id: tokenDoc._id })
 
       // Redirect to frontend with success message
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+      const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
       res.redirect(`${frontendUrl}/login?verified=true`)
       return
     }
@@ -294,7 +294,7 @@ app.get("/verify-email", async (req, res) => {
       await Token.deleteOne({ _id: tokenDoc._id })
 
       // Redirect to frontend with success message
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+      const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
       res.redirect(`${frontendUrl}/login?verified=true`)
       return
     }
@@ -335,7 +335,7 @@ app.post("/resend-verification", async (req, res) => {
     })
 
     // Send new verification email
-    const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+    const baseUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
     const emailResult = await sendVerificationEmail(user, baseUrl)
 
     if (!emailResult.success) {
@@ -432,7 +432,7 @@ app.post("/forgot-password", async (req, res) => {
     }).save()
 
     // Create reset URL
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+    const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
     const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`
 
     // Send email with reset link

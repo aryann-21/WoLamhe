@@ -8,7 +8,7 @@ import { useUser } from "../context/UserContext";
 import axios from "axios";
 import { Eye, EyeOff } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:5001";
+const API_BASE_URL = "https://wolamhe-4.onrender.com";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -229,8 +229,12 @@ const ResetPassword = () => {
               <div className="mt-4 mb-2">
                 <p className="text-sm font-semibold">How to find your token:</p>
                 <ol className="text-xs text-left mt-1">
-                  <li className="mb-1">1. Check your email for the password reset link</li>
-                  <li className="mb-1">2. Look for a long code in the reset link (after "token=")</li>
+                  <li className="mb-1">
+                    1. Check your email for the password reset link
+                  </li>
+                  <li className="mb-1">
+                    2. Look for a long code in the reset link (after "token=")
+                  </li>
                   <li className="mb-1">3. Copy that code and paste it above</li>
                 </ol>
               </div>

@@ -15,29 +15,16 @@ const VerifyEmail = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log("VerifyEmail component mounted")
-    console.log("Current location:", location)
-
-    // Get the token from URL
     const query = new URLSearchParams(location.search)
     const token = query.get("token")
     const verified = query.get("verified")
-
-    console.log("URL search params:", location.search)
-    console.log("Extracted token:", token)
-    console.log("Verified status:", verified)
-
-    // If we're redirected back with verified=true, show success
     if (verified === "true") {
       setStatus("success")
       return
     }
-
-    // Check if we have a token
     if (token && token.length > 0) {
       verifyEmail(token)
     } else {
-      // For users who navigate directly to this page without a token
       setStatus("needsToken")
       setMessage("Please enter your email to receive a verification link.")
     }
@@ -45,24 +32,13 @@ const VerifyEmail = () => {
 
   const verifyEmail = async (token) => {
     try {
-      console.log("Verifying email with token:", token)
-      // Make request to backend verification endpoint
       const response = await axios.get(`${API_BASE_URL}/verify-email?token=${token}`)
-      console.log("Verification response:", response)
-
       setStatus("success")
       setTimeout(() => {
         navigate("/login?verified=true")
       }, 3000)
     } catch (error) {
-      console.error("Verification error:", error)
       setStatus("error")
-
-      // Extract the error message
-      const errorMessage =
-        error.response?.data?.message || "Failed to verify your email. The link may have expired or is invalid."
-
-      setMessage(errorMessage)
     }
   }
 
@@ -76,13 +52,10 @@ const VerifyEmail = () => {
 
     try {
       setStatus("sending")
-      console.log("Resending verification to:", email)
       const response = await axios.post(`${API_BASE_URL}/resend-verification`, { email })
-      console.log("Resend response:", response)
       setStatus("resent")
       setMessage("Verification email has been resent. Please check your inbox.")
     } catch (error) {
-      console.error("Resend verification error:", error)
       setMessage(error.response?.data?.message || "Failed to resend verification email. Please try again later.")
       setStatus("error")
     }

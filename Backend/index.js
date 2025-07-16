@@ -98,7 +98,6 @@ passport.use(new GoogleStrategy({
 app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }))
 
 app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/login" }), (req, res) => {
-  console.log("Google OAuth callback hit. req.user:", req.user)
   if (!req.user) {
     return res.status(500).send("No user found after Google OAuth")
   }
@@ -152,7 +151,6 @@ app.get("/", (req, res) => {
 // Replace the existing signup route with this implementation
 app.post("/signup", async (req, res) => {
   try {
-    console.log("Signup request received:", req.body)
 
     const { name, email, phone, password } = req.body
 
@@ -186,7 +184,6 @@ app.post("/signup", async (req, res) => {
     })
 
     await tokenDoc.save()
-    console.log("Registration data stored with token:", registrationToken)
 
     // Send verification email
     const baseUrl = process.env.FRONTEND_URL || "http://localhost:5173"
@@ -222,7 +219,6 @@ app.post("/signup", async (req, res) => {
       }
 
       await sgMail.send(msg)
-      console.log("Verification email sent to:", email)
     } else {
       console.error("SendGrid API key not configured")
       return res.status(500).json({ message: "Email service not configured" })
@@ -241,7 +237,6 @@ app.post("/signup", async (req, res) => {
 app.get("/verify-email", async (req, res) => {
   try {
     const { token } = req.query
-    console.log("Received verification request with token:", token)
 
     if (!token) {
       return res.status(400).json({ message: "Verification token is required" })
@@ -253,7 +248,6 @@ app.get("/verify-email", async (req, res) => {
     })
 
     if (!tokenDoc) {
-      console.log("Token not found in database:", token)
       return res.status(400).json({
         message: "Invalid or expired verification token. Please register again.",
       })
@@ -273,7 +267,6 @@ app.get("/verify-email", async (req, res) => {
       })
 
       await user.save()
-      console.log("User registered and verified successfully:", user.email)
 
       // Delete the used token
       await Token.deleteOne({ _id: tokenDoc._id })
@@ -296,7 +289,6 @@ app.get("/verify-email", async (req, res) => {
       // Update user verification status
       user.isVerified = true
       await user.save()
-      console.log("User verified successfully:", user.email)
 
       // Delete the used token
       await Token.deleteOne({ _id: tokenDoc._id })
@@ -360,7 +352,6 @@ app.post("/resend-verification", async (req, res) => {
 // User login route with verification check
 app.post("/login", async (req, res) => {
   try {
-    console.log("Login request received:", req.body)
 
     const { email, password } = req.body
 
@@ -489,7 +480,6 @@ app.post("/forgot-password", async (req, res) => {
 app.get("/verify-reset-token", async (req, res) => {
   try {
     const { token } = req.query
-    console.log("Verifying reset token:", token)
 
     if (!token) {
       return res.status(400).json({ message: "Token is required", valid: false })
@@ -502,11 +492,9 @@ app.get("/verify-reset-token", async (req, res) => {
     })
 
     if (!tokenDoc) {
-      console.log("Token not found:", token)
       return res.status(400).json({ message: "Invalid or expired token", valid: false })
     }
 
-    console.log("Token found and valid:", tokenDoc)
     res.status(200).json({ valid: true })
   } catch (error) {
     console.error("Token verification error:", error)
@@ -518,7 +506,6 @@ app.get("/verify-reset-token", async (req, res) => {
 app.post("/reset-password", async (req, res) => {
   try {
     const { token, password } = req.body
-    console.log("Reset password request received with token:", token)
 
     if (!token || !password) {
       return res.status(400).json({ message: "Token and password are required" })
@@ -531,7 +518,6 @@ app.post("/reset-password", async (req, res) => {
     })
 
     if (!tokenDoc) {
-      console.log("Token not found for reset:", token)
       return res.status(400).json({ message: "Invalid or expired token" })
     }
 
@@ -547,7 +533,6 @@ app.post("/reset-password", async (req, res) => {
     // Update user's password
     user.password = hashedPassword
     await user.save()
-    console.log("Password reset successful for user:", user.email)
 
     // Delete the used token
     await Token.deleteOne({ _id: tokenDoc._id })
@@ -581,7 +566,6 @@ app.get("/api/user", async (req, res) => {
 
     res.json(userObj)
   } catch (error) {
-    console.error("User Fetch Error:", error)
     res.status(401).json({ message: "Invalid token" })
   }
 })
@@ -629,7 +613,6 @@ app.put("/api/users/:id", async (req, res) => {
       phone: updatedUser.phone,
     })
   } catch (error) {
-    console.error("User Update Error:", error)
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({ message: "Invalid token" })
     }
@@ -640,7 +623,6 @@ app.put("/api/users/:id", async (req, res) => {
 // Create order with Cloudinary and email notifications
 app.post("/api/orders", async (req, res) => {
   try {
-    console.log("Incoming Order Data:", req.body)
 
     const { userId, total, deliveryAddress, paymentProof, products } = req.body
 
@@ -657,8 +639,6 @@ app.post("/api/orders", async (req, res) => {
       return res.status(404).json({ message: "User not found" })
     }
 
-    console.log("User found:", user.email)
-
     // Save order to DB
     const order = new Order({
       user: userId,
@@ -670,7 +650,6 @@ app.post("/api/orders", async (req, res) => {
     })
 
     await order.save()
-    console.log("Order saved successfully:", order._id)
 
     // Send email notification to admin
     try {
@@ -750,7 +729,6 @@ app.post("/api/orders", async (req, res) => {
 
       // Send email
       await transporter.sendMail(mailOptions)
-      console.log("Admin notification email sent successfully")
     } catch (emailError) {
       // Log error but don't fail the order process
       console.error("Error sending admin notification email:", emailError)

@@ -20,7 +20,6 @@ export const UserProvider = ({ children }) => {
       try {
         setUser(JSON.parse(storedUser))
       } catch (error) {
-        console.error("Failed to parse user from localStorage:", error)
         localStorage.removeItem("user")
       }
     }
@@ -30,14 +29,12 @@ export const UserProvider = ({ children }) => {
   const fetchUser = async (token) => {
     try {
       setLoading(true)
-
       const response = await axios.get(`${API_BASE_URL}/api/user`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       })
-
       setUser({
         ...response.data,
         id: response.data.id || response.data._id,
@@ -45,9 +42,8 @@ export const UserProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify({
         ...response.data,
         id: response.data.id || response.data._id,
-      })) // Sync user to localStorage
+      }))
     } catch (error) {
-      console.error("Error fetching user:", error.message)
       localStorage.removeItem("token")
       localStorage.removeItem("user")
       setUser(null)
@@ -58,16 +54,12 @@ export const UserProvider = ({ children }) => {
 
   const signup = async (userData) => {
     try {
-      console.log("Sending signup request with data:", userData)
       const response = await axios.post(`${API_BASE_URL}/signup`, userData)
-      console.log("Signup response:", response.data)
-
       return {
         success: true,
         message: response.data.message || "Signup successful! Please check your email to verify your account.",
       }
     } catch (error) {
-      console.error("Signup Error:", error)
       return {
         success: false,
         message: error.response?.data?.message || "Signup failed. Please try again.",
@@ -78,11 +70,7 @@ export const UserProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setLoading(true)
-
-      console.log("Sending login request for:", email)
       const response = await axios.post(`${API_BASE_URL}/login`, { email, password })
-      console.log("Login response:", response.data)
-
       const { token, user } = response.data
 
       localStorage.setItem("token", token)
@@ -91,8 +79,6 @@ export const UserProvider = ({ children }) => {
 
       return { success: true, user }
     } catch (error) {
-      console.error("Login Error:", error)
-
       // Check if this is a verification error
       if (error.response?.status === 401 && error.response?.data?.needsVerification) {
         return {
@@ -139,7 +125,6 @@ export const UserProvider = ({ children }) => {
         user: response.data,
       }
     } catch (error) {
-      console.error("Error updating user:", error)
       return {
         success: false,
         message: error.response?.data?.message || "Failed to update user information",
@@ -158,7 +143,6 @@ const forgotPassword = async (email) => {
         response.data.message || "If your email is registered, you will receive a password reset link shortly.",
     }
   } catch (error) {
-    console.error("Forgot password error:", error)
     return {
       success: false,
       message: error.response?.data?.message || "Failed to process your request. Please try again later.",
@@ -175,7 +159,6 @@ const forgotPassword = async (email) => {
         message: response.data.message || "Password has been reset successfully!",
       }
     } catch (error) {
-      console.error("Reset password error:", error)
       return {
         success: false,
         message: error.response?.data?.message || "Failed to reset password. The link may have expired or is invalid.",

@@ -27,26 +27,13 @@ const ResetPassword = () => {
   const { resetPassword } = useUser();
 
   useEffect(() => {
-    console.log("ResetPassword component mounted");
-    console.log("Current location:", location);
-    
-    // Clear existing token from localStorage
     localStorage.removeItem("passwordResetToken");
-    
-    // Get token from URL search params (query string) - SAME AS VERIFY EMAIL
     const query = new URLSearchParams(location.search);
     const tokenFromQuery = query.get("token");
-    
-    console.log("URL search params:", location.search);
-    console.log("Extracted token:", tokenFromQuery);
-
-    // Check if we have a token in the query string
     if (tokenFromQuery && tokenFromQuery.length > 0) {
-      console.log("Token found in query params:", tokenFromQuery);
       setToken(tokenFromQuery);
       verifyToken(tokenFromQuery);
     } else {
-      // No token in URL, user needs to paste it manually
       setTokenChecked(true);
       setError(
         "Reset token is missing. Please paste the token from your email reset link below."
@@ -60,21 +47,13 @@ const ResetPassword = () => {
       setTokenChecked(true);
       return;
     }
-
     try {
-      console.log("Verifying token:", tokenToVerify);
-      
-      // Make API call SIMILAR TO VERIFY EMAIL
       const response = await axios.get(
         `${API_BASE_URL}/verify-reset-token?token=${tokenToVerify}`
       );
-      
-      console.log("Token verification response:", response);
-
       if (response.data && response.data.valid) {
         setTokenValid(true);
         setError("");
-        // Store valid token for form submission
         localStorage.setItem("passwordResetToken", tokenToVerify);
       } else {
         setError(
@@ -82,14 +61,10 @@ const ResetPassword = () => {
         );
       }
     } catch (error) {
-      console.error("Token verification error:", error);
-      
-      // Handle error cases
-      const errorMessage =
-        error.response?.data?.message || 
-        "Failed to verify reset token. The link may have expired or is invalid.";
-      
-      setError(errorMessage);
+      setError(
+        error.response?.data?.message ||
+          "Failed to verify reset token. The link may have expired or is invalid."
+      );
     } finally {
       setTokenChecked(true);
     }
@@ -99,30 +74,20 @@ const ResetPassword = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
-    // Basic validation
     if (password.length < 6) {
       setError("Password must be at least 6 characters long");
       return;
     }
-
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
     setIsSubmitting(true);
-
     try {
-      console.log("Submitting reset with token:", token);
       const result = await resetPassword(token, password);
-
       if (result.success) {
-        // Clear the token from localStorage on success
         localStorage.removeItem("passwordResetToken");
-
         setSuccess(result.message || "Password has been reset successfully!");
-        // Redirect to login after 3 seconds
         setTimeout(() => {
           navigate("/login?reset=success");
         }, 3000);
@@ -133,7 +98,6 @@ const ResetPassword = () => {
         );
       }
     } catch (error) {
-      console.error("Password reset error:", error);
       setError("An unexpected error occurred. Please try again later.");
     } finally {
       setIsSubmitting(false);

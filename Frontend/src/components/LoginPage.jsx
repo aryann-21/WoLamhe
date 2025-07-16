@@ -72,9 +72,7 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    const backendUrl =
-      import.meta.env.VITE_BACKEND_URL || "https://wolamhe-4.onrender.com";
-    window.location.href = `${backendUrl}/auth/google`;
+    window.location.href = "https://wolamhe-3.onrender.com/auth/google";
   };
 
   return (

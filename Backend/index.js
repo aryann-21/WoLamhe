@@ -32,9 +32,9 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
   })
 }
 
-// CORS configuration - UPDATED to be more permissive
+// CORS configuration - restrict to frontend deployment URL
 app.use(cors({
-  origin: '*',
+  origin: 'https://wolamhe-4.onrender.com',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept'],
   credentials: true,

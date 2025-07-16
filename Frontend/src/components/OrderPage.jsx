@@ -193,7 +193,7 @@ const OrderPage = () => {
       };
 
       const response = await axios.post(
-        "https://www.wolamhe.in/api/orders",
+        "https://wolamhe-3.onrender.com/api/orders",
         orderData,
         {
           headers: {

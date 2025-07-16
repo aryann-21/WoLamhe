@@ -34,7 +34,11 @@ if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && proce
 
 // CORS configuration - restrict to frontend deployment URL
 app.use(cors({
-  origin: 'https://wolamhe-4.onrender.com',
+  origin: [
+    'https://wolamhe-4.onrender.com',  // Your frontend
+    'https://accounts.google.com',     // Google OAuth
+    'https://oauth2.googleapis.com'    // Google OAuth
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'X-Requested-With', 'Accept'],
   credentials: true,
@@ -73,23 +77,34 @@ passport.deserializeUser(async (id, done) => {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://wolamhe-4.onrender.com/auth/google/callback",
+  callbackURL: process.env.GOOGLE_CALLBACK_URL || "https://wolamhe-3.onrender.com/auth/google/callback",
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ googleId: profile.id })
     if (!user) {
-      // Create new user
-      user = new User({
-        name: profile.displayName,
-        email: profile.emails[0].value,
-        googleId: profile.id,
-        isVerified: true,
-        // phone and password can be left blank for Google users
-      })
-      await user.save()
+      // Check if user exists with same email
+      user = await User.findOne({ email: profile.emails[0].value })
+      if (user) {
+        // Link Google account to existing user
+        user.googleId = profile.id
+        user.isVerified = true
+        await user.save()
+      } else {
+        // Create new user
+        user = new User({
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          googleId: profile.id,
+          isVerified: true,
+          phone: '', // Optional for Google users
+          password: '' // Not needed for Google users
+        })
+        await user.save()
+      }
     }
     return done(null, user)
   } catch (err) {
+    console.error('Google OAuth Error:', err)
     return done(err, null)
   }
 }))
@@ -97,14 +112,28 @@ passport.use(new GoogleStrategy({
 // Google OAuth routes
 app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }))
 
-app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "/login" }), (req, res) => {
-  if (!req.user) {
-    return res.status(500).send("No user found after Google OAuth")
+app.get("/auth/google/callback", 
+  passport.authenticate("google", { failureRedirect: "https://wolamhe-4.onrender.com/login?error=oauth_failed" }), 
+  (req, res) => {
+    try {
+      if (!req.user) {
+        return res.redirect("https://wolamhe-4.onrender.com/login?error=no_user")
+      }
+      
+      const token = jwt.sign(
+        { userId: req.user._id }, 
+        process.env.JWT_SECRET || "fallback_secret_key", 
+        { expiresIn: "24h" }
+      )
+      
+      const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
+      res.redirect(`${frontendUrl}/google-auth-success?token=${token}`)
+    } catch (error) {
+      console.error('OAuth callback error:', error)
+      res.redirect("https://wolamhe-4.onrender.com/login?error=oauth_callback_failed")
+    }
   }
-  const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET || "fallback_secret_key", { expiresIn: "1h" })
-  const frontendUrl = process.env.FRONTEND_URL || "https://wolamhe-4.onrender.com"
-  res.redirect(`${frontendUrl}/google-auth-success?token=${token}`)
-})
+)
 
 // Middleware
 app.use(express.json())

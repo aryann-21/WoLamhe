@@ -1,108 +1,131 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import LoginPhoto from "../assets/login.jpg";
-import PasswordIcon from "../assets/password.png";
-import { useUser } from "../context/UserContext";
-import axios from "axios";
-import { Eye, EyeOff } from "lucide-react";
+import { useState, useEffect } from "react"
+import { Link, useNavigate, useLocation } from "react-router-dom"
+import LoginPhoto from "../assets/login.jpg"
+import PasswordIcon from "../assets/password.png"
+import { useUser } from "../context/UserContext"
+import axios from "axios"
+import { Eye, EyeOff } from "lucide-react"
 
-const API_BASE_URL = "https://wolamhe-4.onrender.com";
+const API_BASE_URL = "https://wolamhe-3.onrender.com"
 
 const ResetPassword = () => {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [token, setToken] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [tokenValid, setTokenValid] = useState(false);
-  const [tokenChecked, setTokenChecked] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [token, setToken] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  const [tokenValid, setTokenValid] = useState(false)
+  const [tokenChecked, setTokenChecked] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { resetPassword } = useUser();
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { resetPassword } = useUser()
 
   useEffect(() => {
-    localStorage.removeItem("passwordResetToken");
-    const query = new URLSearchParams(location.search);
-    const tokenFromQuery = query.get("token");
+    console.log("ResetPassword component mounted")
+    console.log("Current location:", location)
+
+    // Clear existing token from localStorage
+    localStorage.removeItem("passwordResetToken")
+
+    // Get token from URL search params (query string) - SAME AS VERIFY EMAIL
+    const query = new URLSearchParams(location.search)
+    const tokenFromQuery = query.get("token")
+
+    console.log("URL search params:", location.search)
+    console.log("Extracted token:", tokenFromQuery)
+
+    // Check if we have a token in the query string
     if (tokenFromQuery && tokenFromQuery.length > 0) {
-      setToken(tokenFromQuery);
-      verifyToken(tokenFromQuery);
+      console.log("Token found in query params:", tokenFromQuery)
+      setToken(tokenFromQuery)
+      verifyToken(tokenFromQuery)
     } else {
-      setTokenChecked(true);
-      setError(
-        "Reset token is missing. Please paste the token from your email reset link below."
-      );
+      // No token in URL, user needs to paste it manually
+      setTokenChecked(true)
     }
-  }, [location]);
+  }, [location])
 
   const verifyToken = async (tokenToVerify) => {
     if (!tokenToVerify) {
-      setError("Invalid token format");
-      setTokenChecked(true);
-      return;
+      setError("Invalid token format")
+      setTokenChecked(true)
+      return
     }
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/verify-reset-token?token=${tokenToVerify}`
-      );
+      console.log("Verifying token:", tokenToVerify)
+
+      // Make API call SIMILAR TO VERIFY EMAIL
+      const response = await axios.get(`${API_BASE_URL}/verify-reset-token?token=${tokenToVerify}`)
+
+      console.log("Token verification response:", response)
+
       if (response.data && response.data.valid) {
-        setTokenValid(true);
-        setError("");
-        localStorage.setItem("passwordResetToken", tokenToVerify);
+        setTokenValid(true)
+        setError("")
+        // Store valid token for form submission
+        localStorage.setItem("passwordResetToken", tokenToVerify)
       } else {
-        setError(
-          "This password reset link is invalid or has expired. Please request a new one."
-        );
+        setError("This password reset link is invalid or has expired. Please request a new one.")
       }
     } catch (error) {
-      setError(
-        error.response?.data?.message ||
-          "Failed to verify reset token. The link may have expired or is invalid."
-      );
+      console.error("Token verification error:", error)
+
+      // Handle error cases
+      const errorMessage =
+        error.response?.data?.message || "Failed to verify reset token. The link may have expired or is invalid."
+
+      setError(errorMessage)
     } finally {
-      setTokenChecked(true);
+      setTokenChecked(true)
     }
-  };
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccess("");
+    e.preventDefault()
+    setError("")
+    setSuccess("")
+
+    // Basic validation
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      return;
+      setError("Password must be at least 6 characters long")
+      return
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
+      setError("Passwords do not match")
+      return
     }
-    setIsSubmitting(true);
+
+    setIsSubmitting(true)
+
     try {
-      const result = await resetPassword(token, password);
+      console.log("Submitting reset with token:", token)
+      const result = await resetPassword(token, password)
+
       if (result.success) {
-        localStorage.removeItem("passwordResetToken");
-        setSuccess(result.message || "Password has been reset successfully!");
+        // Clear the token from localStorage on success
+        localStorage.removeItem("passwordResetToken")
+
+        setSuccess(result.message || "Password has been reset successfully!")
+        // Redirect to login after 3 seconds
         setTimeout(() => {
-          navigate("/login?reset=success");
-        }, 3000);
+          navigate("/login?reset=success")
+        }, 3000)
       } else {
-        setError(
-          result.message ||
-            "Failed to reset password. Please try again or request a new reset link."
-        );
+        setError(result.message || "Failed to reset password. Please try again or request a new reset link.")
       }
     } catch (error) {
-      setError("An unexpected error occurred. Please try again later.");
+      console.error("Password reset error:", error)
+      setError("An unexpected error occurred. Please try again later.")
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   if (!tokenChecked) {
     return (
@@ -112,21 +135,15 @@ const ResetPassword = () => {
           <p className="text-lg">Verifying your reset link...</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="bg-[#faf5f0] flex justify-center p-4 mt-[108px]">
       <div className="flex flex-col md:flex-row bg-[#f6f2ea] rounded-lg overflow-hidden shadow-lg w-full max-w-4xl">
         <div className="w-full md:w-1/2 bg-[#e4ccb4] p-6 flex flex-col items-center justify-start text-center pt-10 md:pt-20">
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-6 md:mb-8 text-black">
-            Reset Password
-          </h2>
-          {error && (
-            <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 w-full max-w-sm">
-              {error}
-            </div>
-          )}
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-6 md:mb-8 text-black">Reset Password</h2>
+          {error && <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 w-full max-w-sm">{error}</div>}
           {success && (
             <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4 w-full max-w-sm">
               {success}
@@ -180,11 +197,7 @@ const ResetPassword = () => {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white focus:outline-none"
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff size={18} />
-                  ) : (
-                    <Eye size={18} />
-                  )}
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
               <button
@@ -198,9 +211,7 @@ const ResetPassword = () => {
           )}
           {!tokenValid && !success && (
             <div className="mt-4 w-full max-w-sm">
-              <p className="text-sm mb-2">
-                Paste the token from your reset email:
-              </p>
+              <p className="text-sm mb-2">Enter your reset token:</p>
               <div className="flex">
                 <input
                   type="text"
@@ -212,31 +223,15 @@ const ResetPassword = () => {
                 <button
                   onClick={() => {
                     if (token && token.length > 10) {
-                      verifyToken(token.trim());
+                      verifyToken(token.trim())
                     } else {
-                      setError("Please enter a valid token");
+                      setError("Please enter a valid token")
                     }
                   }}
                   className="bg-[#65350f] text-white px-4 py-2 rounded-r-full hover:bg-[#875223]"
                 >
                   Verify
                 </button>
-              </div>
-              <p className="text-xs text-gray-600 mt-1">
-                The token is the long string after "token=" in the reset link
-                you received.
-              </p>
-              <div className="mt-4 mb-2">
-                <p className="text-sm font-semibold">How to find your token:</p>
-                <ol className="text-xs text-left mt-1">
-                  <li className="mb-1">
-                    1. Check your email for the password reset link
-                  </li>
-                  <li className="mb-1">
-                    2. Look for a long code in the reset link (after "token=")
-                  </li>
-                  <li className="mb-1">3. Copy that code and paste it above</li>
-                </ol>
               </div>
             </div>
           )}
@@ -253,25 +248,18 @@ const ResetPassword = () => {
           <div className="mt-6">
             <p className="text-sm text-gray-700">
               Remember your password?{" "}
-              <Link
-                to="/login"
-                className="text-[#2E2210] font-semibold underline"
-              >
+              <Link to="/login" className="text-[#2E2210] font-semibold underline">
                 Log In
               </Link>
             </p>
           </div>
         </div>
         <div className="w-full md:w-1/2 h-48 md:h-auto">
-          <img
-            src={LoginPhoto || "/placeholder.svg"}
-            alt="Photographer"
-            className="w-full h-full object-cover"
-          />
+          <img src={LoginPhoto || "/placeholder.svg"} alt="Photographer" className="w-full h-full object-cover" />
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ResetPassword;
+export default ResetPassword

@@ -56,7 +56,9 @@ const SignUpPage = () => {
       })
 
       if (result.success) {
-        setSuccess(result.message || "Registration successful! Please check your email (and spam folder) to verify your account.")
+        setSuccess(
+          "Yay! 🎉 Your email’s on its way! 🚀 Give it a moment, and check your spam folder if it’s playing hide and seek! ✨",
+        )
         // Clear form
         setName("")
         setEmail("")
@@ -87,7 +89,11 @@ const SignUpPage = () => {
 
           {error && <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 w-full max-w-sm">{error}</div>}
 
-          {success && <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4 w-full max-w-sm">{success}</div>}
+          {success && (
+            <div className="bg-green-100 text-green-700 p-3 rounded-lg mb-4 w-full max-w-sm">
+              Yay! 🎉 Your email’s on its way! 🚀 Give it a moment, and check your spam folder if it’s playing hide and seek! ✨
+            </div>
+          )}
 
           <form onSubmit={handleSignUp} className="w-full max-w-sm">
             <div className="mb-3 relative">
@@ -143,8 +149,8 @@ const SignUpPage = () => {
               />
             </div>
             <div className="mb-5 relative">
-              <span className="absolute left-[9px] top-[10px]">
-                <img src={PasswordIcon || "/placeholder.svg"} alt="Confirm Password Icon" className="w-6" />
+              <span className="absolute left-[10px] top-[8px]">
+                <img src={PasswordIcon || "/placeholder.svg"} alt="Confirm Password Icon" className="w-5" />
               </span>
               <input
                 type="password"

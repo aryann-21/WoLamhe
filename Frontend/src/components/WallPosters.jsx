@@ -21,17 +21,19 @@ const WallPosters = forwardRef((props, ref) => {
   }
 
   const handleTouchStart = (e) => {
-    e.preventDefault()
-    setIsTouched(true)
-  }
-
-  const handleTouchEnd = () => {
-    // Keep the overlay visible on mobile after touch
+    // Only toggle if touching the main container, not the overlay
+    if (e.currentTarget === e.target) {
+      e.preventDefault()
+      setIsTouched(!isTouched)
+    }
   }
 
   const handleOverlayTouch = (e) => {
-    // Prevent touch events from propagating to parent elements
-    e.stopPropagation()
+    // Check if the touch is directly on the overlay background (not its children)
+    if (e.target === overlayRef.current) {
+      e.stopPropagation()
+      setIsTouched(false)
+    }
   }
 
   return (
@@ -41,7 +43,6 @@ const WallPosters = forwardRef((props, ref) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
     >
       {/* Title */}
       <div className="absolute right-0 top-0 z-10 p-4">
@@ -65,13 +66,13 @@ const WallPosters = forwardRef((props, ref) => {
       <div
         ref={overlayRef}
         className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col md:flex-row text-white text-lg transition-all duration-700 ease-in-out overflow-y-auto ${
-          isHovered || isTouched ? "opacity-100" : "opacity-0"
+          isHovered || isTouched ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onTouchStart={handleOverlayTouch}
-        onTouchMove={handleOverlayTouch}
-        onTouchEnd={handleOverlayTouch}
-        onClick={(e) => e.stopPropagation()}
       >
+        {/* Close button for mobile */}
+       
+
         {/* Left Section */}
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 min-h-[200px]">
           <img
@@ -109,4 +110,3 @@ const WallPosters = forwardRef((props, ref) => {
 })
 
 export default WallPosters
-

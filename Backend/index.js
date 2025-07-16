@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const multer = require("multer")
 const cloudinary = require("cloudinary").v2
-const User = require("./models/user")
+const User = require("./models/user.js")
 const Order = require("./models/order")
 const Token = require("./models/token")
 const { sendVerificationEmail } = require("./utils/email-service")
@@ -446,16 +446,19 @@ app.post("/forgot-password", async (req, res) => {
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #65350f;">Reset Your Password</h2>
-            <p>You requested a password reset for your Wolamhe account. Click the button below to set a new password:</p>
+            <p>You requested a password reset for your Wolamhe account. Click the button below to reset your password:</p>
             <div style="margin: 30px 0;">
               <a href="${resetUrl}" 
                  style="background-color: #65350f; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
                 Reset Password
               </a>
             </div>
-            <p>If the button doesn't work, you can also copy and paste this link into your browser:</p>
-            <p>${resetUrl}</p>
-            <p>This link will expire in 1 hour.</p>
+            <div style="margin: 20px 0; padding: 15px; background-color: #f5f5f5; border: 1px dashed #ccc; border-radius: 4px;">
+              <p style="font-weight: bold; margin-bottom: 5px;">Your Reset Token:</p>
+              <p style="font-family: monospace; font-size: 14px; background: #fff; padding: 10px; border: 1px solid #ddd; word-break: break-all;">${resetToken}</p>
+            </div>
+            <h3>Copy this token and paste it on the reset password page.</h3>
+            <p>This token will expire in 1 hour.</p>
             <p>If you didn't request a password reset, you can safely ignore this email.</p>
           </div>
         `,
@@ -749,6 +752,83 @@ app.get("/api/orders/:userId", async (req, res) => {
   } catch (error) {
     console.error("Error fetching orders:", error)
     res.status(500).json({ message: "Error fetching orders", error: error.message })
+  }
+})
+
+// Get user's cart
+app.get("/api/cart", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1]
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" })
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key")
+    const user = await User.findById(decoded.userId)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Get cart from user document
+    // If your User model doesn't have a cart field, you'll need to add it
+    // or create a separate Cart model
+    res.json({ items: user.cart || [] })
+  } catch (error) {
+    console.error("Cart Fetch Error:", error)
+    res.status(401).json({ message: "Invalid token" })
+  }
+})
+
+// Update user's cart
+app.post("/api/cart", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1]
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" })
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key")
+    const user = await User.findById(decoded.userId)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Update cart in user document
+    user.cart = req.body.items
+    await user.save()
+
+    res.status(200).json({ message: "Cart updated successfully" })
+  } catch (error) {
+    console.error("Cart Update Error:", error)
+    res.status(500).json({ message: "Error updating cart", error: error.message })
+  }
+})
+
+// Clear user's cart
+app.delete("/api/cart", async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1]
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" })
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret_key")
+    const user = await User.findById(decoded.userId)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    // Clear cart in user document
+    user.cart = []
+    await user.save()
+
+    res.status(200).json({ message: "Cart cleared successfully" })
+  } catch (error) {
+    console.error("Cart Clear Error:", error)
+    res.status(500).json({ message: "Error clearing cart", error: error.message })
   }
 })
 

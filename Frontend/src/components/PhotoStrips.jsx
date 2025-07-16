@@ -16,18 +16,19 @@ const PhotoStrips = forwardRef((props, ref) => {
   }
 
   const handleTouchStart = (e) => {
-    e.preventDefault()
-    setIsTouched(true)
-  }
-
-  const handleTouchEnd = () => {
-    // Keep the overlay visible on mobile after touch
+    // Only toggle if touching the main container, not the overlay
+    if (e.currentTarget === e.target) {
+      e.preventDefault()
+      setIsTouched(!isTouched)
+    }
   }
 
   const handleOverlayTouch = (e) => {
-    // Prevent touch events from propagating to parent elements
-    e.stopPropagation()
-  }
+    if (e.target === overlayRef.current) {
+      setIsTouched(false);
+    }
+  };
+  
 
   return (
     <div
@@ -36,7 +37,6 @@ const PhotoStrips = forwardRef((props, ref) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
     >
       {/* Background Image */}
       <img
@@ -58,15 +58,18 @@ const PhotoStrips = forwardRef((props, ref) => {
 
       {/* Hover/Touch Overlay */}
       <div
-        ref={overlayRef}
-        className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white text-sm transition-all duration-700 ease-in-out overflow-y-auto ${
-          isHovered || isTouched ? "opacity-100" : "opacity-0"
-        }`}
-        onTouchStart={handleOverlayTouch}
-        onTouchMove={handleOverlayTouch}
-        onTouchEnd={handleOverlayTouch}
-        onClick={(e) => e.stopPropagation()}
-      >
+  ref={overlayRef}
+  onTouchStart={handleOverlayTouch}
+  className={`absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white text-sm transition-all duration-700 ease-in-out overflow-y-auto ${
+    isHovered || isTouched ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+  }`}
+>
+  {/* Close button */}
+
+        {/* Close button for mobile */}
+        
+
+
         {/* Content Section */}
         <div className="w-full flex flex-col items-center justify-center p-4 min-h-[300px]">
           <h3 className="text-xl font-bold mb-3 text-center z-40">Photo Strips</h3>

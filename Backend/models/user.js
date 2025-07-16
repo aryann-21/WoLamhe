@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    cart: {
+      type: Array,
+      default: [],
+    },
     googleId: {
       type: String,
       unique: true,
